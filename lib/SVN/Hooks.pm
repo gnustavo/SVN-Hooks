@@ -15,11 +15,11 @@ SVN::Hooks - A framework for implementing Subversion hooks.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12.' . substr(q$Revision$, 10); # bump from 477
+our $VERSION = '0.13.' . substr(q$Revision$, 10); # bump from 477
 
 =head1 SYNOPSIS
 
