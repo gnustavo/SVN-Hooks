@@ -25,37 +25,42 @@ sub has_svn {
 
 our $T;
 
+sub newdir {
+    my $num = 1 + Test::Builder->new()->current_test();
+    my $dir = "$T/$num";
+    mkdir $dir;
+    $dir;
+}
+
 sub do_script {
-    my ($num, $cmd) = @_;
+    my ($dir, $cmd) = @_;
     {
-	open my $script, '>', "$T/script" or die;
+	open my $script, '>', "$dir/script" or die;
 	print $script $cmd;
 	close $script;
-	chmod 0755, "$T/script";
+	chmod 0755, "$dir/script";
     }
 
-    system("$T/script 1>$T/$num.stdout 2>$T/$num.stderr");
+    system("$dir/script 1>$dir/stdout 2>$dir/stderr");
 }
 
 sub work_ok {
     my ($tag, $cmd) = @_;
-    my $num = 1 + Test::Builder->new()->current_test();
-    ok((do_script($num, $cmd) == 0), $tag)
+    ok((do_script(newdir(), $cmd) == 0), $tag)
 	or diag("work_ok command failed.\n");
 }
 
 sub work_nok {
     my ($tag, $error_expect, $cmd) = @_;
-
-    my $num = 1 + Test::Builder->new()->current_test();
-    my $exit = do_script($num, $cmd);
+    my $dir = newdir();
+    my $exit = do_script($dir, $cmd);
     if ($exit == 0) {
 	fail($tag);
 	diag("work_nok command worked but it shouldn't!\n");
 	return;
     }
 
-    my $stderr = `cat $T/$num.stderr`;
+    my $stderr = `cat $dir/stderr`;
 
     if (! ref $error_expect) {
 	ok(index($stderr, $error_expect) >= 0, $tag)
