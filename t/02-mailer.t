@@ -7,6 +7,8 @@ use Test::More;
 
 require "test-functions.pl";
 
+my $io_available = 1;
+
 if (not has_svn()) {
     plan skip_all => 'Need svn commands in the PATH.';
 }
@@ -15,6 +17,10 @@ elsif (not eval {require Email::Send}) {
 }
 elsif (not eval {require Email::Simple::Creator}) {
     plan skip_all => 'Need Email::Simple::Creator';
+}
+elsif (! Email::Send->new()->mailer_available('IO')) {
+    $io_available = 0;
+    plan tests => 7;
 }
 else {
     plan tests => 17;
@@ -80,6 +86,8 @@ EMAIL_COMMIT(match => qr/./, from => 's@a.b');
 EOS
 
 work_nok('commit missing to', "EMAIL_COMMIT: missing 'to' address", work('f'));
+
+exit 0 unless $io_available;
 
 my $log = '02-mailer.log';
 
