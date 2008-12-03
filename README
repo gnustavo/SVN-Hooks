@@ -1,0 +1,76 @@
+Name:    SVN-Hooks
+What:    Framework for Subversion hooks
+Version: 0.12
+Author:  Gustavo Chaves <gnustavo@cpan.org>
+
+SVN-Hooks is a framework for creating Subversion hooks
+(http://svnbook.red-bean.com/nightly/en/svn.reposadmin.create.html#svn.reposadmin.create.hooks).
+
+It comes with a bunch of plugins (actually, sub-modules of SVN::Hooks)
+that implement some of the most used standalone Subversion hooks available
+(http://subversion.tigris.org/tools_contrib.html#hook_scripts), such as
+pre-commit hooks for enforcing:
+
+- the log message format,
+- property settings,
+- the repository structure,
+- restrictions on the modification of repository areas (e.g., /tags)
+- restrictions on filenames, and
+- the integration with ticketing systems.
+
+It also comes with post-commit hooks for
+
+- sending commit emails, and
+- updating configuration files in the server from changes made
+  in the repository.
+
+But as a framework, it can be extended to implement all types of
+hooks.
+
+It can also be very fast for two reasons. First because all calls to
+the svnlook command are cached, and the information gathered with it
+can be reused by all plugins that need it. Second, because it's
+possible to have a single script using SVN::Hooks shared by the hooks
+of several repositories, and the script can be made persistent with
+the use of PersistentPerl (http://daemoninc.com/PersistentPerl/).
+
+Please, read the SVN::Hooks manpage to know how to use it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc SVN::Hooks
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Hooks
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SVN-Hooks
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SVN-Hooks
+
+    Search CPAN
+        http://search.cpan.org/dist/SVN-Hooks
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 CPqD (http://www.cpqd.com.br/)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
