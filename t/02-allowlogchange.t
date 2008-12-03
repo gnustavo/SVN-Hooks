@@ -48,8 +48,10 @@ work_nok('cannot delete' => 'ALLOW_LOG_CHANGE: a revision log can only be modifi
 svn pd svn:log --revprop -r 1 $repo
 EOS
 
+my $username = getpwuid($<);
+
 set_conf(<<"EOS");
-ALLOW_LOG_CHANGE('x$ENV{USER}');
+ALLOW_LOG_CHANGE('x$username');
 EOS
 
 work_nok('deny user' => 'ALLOW_LOG_CHANGE: you are not allowed to change a revision log.', <<"EOS");
@@ -57,7 +59,7 @@ svn ps svn:log --revprop -r 1 value $repo
 EOS
 
 set_conf(<<"EOS");
-ALLOW_LOG_CHANGE($ENV{USER});
+ALLOW_LOG_CHANGE($username);
 EOS
 
 work_ok('can modify', <<"EOS");
