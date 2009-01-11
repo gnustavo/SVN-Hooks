@@ -79,7 +79,7 @@ JIRA_LOG_MATCH(qr/^\[([^\]]+)\]/, 'help');
 JIRA_ACCEPTANCE(qr/./ => '*');
 EOS
 
-work_nok('no keys', 'Could not extract JIRA references from the log message below', work('no keys'));
+work_nok('no keys', 'Could not extract JIRA references from the log message', work('no keys'));
 
 set_conf(<<'EOS');
 JIRA_CONFIG('http://no.way.to.get.here', 'user', 'pass');

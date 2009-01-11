@@ -166,8 +166,7 @@ sub pre_commit {
 	    else {
 		chomp $jira_refs;
 		die <<"EOS";
-JIRA_ACCEPTANCE: Could not extract JIRA references from the log message below:
-$jira_refs
+JIRA_ACCEPTANCE: Could not extract JIRA references from the log message.
 $self->{log}{help}
 EOS
 	    }
@@ -196,9 +195,6 @@ EOS
 	    or die <<"EOS";
 JIRA_ACCEPTANCE: JIRA rejected this log with the following message:
 $comment
-JIRA_ACCEPTANCE: The references that were passed to JIRA were the following:
-$jira_refs
-$self->{log}{help}
 EOS
     }
 }
