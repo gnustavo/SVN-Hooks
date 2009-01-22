@@ -12,7 +12,6 @@ lib/SVN/Hooks/JiraAcceptance.pm
 lib/SVN/Hooks/Mailer.pm
 lib/SVN/Hooks/Notify.pm
 lib/SVN/Hooks/UpdateConfFile.pm
-LICENSE
 Makefile.PL
 MANIFEST
 META.yml
