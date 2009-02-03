@@ -189,6 +189,9 @@ EOS
 	    die "JIRA_ACCEPTANCE: Unable to connect to the JIRA server at \"$jira->{baseURL}/rpc/xmlrpc\": $@.\n"
 	    if $@;
 
+	# This can happen if there's an error in the JIRA plugin
+	$result = 'false|JIRA internal error' unless defined $result;
+
 	my ($acceptance, $comment) = split '\|', $result;
 
 	$acceptance eq 'true'
