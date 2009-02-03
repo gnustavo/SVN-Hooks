@@ -31,3 +31,6 @@
 
 * Allow for the configuration directives to be specified in the hook
    script, to make it simpler in the simple cases.
+
+* Implement a clone of
+   http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py

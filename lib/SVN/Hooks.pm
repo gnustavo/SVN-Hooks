@@ -19,7 +19,7 @@ Version 0.13
 
 =cut
 
-our $VERSION = '0.13.' . substr(q$Revision$, 10); # bump from 11
+our $VERSION = '0.13.' . substr(q$Revision$, 10); # bump from 12
 
 =head1 SYNOPSIS
 
