@@ -74,7 +74,8 @@ set_conf(<<'EOS');
 UPDATE_CONF_FILE(file => 'file');
 
 sub validate {
-    my ($text) = @_;
+    my ($text, $file) = @_;
+    die "undefined second argument" unless defined $file;
     if ($text =~ /abort/) {
 	die "Aborting!"
     }
@@ -87,8 +88,9 @@ UPDATE_CONF_FILE(validate  => 'validate',
                  validator => \&validate);
 
 sub generate {
-    my ($text) = @_;
-    return "[$text]\n";
+    my ($text, $file) = @_;
+    die "undefined second argument" unless defined $file;
+    return "[$file, $text]\n";
 }
 
 UPDATE_CONF_FILE(generate  => 'generate',
@@ -117,7 +119,7 @@ echo asdf >$t/wc/generate
 svn add -q --no-auto-props $t/wc/generate
 svn ci -mx $t/wc/generate
 cat >$t/wc/generated <<'EOSS'
-[asdf
+[generate, asdf
 ]
 EOSS
 cmp $t/wc/generated $t/repo/conf/generate

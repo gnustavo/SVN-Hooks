@@ -50,11 +50,36 @@ strings that will be passed to the shell) that will check the contents
 of FROM in the pre-commit hook to see if it's valid. If there is no
 validator, the contents are considered valid.
 
+The function receives two string arguments: the contents of FROM and
+the relative path to FROM.
+
+The command is called with two arguments: the path to a temporary copy
+of FROM and the relative path to FROM.
+
 =item generator => ARRAY or CODE
 
-A generator is a function or a command that will transform the
+A generator is a function or a command (specified by an array of
+strings that will be passed to the shell) that will transform the
 contents of FROM in the post-commit hook before copying it to TO. If
 there is no generator, the contents are copied as is.
+
+The function receives two string arguments: the contents of FROM and
+the relative path to FROM.
+
+The command is called with two arguments: the path to a temporary copy
+of FROM and the relative path to FROM.
+
+=item actuator => ARRAY or CODE
+
+An actuator is a function or a command (specified by an array of
+strings that will be passed to the shell) that will be invoked after a
+succesful commit of FROM in the post-commit hook.
+
+The function receives two string arguments: the contents of FROM and
+the relative path to FROM.
+
+The command is called with two arguments: the path to a temporary copy
+of FROM and the relative path to FROM.
 
 =item rotate => NUMBER
 
@@ -70,12 +95,17 @@ commit a wrong authz file that denies any subsequent commit.
 	    'conf/authz' => 'authz',
 	    validator 	 => ['/usr/local/bin/svnauthcheck'],
 	    generator 	 => ['/usr/local/bin/authz-expand-includes'],
+            actuator     => ['/usr/local/bin/notify-auth-change'],
 	    rotate       => 2,
 	);
 
 	UPDATE_CONF_FILE(
 	    'conf/svn-hooks.conf' => 'svn-hooks.conf',
-	    validator 	 => ['/usr/bin/perl', '-c'],
+	    validator 	 => [qw(/usr/bin/perl -c)],
+            actuator     => sub {
+                                my ($contents, $file) = @_;
+                                die "Can't use Gustavo here." if $contents =~ /gustavo/;
+                            },
 	    rotate       => 2,
 	);
 
@@ -106,7 +136,7 @@ sub UPDATE_CONF_FILE {
 
     my %args = @args;
 
-    for my $name (qw/validator generator/) {
+    for my $name (qw/validator generator actuator/) {
 	if (my $what = delete $args{$name}) {
 	    if (ref $what eq 'CODE') {
 		$conf->{confs}{$from}{$name} = $what;
@@ -154,12 +184,12 @@ sub pre_commit {
 		my $text = $svnlook->cat($from);
 
 		if (my $generator = $conf->{generator}) {
-		    $text = eval { $generator->($text) };
+		    $text = eval { $generator->($text, $file) };
 		    defined $text
 			or die "$HOOK: Generator aborted for: $file\n", $@, "\n";
 		}
 
-		my $validation = eval { $validator->($text) };
+		my $validation = eval { $validator->($text, $file) };
 		defined $validation
 		    or die "$HOOK: Validator aborted for: $file\n", $@, "\n";
 
@@ -178,9 +208,8 @@ sub post_commit {
 	    my $text = $svnlook->cat($from);
 
 	    if (my $generator = $conf->{generator}) {
-		$text = eval { $generator->($text) };
-		defined $text
-		    or die <<"EOS";
+		$text = eval { $generator->($text, $file) };
+		defined $text or die <<"EOS";
 $HOOK: Generator aborted for: $file
 
 This means that $file was commited but the associated
@@ -202,6 +231,27 @@ EOS
 		or die "$HOOK: Can't open file \"$to\" for writing: $!\n";
 	    print $fd $text;
 	    close $fd;
+
+	    if (my $actuator = $conf->{actuator}) {
+		my $rc = eval { $actuator->($text, $file) };
+		defined $rc or die <<"EOS";
+$HOOK: Actuator aborted for: $file
+
+This means that $file was commited and the associated
+configuration file was updated in the server:
+
+  $conf->{to}
+
+But the actuator command that was called after the succesful commit
+didn't work right.
+
+Please, investigate the problem.
+
+Any error message produced by the actuator appears below:
+
+$@
+EOS
+	    }
 
 	    if (my $rotate = $conf->{rotate}) {
 		for (my $i=$rotate-1; $i >= 0; --$i) {
@@ -226,7 +276,7 @@ sub _functor {
     my $cmd = join(' ', @$cmdlist);
 
     return sub {
-	my ($text) = @_;
+	my ($text, $path) = @_;
 
 	my $temp = tempdir('UpdateConfFile.XXXXXX', TMPDIR => 1, CLEANUP => 1);
 
@@ -236,7 +286,7 @@ sub _functor {
 	close $th;
 
 	$ENV{SVNREPOPATH} = $repo_path;
-	if (system("$cmd $temp/file 1>$temp/output 2>$temp/error") == 0) {
+	if (system("$cmd $path $temp/file 1>$temp/output 2>$temp/error") == 0) {
 	    return `cat $temp/output`;
 	}
 	else {
