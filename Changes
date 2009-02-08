@@ -1,5 +1,22 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.14    2009-02-08
+
+	JiraAcceptance: don't replay the user's log in the error
+	message.
+
+	Removed LICENSE file because it was inconsistent with the
+	licensing information in META.yml.
+
+	UpdateConfFile:
+	- It accepts an 'actuator' function to be executed in the
+	post-commit hook after a succesful commit.
+	- All functions (validator, generator, and actuator) receive
+	the same two parameters: the file contents and the file
+	relative path in the repository.
+	- The files to be updated can be specified via Regexps and
+	they can be copied to subdirectories of /repo/conf.
+
 0.13	2008-12-03
 
 	Moving code to http://code.google.com/p/svn-hooks/.
