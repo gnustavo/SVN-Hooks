@@ -332,7 +332,7 @@ sub _functor {
 	close $th;
 
 	$ENV{SVNREPOPATH} = $repo_path;
-	if (system("$cmd $path $temp/file 1>$temp/output 2>$temp/error") == 0) {
+	if (system("$cmd $temp/file 1>$temp/output 2>$temp/error") == 0) {
 	    return `cat $temp/output`;
 	}
 	else {
