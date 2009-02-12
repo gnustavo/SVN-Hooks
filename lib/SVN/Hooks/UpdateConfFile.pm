@@ -47,6 +47,11 @@ TO is a path relative to the C</repo/conf> directory in the server. It
 can be an explicit file name or a directory, in which case the
 basename of FROM is used as the name of the destination file.
 
+If FROM is a qr/Regexp/ TO is evaluated as a string in order to allow
+for the interpolation of capture buffers from the regular
+expression. This is useful to map the copy operation to a diferent
+directory structure, for example.
+
 The optional @ARGS must be a sequence of pairs like these:
 
 =over
@@ -118,7 +123,7 @@ commit a wrong authz file that denies any subsequent commit.
 	);
 
 	UPDATE_CONF_FILE(
-	    qr:/file(\n+)$:' => 'conf_subdir',
+	    qr:/file(\n+)$:' => 'subdir/$1/file',
 	    rotate       => 2,
 	);
 
@@ -227,14 +232,16 @@ sub post_commit {
     foreach my $conf (@{$self->{confs}}) {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
+	    my $to = $conf->{to};
 	    if (! ref $from) {
 		next if $file ne $from;
 	    }
 	    else {
 		next if $file !~ $from;
+		$to = eval qq{"$to"}; # interpolate backreferences
 	    }
 
-	    my $to = abs_path(catfile($SVN::Hooks::Repo->{repo_path}, 'conf', $conf->{to}));
+	    $to = abs_path(catfile($SVN::Hooks::Repo->{repo_path}, 'conf', $to));
 	    if (-d $to) {
 		$to = catfile($to, (File::Spec->splitpath($file))[2]);
 	    }

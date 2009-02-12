@@ -8,7 +8,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (has_svn()) {
-    plan tests => 12;
+    plan tests => 13;
 }
 else {
     plan skip_all => 'Need svn commands in the PATH.';
@@ -126,7 +126,9 @@ cmp $t/wc/generated $t/repo/conf/generate
 EOS
 
 set_conf(<<'EOS');
-UPDATE_CONF_FILE(qr/^file(\d)$/ => 'dir');
+UPDATE_CONF_FILE(subfile => 'subdir');
+
+UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
 
 sub actuate {
     my ($text, $file) = @_;
@@ -140,13 +142,20 @@ UPDATE_CONF_FILE(actuate  => 'actuate',
                  actuator => \&actuate);
 EOS
 
-mkdir "$t/repo/conf/dir";
+mkdir "$t/repo/conf/subdir";
+
+work_ok('to subdir', <<"EOS");
+echo asdf >$t/wc/subfile
+svn add -q --no-auto-props $t/wc/subfile
+svn ci -mx $t/wc/subfile
+cmp $t/wc/subfile $t/repo/conf/subdir/subfile
+EOS
 
 work_ok('regexp', <<"EOS");
 echo asdf >$t/wc/file1
 svn add -q --no-auto-props $t/wc/file1
 svn ci -mx $t/wc/file1
-cmp $t/wc/file1 $t/repo/conf/dir/file1
+cmp $t/wc/file1 $t/repo/conf/1-file
 EOS
 
 work_ok('actuate', <<"EOS");

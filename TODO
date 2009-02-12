@@ -34,9 +34,3 @@
 
 * Implement a clone of
    http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
-
-* The UPDATE_CONF_FILE directive should accept a regexp as its first argument.
-
-* The UPDATE_CONF_FILE directive second argument shouldn't be
-   restricted to a basename, but it could be a relative PATH based on
-   the <repo>/conf directory.
