@@ -46,8 +46,9 @@ sub do_script {
 
 sub work_ok {
     my ($tag, $cmd) = @_;
-    ok((do_script(newdir(), $cmd) == 0), $tag)
-	or diag("work_ok command failed.\n");
+    my $dir = newdir();
+    ok((do_script($dir, $cmd) == 0), $tag)
+	or diag("work_ok command failed with following stderr:\n", `cat $dir/stderr`);
 }
 
 sub work_nok {
