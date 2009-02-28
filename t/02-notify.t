@@ -7,11 +7,14 @@ use Test::More;
 
 require "test-functions.pl";
 
-if (eval {require SVN::Notify}) {
-    plan tests => 1;
+if (not has_svn()) {
+    plan skip_all => 'Need svn commands in the PATH.';
+}
+elsif (! eval {require SVN::Notify}) {
+    plan skip_all => 'Need SVN::Notify.';
 }
 else {
-    plan skip_all => 'Need SVN::Notify.';
+    plan tests => 1;
 }
 
 my $t = reset_repo();

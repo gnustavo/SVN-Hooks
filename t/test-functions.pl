@@ -22,7 +22,6 @@ sub has_svn {
     return 1;
 }
 
-
 our $T;
 
 sub newdir {
