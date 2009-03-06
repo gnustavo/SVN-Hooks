@@ -83,6 +83,13 @@ sub set_hook {
 #!$^X
 use strict;
 use warnings;
+EOS
+    if (defined $ENV{PERL5LIB}) {
+	print $fd <<"EOS";
+BEGIN {\$ENV{PERL5LIB}='$ENV{PERL5LIB}'}
+EOS
+    }
+    print $fd <<"EOS";
 use lib 'blib/lib';
 use SVN::Hooks;
 EOS
