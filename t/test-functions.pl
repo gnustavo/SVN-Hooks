@@ -85,9 +85,9 @@ use strict;
 use warnings;
 EOS
     if (defined $ENV{PERL5LIB}) {
-	print $fd <<"EOS";
-BEGIN {\$ENV{PERL5LIB}='$ENV{PERL5LIB}'}
-EOS
+	foreach my $path (reverse split /:/, $ENV{PERL5LIB}) {
+	    print $fd "use lib '$path';\n";
+	}
     }
     print $fd <<"EOS";
 use lib 'blib/lib';
