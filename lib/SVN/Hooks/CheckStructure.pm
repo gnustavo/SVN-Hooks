@@ -214,7 +214,7 @@ sub _check_structure {
 SVN::Hooks::CheckStructure exports a function to allow for the
 verification of path structures outside the context of a Subversion
 hook. (It would probably be better to take this function to its own
-module and use that module here.)
+module and use that module here. We'll take care of that eventually.)
 
 The function check_structure takes two arguments. The first is a
 STRUCT_DEF exactly the same as specified for the CHECK_STRUCTURE
@@ -224,13 +224,19 @@ against the STRUCT_DEF.
 The function returns true if the check succeeds and dies with a proper
 message otherwise.
 
+The funcion is intended to check paths as they're shown by the 'svn
+ls' command, i.e., with no leading slashes and with a trailing slash
+to indicate directories. The leading slash is assumed if it's missing,
+but the trailing slash is needed to indicate directories.
+
 =cut
 
 sub check_structure {
     my ($structure, $path) = @_;
+    $path = "/$path" unless $path =~ m@^/@; # make sure it's an absolute path
     my @path = split '/', $path, -1; # preserve trailing empty components
     my ($code, $error) = _check_structure($structure, \@path);
-    die "$path: $error\n" if $code == 0;
+    die "$error: $path\n" if $code == 0;
     1;
 }
 
@@ -298,7 +304,7 @@ L<http://search.cpan.org/dist/SVN-Hooks>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 CPqD, all rights reserved.
+Copyright 2008-2009 CPqD, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
