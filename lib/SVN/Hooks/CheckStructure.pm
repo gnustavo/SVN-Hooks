@@ -143,51 +143,38 @@ $SVN::Hooks::Inits{$HOOK} = sub {
 sub _check_structure {
     my ($structure, $path) = @_;
 
-    my $component = shift @$path;
+    @$path > 0 or die "Can't happen!";
 
-    if (! defined $structure) {
-	return (1);
-    }
-    elsif (! ref $structure) {
+    if (! ref $structure) {
 	if ($structure eq 'DIR') {
-	    if (defined $component) {
-		return (1);
-	    }
-	    else {
-		return (0, "a FILE should be a DIRECTORY in");
-	    }
+	    return (1) if @$path > 1;
+	    return (0, "the component ($path->[0]) should be a DIR in");
 	}
 	elsif ($structure eq 'FILE') {
-	    if (defined $component) {
-		return (0, "a DIRECTORY should be a FILE in");
-	    }
-	    else {
-		return (1);
-	    }
+	    return (0, "the component ($path->[0]) should be a FILE in") if @$path > 1;
+	    return (1);
 	}
 	elsif ($structure =~ /^\d+$/) {
-	    if ($structure) {
-		return (1);
-	    }
-	    else {
-		return (0, "invalid path");
-	    }
+	    return (1) if $structure;
+	    return (0, "invalid path");
 	}
 	else {
 	    return (0, "syntax error: unknown string spec ($structure), while checking");
 	}
     }
     elsif (ref $structure eq 'ARRAY') {
-	if (scalar(@$path) == 0 && $component eq '') {
-	    return (1);
-	}
-	if (scalar(@$structure) % 2 != 0) {
-	    return (0, "syntax error: odd number of elements in the structure spec, while checking")
-	}
+	return (0, "syntax error: odd number of elements in the structure spec, while checking")
+	    unless scalar(@$structure) % 2 == 0;
+	return (0, "the component ($path->[0]) should be a DIR in")
+	    unless @$path > 1;
+	shift @$path;
+	# Return ok if the directory doesn't have subcomponents.
+	return (1) if @$path == 1 && length($path->[0]) == 0;
+
 	for (my $s=0; $s<$#$structure; $s+=2) {
 	    my ($lhs, $rhs) = @{$structure}[$s, $s+1];
 	    if (! ref $lhs) {
-		if ($lhs eq $component) {
+		if ($lhs eq $path->[0]) {
 		    return _check_structure($rhs, $path);
 		}
 		elsif ($lhs =~ /^\d+$/) {
@@ -203,7 +190,7 @@ sub _check_structure {
 		}
 	    }
 	    elsif (ref $lhs eq 'Regexp') {
-		if ($component =~ $lhs) {
+		if ($path->[0] =~ $lhs) {
 		    return _check_structure($rhs, $path);
 		}
 	    }
@@ -212,7 +199,7 @@ sub _check_structure {
 		return (0, "syntax error: the left hand side of arrays in the structure spec must be scalars or qr/Regexes/, not $what, while checking");
 	    }
 	}
-	return (0, "the component ($component) is not allowed in");
+	return (0, "the component ($path->[0]) is not allowed in");
     }
     else {
 	my $what = ref $structure;
@@ -226,7 +213,12 @@ sub pre_commit {
     my @errors;
 
     foreach my $added ($svnlook->added()) {
-	my @added = split '/', $added, -1; # preserve trailing empty components
+	# Split the $added path in its components. We prefix $added
+	# with a slash to make it look like an absolute path for
+	# _check_structure. The '-1' is to preserve trailing empty
+	# components so that we can differentiate directory paths from
+	# file paths.
+	my @added = split '/', "/$added", -1;
 	my ($code, $error) = _check_structure($self->{structure}, \@added);
 	push @errors, "$error: $added" if $code == 0;
     }

@@ -59,7 +59,7 @@ svn add -q --no-auto-props $t/wc/allow
 svn ci -mx $t/wc/allow
 EOS
 
-work_nok('is not file', 'a DIRECTORY should be a FILE in', <<"EOS");
+work_nok('is not file', 'the component (file) should be a FILE in', <<"EOS");
 mkdir $t/wc/file
 svn add -q --no-auto-props $t/wc/file
 svn ci -mx $t/wc/file
@@ -72,7 +72,7 @@ svn add -q --no-auto-props $t/wc/file
 svn ci -mx $t/wc/file
 EOS
 
-work_nok('is not dir', 'a FILE should be a DIRECTORY in', <<"EOS");
+work_nok('is not dir', 'the component (dir) should be a DIR in', <<"EOS");
 touch $t/wc/dir
 svn add -q --no-auto-props $t/wc/dir
 svn ci -mx $t/wc/dir
@@ -110,7 +110,7 @@ svn add -q --no-auto-props $t/wc/preregexsuf/no
 svn ci -mx $t/wc/preregexsuf/no
 EOS
 
-work_nok('deny else', 'a FILE should be a DIRECTORY in', <<"EOS");
+work_nok('deny else', 'the component (else) should be a DIR in', <<"EOS");
 touch $t/wc/else
 svn add -q --no-auto-props $t/wc/else
 svn ci -mx $t/wc/else
