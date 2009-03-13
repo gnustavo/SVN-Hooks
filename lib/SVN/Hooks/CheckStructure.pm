@@ -6,7 +6,7 @@ use SVN::Hooks;
 
 use Exporter qw/import/;
 my $HOOK = 'CHECK_STRUCTURE';
-our @EXPORT = ($HOOK);
+our @EXPORT = ($HOOK, 'check_structure');
 
 our $VERSION = $SVN::Hooks::VERSION;
 
@@ -205,6 +205,33 @@ sub _check_structure {
 	my $what = ref $structure;
 	return (0, "syntax error: invalid reference to a $what in the structure spec, while checking");
     }
+}
+
+=head1 EXPORT
+
+=head2 check_structure(STRUCT_DEF, PATH)
+
+SVN::Hooks::CheckStructure exports a function to allow for the
+verification of path structures outside the context of a Subversion
+hook. (It would probably be better to take this function to its own
+module and use that module here.)
+
+The function check_structure takes two arguments. The first is a
+STRUCT_DEF exactly the same as specified for the CHECK_STRUCTURE
+directive above. The second is a PATH to a file which will be checked
+against the STRUCT_DEF.
+
+The function returns true if the check succeeds and dies with a proper
+message otherwise.
+
+=cut
+
+sub check_structure {
+    my ($structure, $path) = @_;
+    my @path = split '/', $path, -1; # preserve trailing empty components
+    my ($code, $error) = _check_structure($structure, \@path);
+    die "$path: $error\n" if $code == 0;
+    1;
 }
 
 sub pre_commit {
