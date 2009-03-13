@@ -1,4 +1,14 @@
-Revision history for SVN-Look. -*- text -*-
+Revision history for SVN-Hooks. -*- text -*-
+
+0.15    2009-03-12
+
+	Corrects a nasty bug in CheckStructure.
+
+	Corrects some problems with the test scripts that prevented
+	them to work right in some environments.
+
+	Implements the function
+	SVN::Hooks::CheckStructure::check_structure.
 
 0.14    2009-02-08
 

@@ -22,6 +22,7 @@ t/02-checklog.t
 t/02-checkmimetypes.t
 t/02-checkproperty.t
 t/02-checkstructure.t
+t/02-checkstructurealone.t
 t/02-denychanges.t
 t/02-denyfilenames.t
 t/02-jiraacceptance.t

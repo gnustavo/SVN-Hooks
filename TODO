@@ -34,3 +34,5 @@
 
 * Implement a clone of
    http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
+
+* Make each plugin an object factory.
