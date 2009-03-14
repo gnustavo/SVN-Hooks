@@ -19,7 +19,11 @@ Version 0.15
 
 =cut
 
-our $VERSION = '0.15.' . (q$Revision$ =~ / (\d+) /)[0]; # bump from 38
+# A routine to construct the version string for this module and its
+# submodules.
+sub version_of { sprintf '0.2%03d', $_[0] =~ /\d+/g }
+
+our $VERSION = version_of(q$Revision$);
 
 =head1 SYNOPSIS
 

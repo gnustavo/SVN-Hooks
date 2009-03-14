@@ -11,7 +11,7 @@ use Exporter qw/import/;
 my $HOOK = 'MAILER';
 our @EXPORT = qw/EMAIL_CONFIG EMAIL_COMMIT/;
 
-our $VERSION = 0.11;
+our $VERSION = SVN::Hooks::version_of(q$Revision$);
 
 =head1 NAME
 

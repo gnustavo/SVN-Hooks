@@ -11,7 +11,7 @@ use Exporter qw/import/;
 my $HOOK = 'NOTIFY';
 our @EXPORT = qw/NOTIFY_DEFAULTS NOTIFY/;
 
-our $VERSION = $SVN::Hooks::VERSION;
+our $VERSION = SVN::Hooks::version_of(q$Revision$);
 
 =head1 NAME
 
