@@ -1,9 +1,5 @@
 Revision history for SVN-Hooks. -*- text -*-
 
-0.2	2009-03-13
-
-	Change the $VERSION numbering scheme.
-
 0.15    2009-03-12
 
 	Corrects a nasty bug in CheckStructure.

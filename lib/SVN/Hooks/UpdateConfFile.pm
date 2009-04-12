@@ -12,7 +12,7 @@ use Exporter qw/import/;
 my $HOOK = 'UPDATE_CONF_FILE';
 our @EXPORT = ($HOOK);
 
-our $VERSION = SVN::Hooks::version_of(q$Revision$);
+our $VERSION = $SVN::Hooks::VERSION;
 
 =head1 NAME
 

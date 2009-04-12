@@ -9,7 +9,7 @@ use Exporter qw/import/;
 my $HOOK = 'JIRA';
 our @EXPORT = qw/JIRA_CONFIG JIRA_LOG_MATCH JIRA_ACCEPTANCE/;
 
-our $VERSION = SVN::Hooks::version_of(q$Revision$);
+our $VERSION = $SVN::Hooks::VERSION;
 
 =head1 NAME
 

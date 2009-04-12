@@ -8,7 +8,7 @@ use Exporter qw/import/;
 my $HOOK = 'CHECK_PROPERTY';
 our @EXPORT = ($HOOK);
 
-our $VERSION = SVN::Hooks::version_of(q$Revision$);
+our $VERSION = $SVN::Hooks::VERSION;
 
 =head1 NAME
 

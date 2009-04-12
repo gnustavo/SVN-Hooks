@@ -9,7 +9,7 @@ my $HOOK = 'DENY_CHANGES';
 my @HOOKS = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE');
 our @EXPORT = @HOOKS;
 
-our $VERSION = SVN::Hooks::version_of(q$Revision$);
+our $VERSION = $SVN::Hooks::VERSION;
 
 =head1 NAME
 
