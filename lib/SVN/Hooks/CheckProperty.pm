@@ -34,8 +34,30 @@ comply to this rule.
 The PROPERTY argument is the name of the property that must be set for
 the files matching WHERE.
 
-The VALUE argument is an optional STRING. Use it to require a specific
-value for PROPERTY.
+The optional VALUE argument specifies the value for PROPERTY depending
+on its type:
+
+=over
+
+=item UNDEF or not present
+
+The PROPERTY must be set.
+
+=item NUMBER
+
+If non-zero, the PROPERTY must be set. If zero, the PROPERTY must NOT be set.
+
+=item STRING
+
+The PROPERTY must be set with a value equal to the string.
+
+=item qr/Regexp/
+
+The PROPERTY must be set with a value that matches the Regexp.
+
+=back
+
+Example:
 
 	CHECK_PROPERTY(qr/\.(?:do[ct]|od[bcfgimpst]|ot[ghpst]|pp[st]|xl[bst])$/i
 	       => 'svn:needs-lock');
