@@ -19,6 +19,8 @@ SVN::Hooks::AllowLogChange - Allow changes in revision log messages.
 This SVN::Hooks plugin is used to allow revision log changes by some
 users.
 
+It's deprecated. You should use SVN::Hooks::AllowPropChange instead.
+
 It's active in the C<pre-revprop-change> hook.
 
 It's configured by the following directive.
