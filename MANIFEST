@@ -2,6 +2,7 @@
 Changes
 lib/SVN/Hooks.pm
 lib/SVN/Hooks/AllowLogChange.pm
+lib/SVN/Hooks/AllowPropChange.pm
 lib/SVN/Hooks/CheckLog.pm
 lib/SVN/Hooks/CheckMimeTypes.pm
 lib/SVN/Hooks/CheckProperty.pm
