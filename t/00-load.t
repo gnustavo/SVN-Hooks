@@ -15,14 +15,17 @@ else {
 my $t = reset_repo();
 
 set_hook(<<'EOS');
-use SVN::Hooks::CheckMimeTypes;
-use SVN::Hooks::DenyChanges;
+use SVN::Hooks::AllowLogChange;
+use SVN::Hooks::AllowPropChange;
+use SVN::Hooks::CheckLog;
 use SVN::Hooks::CheckMimeTypes;
 use SVN::Hooks::CheckProperty;
 use SVN::Hooks::CheckStructure;
+use SVN::Hooks::DenyChanges;
 use SVN::Hooks::DenyFilenames;
 use SVN::Hooks::JiraAcceptance;
 use SVN::Hooks::Mailer;
+use SVN::Hooks::Notify;
 use SVN::Hooks::UpdateConfFile;
 EOS
 
