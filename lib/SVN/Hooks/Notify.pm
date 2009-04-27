@@ -144,7 +144,7 @@ L<http://search.cpan.org/dist/SVN-Hooks>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 CPqD, all rights reserved.
+Copyright 2008-2009 CPqD, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

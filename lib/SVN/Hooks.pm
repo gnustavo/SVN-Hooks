@@ -15,11 +15,11 @@ SVN::Hooks - A framework for implementing Subversion hooks.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16.' . (q$Revision$ =~ / (\d+) /)[0]; # bump from 48
+our $VERSION = '0.17.' . (q$Revision$ =~ / (\d+) /)[0]; # bump from 52
 
 =head1 SYNOPSIS
 
@@ -430,7 +430,7 @@ L<http://search.cpan.org/dist/SVN-Hooks>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 CPqD, all rights reserved.
+Copyright 2008-2009 CPqD, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
