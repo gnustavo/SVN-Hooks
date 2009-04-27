@@ -1,5 +1,11 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.17    2009-04-26
+
+	Implements the CheckJira plugin and deprecates JiraAcceptance.
+
+	Make Makefile.PL know about online tests.
+
 0.16    2009-04-12
 
 	Implements the AllowPropChange plugin.

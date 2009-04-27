@@ -53,6 +53,7 @@ WriteMakefile(
 	'SVN::Notify'   => 0,
         'Test::More'    => 0,
 	'XMLRPC::Lite'  => 0,
+	'JIRA::Client'  => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'SVN-Hooks-*' },
