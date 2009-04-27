@@ -17,8 +17,11 @@ SVN::Hooks::JiraAcceptance - Integrate Subversion with the JIRA ticketing system
 
 =head1 SYNOPSIS
 
-This SVN::Hooks plugin was derived from version 1.3 of the L<JIRA
-Commit Acceptance
+This SVN::Hooks plugin is deprecated. Please, consider using the
+SVN::Hooks::CheckJira plugin instead.
+
+This plugin was derived from version 1.3 of the L<JIRA Commit
+Acceptance
 Plugin|http://svn.atlassian.com/svn/public/contrib/jira/jira-commitacceptance-plugin/jars/jira-commitacceptance-plugin-1.3-client-scripts.zip>
 by ferenc.kiss@midori.hu.
 
