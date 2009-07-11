@@ -199,10 +199,10 @@ sub pre_commit {
 	    my $from = $conf->{from};
 	    for my $file ($svnlook->added(), $svnlook->updated()) {
 		if (! ref $from) {
-		    next if $from ne $file;
+		    next if $file ne $from;
 		}
 		else {
-		    next if $from !~ $file;
+		    next if $file !~ $from;
 		}
 
 		my $text = $svnlook->cat($file);
