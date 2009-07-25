@@ -2,7 +2,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 name: SVN-Hooks
 abstract: Framework for implementing Subversion hooks.
-version: 0.17
+version: 0.18
 author:
 - Gustavo Chaves <gnustavo@cpan.org>
 license: perl
@@ -12,6 +12,10 @@ requires:
   Test::More: 0
   SVN::Look: 0.10
 optional_features:
+- Jira::Client:
+    description: An extended interface to JIRAs SOAP API.
+    requires:
+      SOAP::Lite: 0
 - JiraAcceptance:
     description: Plugin to integrate Subversion with the JIRA ticketing system.
     requires:
@@ -29,6 +33,8 @@ optional_features:
 provides:
   SVN::Hooks::AllowLogChange
     file: lib/SVN/Hooks/AllowLogChange.pm
+  SVN::Hooks::CheckJira
+    file: lib/SVN/Hooks/CheckJira.pm
   SVN::Hooks::CheckLog
     file: lib/SVN/Hooks/CheckLog.pm
   SVN::Hooks::CheckMimeTypes
