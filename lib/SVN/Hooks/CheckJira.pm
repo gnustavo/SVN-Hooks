@@ -216,7 +216,7 @@ sub CHECK_JIRA {
 	push @{$conf->{checks}}, [$regex => $opts];
     }
     else {
-	while (my ($opt, $val) = %$opts) {
+	while (my ($opt, $val) = each %$opts) {
 	    $conf->{defaults}{$opt} = $val;
 	}
     }
