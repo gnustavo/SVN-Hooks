@@ -1,4 +1,4 @@
-{package SVN::Hooks::CheckJira;
+package SVN::Hooks::CheckJira;
 
 use warnings;
 use strict;
