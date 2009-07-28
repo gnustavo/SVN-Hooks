@@ -136,9 +136,14 @@ more details.
 
 =over
 
-=item SVN::Hooks::AllowLogChange
+=item SVN::Hooks::AllowPropChange
 
-Allow changes in revision log messages.
+Allow changes in revision properties.
+
+=item SVN::Hooks::CheckJira
+
+Integrate Subversion with the
+L<JIRA|http://www.atlassian.com/software/jira/> ticketing system.
 
 =item SVN::Hooks::CheckLog
 
@@ -170,12 +175,6 @@ the C<tags> directory.
 Deny the addition of files which file names doesn't comply with a
 Regexp. Usually used to disallow some characteres in the filenames.
 
-=item SVN::Hooks::JiraAcceptance
-
-Require that the log message in a commit includes references to issues
-in the L<JIRA|http://www.atlassian.com/software/jira/> ticketing
-system.
-
 =item SVN::Hooks::Notify
 
 Sends notification emails after succesful commits.
@@ -203,14 +202,14 @@ which you are interested.
 	use strict;
 	use warnings;
 	use SVN::Hooks;
-	use SVN::Hooks::AllowLogChange;
+	use SVN::Hooks::AllowPropChange;
+	use SVN::Hooks::CheckJira;
 	use SVN::Hooks::CheckLog;
 	use SVN::Hooks::CheckMimeTypes;
 	use SVN::Hooks::CheckProperty;
 	use SVN::Hooks::CheckStructure;
 	use SVN::Hooks::DenyChanges;
 	use SVN::Hooks::DenyFilenames;
-	use SVN::Hooks::JiraAcceptance;
 	use SVN::Hooks::Notify;
 	use SVN::Hooks::UpdateRepoFile;
 
