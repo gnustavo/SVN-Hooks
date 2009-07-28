@@ -164,6 +164,14 @@ qr/Regexp/.
         check_one   => \&is_scheduled,
     });
 
+Note that you need to call CHECK_JIRA at least once with a qr/Regexp/
+in order to trigger the checks. A call for (C<'default'> doesn't
+count. If you want to change defaults and force checks for every
+commit, do this:
+
+    CHECK_JIRA(default => {projects => 'CDS'});
+    CHECK_JIRA(qr/./);
+
 =cut
 
 sub _validate_projects {
