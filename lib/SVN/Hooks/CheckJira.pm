@@ -289,18 +289,22 @@ sub _check_jira {
 sub pre_commit {
     my ($self, $svnlook) = @_;
 
-    my @files = $svnlook->changed();
+    if (@{$self->{checks}}) {
+	my @files = $svnlook->changed();
+	foreach my $check (@{$self->{checks}}) {
+	    my ($regex, $opts) = @$check;
 
-    foreach my $check (@{$self->{checks}}) {
-	my ($regex, $opts) = @$check;
-
-	for my $file (@files) {
-	    if ($file =~ $regex) {
-		my %opts = (%{$self->{defaults}}, %$opts);
-		_check_jira($self, $svnlook, \%opts);
-		last;
+	    for my $file (@files) {
+		if ($file =~ $regex) {
+		    my %opts = (%{$self->{defaults}}, %$opts);
+		    _check_jira($self, $svnlook, \%opts);
+		    last;
+		}
 	    }
 	}
+    }
+    else {
+	_check_jira($self, $svnlook, \%{$self->{defaults}});
     }
 }
 
