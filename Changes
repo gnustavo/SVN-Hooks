@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.19	2009-07-28
+
+	Corrects a bug in CheckJira.
+
 0.18	2009-07-24
 
 	Corrects two bugs.
