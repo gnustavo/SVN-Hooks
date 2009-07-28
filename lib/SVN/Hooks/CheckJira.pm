@@ -1,4 +1,4 @@
-package SVN::Hooks::CheckJira;
+{package SVN::Hooks::CheckJira;
 
 use warnings;
 use strict;
@@ -272,7 +272,7 @@ sub _check_jira {
 	}
 	if ($opts->{by_assignee}) {
 	    my $author = $svnlook->author();
-	    die "$HOOK: committer ($author) is different from issue $key's assignee ($issue->{assignee}).\n"
+	    die "$HOOK: committer ($author) is different from issue ${key}'s assignee ($issue->{assignee}).\n"
 		if $author ne $issue->{assignee};
 	}
 	if (my $check = $opts->{check_one}) {
