@@ -1,5 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.21	2009-08-19
+
+	The pod tests are skipped by default unless you use
+	perl Makefile.PL --author-tests.
+
 0.20	2009-07-28
 
 	Reverting the change in 0.19 and better documenting the
