@@ -7,10 +7,12 @@ use Getopt::Long  qw(GetOptions);
 # clean up the online testing flag file.
 unlink("t/online.enabled");
 
-my $usage        = "$0 [--[no]online-tests]\n";
+my $usage        = "$0 [--online-tests] [--author-tests]\n";
 my $online_tests = 0;
+my $author_tests = 0;
 GetOptions(
-    'online-tests!' => \$online_tests,
+    'online-tests' => \$online_tests,
+    'author-tests' => \$author_tests,
 ) or die $usage;
 
 #
@@ -37,6 +39,11 @@ EOT
 if ($online_tests) {
     open(ENABLED, ">t/online.enabled") or die "Can't touch ./t/online.enabled: $!";
     close(ENABLED)                     or die "Can't touch ./t/online.enabled: $!";
+}
+
+if ($author_tests) {
+    open(ENABLED, ">t/author.enabled") or die "Can't touch ./t/author.enabled: $!";
+    close(ENABLED)                     or die "Can't touch ./t/author.enabled: $!";
 }
 
 WriteMakefile(
