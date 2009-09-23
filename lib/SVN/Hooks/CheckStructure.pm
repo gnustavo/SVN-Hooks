@@ -134,6 +134,8 @@ sub CHECK_STRUCTURE {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{structure} = $structure;
     $conf->{'pre-commit'} = \&pre_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

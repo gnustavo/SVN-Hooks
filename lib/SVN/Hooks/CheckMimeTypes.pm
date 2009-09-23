@@ -47,6 +47,7 @@ sub CHECK_MIMETYPES {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{help} = $help;
     $conf->{'pre-commit'} = \&pre_commit;
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

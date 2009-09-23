@@ -184,6 +184,8 @@ sub UPDATE_CONF_FILE {
 	or die "$HOOK: invalid function names: ", join(', ', sort keys %args), ".\n";
 
     $conf->{'post-commit'} = \&post_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

@@ -48,6 +48,8 @@ sub NOTIFY_DEFAULTS {
     my %opt_defaults = @_;
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{defaults} = \%opt_defaults;
+
+    1;
 }
 
 =head2 NOTIFY(%HASH)
@@ -80,6 +82,8 @@ sub NOTIFY {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{opts} = \%opts;
     $conf->{'post-commit'} = \&post_commit;
+
+    1;
 };
 
 $SVN::Hooks::Inits{$HOOK} = sub {

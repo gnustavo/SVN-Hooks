@@ -78,6 +78,8 @@ sub EMAIL_CONFIG {
     else {
 	die "EMAIL_CONFIG: unknown option '$opt'"
     }
+
+    1;
 }
 
 my %valid_options = (
@@ -184,6 +186,8 @@ EOS
     push @{$conf->{projects}}, \%o;
 
     $conf->{'post-commit'} = \&post_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

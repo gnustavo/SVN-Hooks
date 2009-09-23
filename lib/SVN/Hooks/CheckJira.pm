@@ -73,6 +73,8 @@ sub CHECK_JIRA_CONFIG {
 	conf  => [$baseURL, $login, $passwd],
 	match => $match,
     };
+
+    1;
 }
 
 =head2 CHECK_JIRA(REGEXP => {OPT => VALUE, ...})

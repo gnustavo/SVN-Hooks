@@ -77,6 +77,8 @@ sub CHECK_PROPERTY {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     push @{$conf->{checks}}, [$where, $prop => $what];
     $conf->{'pre-commit'} = \&pre_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

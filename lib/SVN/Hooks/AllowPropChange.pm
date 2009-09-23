@@ -88,6 +88,8 @@ sub ALLOW_PROP_CHANGE {
     my $prop = shift @whos;
     push @{$conf->{specs}}, [$prop => \@whos];
     $conf->{'pre-revprop-change'} = \&pre_revprop_change;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

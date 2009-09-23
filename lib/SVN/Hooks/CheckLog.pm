@@ -51,6 +51,8 @@ sub CHECK_LOG {
 	error  => $error_message,
     };
     $conf->{'pre-commit'} = \&pre_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

@@ -58,6 +58,8 @@ sub _deny_change {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     push @{$conf->{$change}}, @regexes;
     $conf->{'pre-commit'} = \&pre_commit;
+
+    1;
 }
 
 sub DENY_ADDITION {

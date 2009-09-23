@@ -56,6 +56,8 @@ sub JIRA_CONFIG {
 	login    => $login,
 	password => $password,
     };
+
+    1;
 }
 
 =head2 JIRA_LOG_MATCH(REGEXP, MESSAGE)
@@ -93,6 +95,8 @@ JIRA_ACCEPTANCE: The administrator offered the following help:
 $message
 EOS
     }
+
+    1;
 }
 
 =head2 JIRA_ACCEPTANCE(REGEXP, PROJECT_KEYS)
@@ -127,6 +131,8 @@ sub JIRA_ACCEPTANCE {
     }
     push @{$conf->{checks}}, [$regex => \%keys];
     $conf->{'pre-commit'} = \&pre_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {

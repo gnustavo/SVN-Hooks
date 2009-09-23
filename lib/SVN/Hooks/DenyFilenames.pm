@@ -41,6 +41,8 @@ sub DENY_FILENAMES {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{checks} = \@regexes;
     $conf->{'pre-commit'} = \&pre_commit;
+
+    1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
