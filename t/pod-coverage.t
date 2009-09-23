@@ -20,5 +20,5 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
 all_pod_coverage_ok(
-    {also_private => [qr/^(?:pre|post)_/]}
+    {also_private => [qr/^(?:pre|post|start)_/]}
 );

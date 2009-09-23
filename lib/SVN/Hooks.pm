@@ -140,6 +140,10 @@ more details.
 
 Allow changes in revision properties.
 
+=item SVN::Hooks::CheckCapability
+
+Check if the Subversion client implements the required capabilities.
+
 =item SVN::Hooks::CheckJira
 
 Integrate Subversion with the
@@ -203,6 +207,7 @@ which you are interested.
 	use warnings;
 	use SVN::Hooks;
 	use SVN::Hooks::AllowPropChange;
+	use SVN::Hooks::CheckCapability;
 	use SVN::Hooks::CheckJira;
 	use SVN::Hooks::CheckLog;
 	use SVN::Hooks::CheckMimeTypes;
@@ -219,6 +224,7 @@ which you are interested.
 This script will serve for any hook. Create symbolic links pointing to
 it for each hook you are interested in.
 
+	$ ln -s svn-hooks.pl start-commit
 	$ ln -s svn-hooks.pl pre-commit
 	$ ln -s svn-hooks.pl post-commit
 	$ ln -s svn-hooks.pl pre-revprop-change
@@ -232,6 +238,8 @@ by the plugins.
 	$ cd ../conf
 	$ cat svn-hooks.conf
 	DENY_FILENAMES(qr:[^-/\.\w]:i);
+
+        CHECK_CAPABILITY('mergeinfo');
 
 	CHECK_MIMETYPES();
 
@@ -277,7 +285,7 @@ called, like this:
 
 =over
 
-=item * start-commit repo-path user
+=item * start-commit repo-path user capabilities
 
 =item * pre-commit repo-path txn
 

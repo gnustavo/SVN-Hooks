@@ -3,6 +3,7 @@ Changes
 lib/SVN/Hooks.pm
 lib/SVN/Hooks/AllowLogChange.pm
 lib/SVN/Hooks/AllowPropChange.pm
+lib/SVN/Hooks/CheckCapability.pm
 lib/SVN/Hooks/CheckJira.pm
 lib/SVN/Hooks/CheckLog.pm
 lib/SVN/Hooks/CheckMimeTypes.pm
@@ -21,6 +22,7 @@ README
 t/00-load.t
 t/02-allowlogchange.t
 t/02-allowpropchange.t
+t/02-checkcapability.t
 t/02-checkjira.t
 t/02-checklog.t
 t/02-checkmimetypes.t
