@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.22	2009-09-23
+
+	New hook: CheckCapability.
+
 0.21	2009-08-19
 
 	The pod tests are skipped by default unless you use
