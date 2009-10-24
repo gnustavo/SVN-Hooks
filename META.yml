@@ -3,8 +3,7 @@
 name: SVN-Hooks
 abstract: Framework for implementing Subversion hooks.
 version: 0.22
-author:
-- Gustavo Chaves <gnustavo@cpan.org>
+author: Gustavo Chaves <gnustavo@cpan.org>
 license: perl
 generated_by: Gustavo Chaves
 distribution_type: module
