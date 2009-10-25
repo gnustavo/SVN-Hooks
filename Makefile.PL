@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker qw(WriteMakefile prompt);
 use IO::Socket ();
 use Getopt::Long  qw(GetOptions);
 
-# clean up the online testing flag file.
-unlink("t/online.enabled");
+# clean up the testing flag files.
+unlink('t/online.enabled', 't/author.enabled');
 
 my $usage        = "$0 [--online-tests] [--author-tests]\n";
 my $online_tests = 0;
