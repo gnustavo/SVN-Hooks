@@ -35,6 +35,7 @@ t/02-jiraacceptance.t
 t/02-mailer.t
 t/02-notify.t
 t/02-updateconffile.t
+t/kwalitee.t
 t/pod-coverage.t
 t/pod.t
 t/test-functions.pl

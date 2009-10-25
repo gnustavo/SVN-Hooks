@@ -30,29 +30,29 @@ optional_features:
     requires:
       SVN::Notify: 0
 provides:
-  SVN::Hooks::AllowLogChange
+  SVN::Hooks::AllowLogChange:
     file: lib/SVN/Hooks/AllowLogChange.pm
-  SVN::Hooks::CheckJira
+  SVN::Hooks::CheckJira:
     file: lib/SVN/Hooks/CheckJira.pm
-  SVN::Hooks::CheckLog
+  SVN::Hooks::CheckLog:
     file: lib/SVN/Hooks/CheckLog.pm
-  SVN::Hooks::CheckMimeTypes
+  SVN::Hooks::CheckMimeTypes:
     file: lib/SVN/Hooks/CheckMimeTypes.pm
-  SVN::Hooks::CheckProperty
+  SVN::Hooks::CheckProperty:
     file: lib/SVN/Hooks/CheckProperty.pm
-  SVN::Hooks::CheckStructure
+  SVN::Hooks::CheckStructure:
     file: lib/SVN/Hooks/CheckStructure.pm
-  SVN::Hooks::DenyChanges
+  SVN::Hooks::DenyChanges:
     file: lib/SVN/Hooks/DenyChanges.pm
-  SVN::Hooks::DenyFilenames
+  SVN::Hooks::DenyFilenames:
     file: lib/SVN/Hooks/DenyFilenames.pm
-  SVN::Hooks::JiraAcceptance
+  SVN::Hooks::JiraAcceptance:
     file: lib/SVN/Hooks/JiraAcceptance.pm
-  SVN::Hooks::Mailer
+  SVN::Hooks::Mailer:
     file: lib/SVN/Hooks/Mailer.pm
-  SVN::Hooks::Notify
+  SVN::Hooks::Notify:
     file: lib/SVN/Hooks/Notify.pm
-  SVN::Hooks::UpdateConfFile
+  SVN::Hooks::UpdateConfFile:
     file: lib/SVN/Hooks/UpdateConfFile.pm
 resources:
   license: http://dev.perl.org/licenses/
