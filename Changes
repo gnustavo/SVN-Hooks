@@ -1,5 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.23    2009-10-24
+
+	Add kwalitee tests. (See
+	http://cpants.perl.org/dist/overview/SVN-Hooks)
+
 0.22	2009-09-23
 
 	New hook: CheckCapability.
