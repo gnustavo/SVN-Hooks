@@ -1,7 +1,8 @@
 package SVN::Hooks::AllowPropChange;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -69,27 +70,29 @@ Specify the class of users whose names are matched by the Regexp.
 =cut
 
 sub ALLOW_PROP_CHANGE {
+    my @args = @_;
+
     my $conf = $SVN::Hooks::Confs->{$HOOK};
 
     my @whos;
 
-    foreach my $arg (@_) {
-	if (! ref $arg or ref $arg eq 'Regexp') {
+    foreach my $arg (@args) {
+	if (not ref $arg or ref $arg eq 'Regexp') {
 	    push @whos, $arg;
 	}
 	else {
-	    die "$HOOK: invalid argument '$arg'\n";
+	    croak "$HOOK: invalid argument '$arg'\n";
 	}
     }
 
     @whos != 0
-	or die "$HOOK: you must specify at least the first argument\n";
+	or croak "$HOOK: you must specify at least the first argument\n";
 
     my $prop = shift @whos;
     push @{$conf->{specs}}, [$prop => \@whos];
     $conf->{'pre-revprop-change'} = \&pre_revprop_change;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -100,10 +103,10 @@ sub pre_revprop_change {
     my ($self, $rev, $author, $propname, $action) = @_;
 
     $propname =~ /^svn:(?:author|date|log)$/
-	or die "$HOOK: the revision property $propname cannot be changed.\n";
+	or croak "$HOOK: the revision property $propname cannot be changed.\n";
 
     $action eq 'M'
-	or die "$HOOK: revision properties can only be modified, not added or deleted.\n";
+	or croak "$HOOK: revision properties can only be modified, not added or deleted.\n";
 
     foreach my $spec (@{$self->{specs}}) {
 	my ($prop, $whos) = @$spec;
@@ -123,7 +126,7 @@ sub pre_revprop_change {
 	}
     }
 
-    die "$HOOK: you are not allowed to change property $propname.\n";
+    croak "$HOOK: you are not allowed to change property $propname.\n";
 }
 
 =head1 AUTHOR

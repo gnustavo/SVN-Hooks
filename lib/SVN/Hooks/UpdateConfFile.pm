@@ -1,7 +1,8 @@
 package SVN::Hooks::UpdateConfFile;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 use File::Spec::Functions;
 use File::Temp qw/tempdir/;
@@ -132,17 +133,17 @@ commit a wrong authz file that denies any subsequent commit.
 sub UPDATE_CONF_FILE {
     my ($from, $to, @args) = @_;
 
-    defined $from && (! ref $from || ref $from eq 'Regexp')
-	or die "$HOOK: invalid first argument.\n";
+    defined $from and (not ref $from or ref $from eq 'Regexp')
+	or croak "$HOOK: invalid first argument.\n";
 
-    defined $to && ! ref $to
-	or die "$HOOK: invalid second argument.\n";
+    defined $to and not ref $to
+	or croak "$HOOK: invalid second argument.\n";
 
     (@args % 2) == 0
-	or die "$HOOK: odd number of arguments.\n";
+	or croak "$HOOK: odd number of arguments.\n";
 
     file_name_is_absolute($to)
-	and die "$HOOK: second argument cannot be an absolute pathname ($to).\n";
+	and croak "$HOOK: second argument cannot be an absolute pathname ($to).\n";
 
     my $conf = $SVN::Hooks::Confs->{$HOOK};
 
@@ -160,13 +161,13 @@ sub UPDATE_CONF_FILE {
 	    elsif (ref $what eq 'ARRAY') {
 		# This should point to list of command arguments
 		@$what > 0
-		    or die "$HOOK: $function argument must have at least one element.\n";
+		    or croak "$HOOK: $function argument must have at least one element.\n";
 		-x $what->[0]
-		    or die "$HOOK: $function argument is not a valid command ($what->[0]).\n";
+		    or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
 		$confs{$function} = _functor($SVN::Hooks::Repo->{repo_path}, $what);
 	    }
 	    else {
-		die "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
+		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
 	    }
 	    $conf->{'pre-commit'} = \&pre_commit;
 	}
@@ -174,18 +175,18 @@ sub UPDATE_CONF_FILE {
 
     if (my $rotate = delete $args{rotate}) {
 	$rotate =~ /^\d+$/
-	    or die "$HOOK: rotate argument must be numeric, not '$rotate'";
+	    or croak "$HOOK: rotate argument must be numeric, not '$rotate'";
 	$rotate < 10
-	    or die "$HOOK: rotate argument must be less than 10, not '$rotate'";
+	    or croak "$HOOK: rotate argument must be less than 10, not '$rotate'";
 	$confs{rotate} = $rotate;
     }
 
     keys %args == 0
-	or die "$HOOK: invalid function names: ", join(', ', sort keys %args), ".\n";
+	or croak "$HOOK: invalid function names: ", join(', ', sort keys %args), ".\n";
 
     $conf->{'post-commit'} = \&post_commit;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -212,17 +213,18 @@ sub pre_commit {
 		if (my $generator = $conf->{generator}) {
 		    $text = eval { $generator->($text, $file) };
 		    defined $text
-			or die "$HOOK: Generator aborted for: $file\n", $@, "\n";
+			or croak "$HOOK: Generator aborted for: $file\n", $@, "\n";
 		}
 
 		my $validation = eval { $validator->($text, $file) };
 		defined $validation
-		    or die "$HOOK: Validator aborted for: $file\n", $@, "\n";
+		    or croak "$HOOK: Validator aborted for: $file\n", $@, "\n";
 
 		next CONF;
 	    }
 	}
     }
+    return;
 }
 
 sub post_commit {
@@ -240,7 +242,8 @@ sub post_commit {
 	    }
 	    else {
 		next if $file !~ $from;
-		$to = eval qq{"$to"}; # interpolate backreferences
+		# interpolate backreferences 
+		$to = eval qq{"$to"}; ## no critic
 	    }
 
 	    $to = abs_path(catfile($SVN::Hooks::Repo->{repo_path}, 'conf', $to));
@@ -249,7 +252,7 @@ sub post_commit {
 	    }
 
 	    $absbase eq substr($to, 0, length($absbase))
-		or die <<"EOS";
+		or croak <<"EOS";
 $HOOK: post-commit aborted for: $file
 
 This means that $file was committed but the associated
@@ -265,7 +268,7 @@ EOS
 
 	    if (my $generator = $conf->{generator}) {
 		$text = eval { $generator->($text, $file) };
-		defined $text or die <<"EOS";
+		defined $text or croak <<"EOS";
 $HOOK: generator in post-commit aborted for: $file
 
 This means that $file was committed but the associated
@@ -282,13 +285,13 @@ EOS
 	    }
 
 	    open my $fd, '>', "$to.new"
-		or die "$HOOK: Can't open file \"$to\" for writing: $!\n";
+		or croak "$HOOK: Can't open file \"$to\" for writing: $!\n";
 	    print $fd $text;
 	    close $fd;
 
 	    if (my $actuator = $conf->{actuator}) {
 		my $rc = eval { $actuator->($text, $file) };
-		defined $rc or die <<"EOS";
+		defined $rc or croak <<"EOS";
 $HOOK: actuator in post-commit aborted for: $file
 
 This means that $file was committed and the associated
@@ -321,6 +324,7 @@ EOS
 	    next CONF;
 	}
     }
+    return;
 }
 
 # FIXME: memoize isn't working
@@ -336,16 +340,16 @@ sub _functor {
 
 	# FIXME: this is Unix specific!
 	open my $th, '>', "$temp/file"
-	    or die "Can't create $temp/file: $!";
+	    or croak "Can't create $temp/file: $!";
 	print $th $text;
 	close $th;
 
-	$ENV{SVNREPOPATH} = $repo_path;
+	local $ENV{SVNREPOPATH} = $repo_path;
 	if (system("$cmd $temp/file 1>$temp/output 2>$temp/error") == 0) {
 	    return `cat $temp/output`;
 	}
 	else {
-	    die `cat $temp/error`;
+	    croak `cat $temp/error`;
 	}
     };
 }

@@ -1,7 +1,8 @@
 package SVN::Hooks::CheckStructure;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -134,8 +135,7 @@ sub CHECK_STRUCTURE {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{structure} = $structure;
     $conf->{'pre-commit'} = \&pre_commit;
-
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -145,7 +145,7 @@ $SVN::Hooks::Inits{$HOOK} = sub {
 sub _check_structure {
     my ($structure, $path) = @_;
 
-    @$path > 0 or die "Can't happen!";
+    @$path > 0 or croak "Can't happen!";
 
     if (! ref $structure) {
 	if ($structure eq 'DIR') {
@@ -238,8 +238,8 @@ sub check_structure {
     $path = "/$path" unless $path =~ m@^/@; # make sure it's an absolute path
     my @path = split '/', $path, -1; # preserve trailing empty components
     my ($code, $error) = _check_structure($structure, \@path);
-    die "$error: $path\n" if $code == 0;
-    1;
+    croak "$error: $path\n" if $code == 0;
+    return 1;
 }
 
 sub pre_commit {
@@ -258,9 +258,10 @@ sub pre_commit {
 	push @errors, "$error: $added" if $code == 0;
     }
 
-    if (@errors) {
-	die join("\n", "$HOOK:", @errors), "\n";
-    }
+    croak join("\n", "$HOOK:", @errors), "\n"
+	if @errors;
+
+    return;
 }
 
 =head1 AUTHOR

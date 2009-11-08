@@ -1,7 +1,8 @@
 package SVN::Hooks::Mailer;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 use Email::Send;
 use Email::Simple;
@@ -24,19 +25,19 @@ commits. It's deprecated. You should use SVN::Hooks::Notify instead.
 
 The emails contain information about the commit like this:
 
-	Subject: [TAG] Commit revision 153 by jsilva
+        Subject: [TAG] Commit revision 153 by jsilva
 
-	Author:   jsilva
-	Revision: 153
-	Date:     2008-09-16 11:03:35 -0300 (Tue, 16 Sep 2008)
-	Added files:
-	    trunk/conf/svn-hooks.conf
-	Deleted files:
-	    trunk/conf/hooks.conf
-	Updated files:
-	    trunk/conf/passwd
-	Log Message:
-	    Setting up the conf directory.
+        Author:   jsilva
+        Revision: 153
+        Date:     2008-09-16 11:03:35 -0300 (Tue, 16 Sep 2008)
+        Added files:
+            trunk/conf/svn-hooks.conf
+        Deleted files:
+            trunk/conf/hooks.conf
+        Updated files:
+            trunk/conf/passwd
+        Log Message:
+            Setting up the conf directory.
 
 It's active in the C<post-commit> hook.
 
@@ -49,37 +50,37 @@ SVN::Hooks::Mailer uses Email::Send to send emails.
 This directive allows you to chose a particular mailer to send email
 with.
 
-	EMAIL_CONFIG(Sendmail => '/usr/sbin/sendmail');
-	EMAIL_CONFIG(SMTP => 'smtp.example.com');
-	EMAIL_CONFIG(IO => '/path/to/file');
+        EMAIL_CONFIG(Sendmail => '/usr/sbin/sendmail');
+        EMAIL_CONFIG(SMTP => 'smtp.example.com');
+        EMAIL_CONFIG(IO => '/path/to/file');
 
 The first two are the most common. The last can be used for debugging.
 
 =cut
 
 sub EMAIL_CONFIG {
-    die "EMAIL_CONFIG: requires two arguments"
-	if @_ != 2;
+    croak "EMAIL_CONFIG: requires two arguments"
+        if @_ != 2;
 
     my ($opt, $arg) = @_;
     my $conf = $SVN::Hooks::Confs->{$HOOK};
 
     $conf->{sender} = Email::Send->new({mailer => $opt});
     if    ($opt eq 'Sendmail') {
-	-x $arg or die "EMAIL_CONFIG: not an executable file ($arg)";
-	$Email::Send::Sendmail::SENDMAIL = $arg;
+        -x $arg or croak "EMAIL_CONFIG: not an executable file ($arg)";
+        $Email::Send::Sendmail::SENDMAIL = $arg;
     }
     elsif ($opt eq 'SMTP') {
-	$conf->{sender}->mailer_args([Host => $arg]);
+        $conf->{sender}->mailer_args([Host => $arg]);
     }
     elsif ($opt eq 'IO') {
-	$conf->{sender}->mailer_args([$arg]);
+        $conf->{sender}->mailer_args([$arg]);
     }
     else {
-	die "EMAIL_CONFIG: unknown option '$opt'"
+        croak "EMAIL_CONFIG: unknown option '$opt'"
     }
 
-    1;
+    return 1;
 }
 
 my %valid_options = (
@@ -153,33 +154,33 @@ Print differences against the copy source.
 =cut
 
 sub EMAIL_COMMIT {
-    die "EMAIL_COMMIT: odd number of arguments"
-	if @_ % 2;
+    croak "EMAIL_COMMIT: odd number of arguments"
+        if @_ % 2;
 
     # Check and normalize options
     my %o = @_;
 
     foreach my $o (keys %o) {
-	unless (exists $valid_options{$o}) {
-	    my $valid_options = join ', ', sort keys %valid_options;
-	    die <<"EOS";
+        unless (exists $valid_options{$o}) {
+            my $valid_options = join ', ', sort keys %valid_options;
+            croak <<"EOS";
 EMAIL_COMMIT: unknown option '$o'
 The valid options are: $valid_options
 EOS
-	}
+        }
     }
 
     if (exists $o{match}) {
-	die "EMAIL_COMMIT: 'match' argument must be a qr/Regexp/"
-	    unless ref $o{match} eq 'Regexp';
+        croak "EMAIL_COMMIT: 'match' argument must be a qr/Regexp/"
+            unless ref $o{match} eq 'Regexp';
     }
     else {
-	$o{match} = qr/./;	# match all
+        $o{match} = qr/./;      # match all
     }
 
     foreach my $header (qw/from to/) {
-	die "EMAIL_COMMIT: missing '$header' address"
-	    unless exists $o{$header};
+        croak "EMAIL_COMMIT: missing '$header' address"
+            unless exists $o{$header};
     }
 
     my $conf = $SVN::Hooks::Confs->{$HOOK};
@@ -187,7 +188,7 @@ EOS
 
     $conf->{'post-commit'} = \&post_commit;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -201,43 +202,45 @@ sub post_commit {
 
   PROJECT:
     foreach my $p (@{$self->{projects}}) {
-	foreach my $file ($svnlook->changed()) {
-	    if ($file =~ $p->{match}) {
-		unless ($body) {
-		    $rev    = $svnlook->rev();
-		    $author = $svnlook->author();
-		    $date   = $svnlook->date();
+        foreach my $file ($svnlook->changed()) {
+            if ($file =~ $p->{match}) {
+                unless ($body) {
+                    $rev    = $svnlook->rev();
+                    $author = $svnlook->author();
+                    $date   = $svnlook->date();
 
-		    $body = <<"EOS";
+                    $body = <<"EOS";
 Author:   $author
 Revision: $rev
 Date:     $date
 EOS
 
-		    my $changed = $svnlook->changed_hash();
-		    foreach my $change (qw/added deleted updated prop_modified/) {
-			my $list = $changed->{$change};
-			if (@$list) {
-			    $body .= join "\n    ", "\u$change files:", @$list;
-			    $body .= "\n";
-			}
-		    }
+                    my $changed = $svnlook->changed_hash();
+                    foreach my $change (qw/added deleted updated prop_modified/) {
+                        my $list = $changed->{$change};
+                        if (@$list) {
+                            $body .= join "\n    ", "\u$change files:", @$list;
+                            $body .= "\n";
+                        }
+                    }
 
-		    my $log = $svnlook->log_msg();
-		    $log    =~ s/^/    /g;		# indent every line
-		    $body  .= "Log Message:\n$log\n";
+                    my $log = $svnlook->log_msg();
+                    $log    =~ s/^/    /g;              # indent every line
+                    $body  .= "Log Message:\n$log\n";
 
-		    if (exists $p->{diff}) {
-			my $opts = $p->{diff};
-			my $diff = $svnlook->diff((ref $opts and ref $opts eq 'ARRAY') ? @$opts : ());
-			$body   .= "\n$diff";
-		    }
-		}
-		_send_email($self->{sender}, $p, $rev, $author, $body);
-		next PROJECT;
-	    }
-	}
+                    if (exists $p->{diff}) {
+                        my $opts = $p->{diff};
+                        my $diff = $svnlook->diff((ref $opts and ref $opts eq 'ARRAY') ? @$opts : ());
+                        $body   .= "\n$diff";
+                    }
+                }
+                _send_email($self->{sender}, $p, $rev, $author, $body);
+                next PROJECT;
+            }
+        }
     }
+
+    return;
 }
 
 sub _send_email {
@@ -246,31 +249,33 @@ sub _send_email {
     my $subject = "Commit revision $rev by $author";
 
     if ($project->{tag}) {
-	$subject = "[$project->{tag}] $subject";
+        $subject = "[$project->{tag}] $subject";
     }
 
     # Necessary headers
     my @headers = (
-	From    => $project->{from},
-	To      => $project->{to},
-	Subject => $subject,
+        From    => $project->{from},
+        To      => $project->{to},
+        Subject => $subject,
     );
 
     # Optional headers
     foreach my $header (qw/reply_to cc bcc/) {
-	if (my $addrs = $project->{$header}) {
-	    $header =~ tr/_/-/;
-	    push @headers, ($header => $addrs);
-	}
+        if (my $addrs = $project->{$header}) {
+            $header =~ tr/_/-/;
+            push @headers, ($header => $addrs);
+        }
     }
 
     my $email = Email::Simple->create(
-	header => \@headers,
-	body   => $body,
+        header => \@headers,
+        body   => $body,
     );
 
     my $result = $sender->send($email);
-    die "$result" if ! $result;
+    croak "$result" if ! $result;
+
+    return;
 }
 
 =head1 AUTHOR

@@ -1,7 +1,8 @@
 package SVN::Hooks::CheckMimeTypes;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -47,7 +48,7 @@ sub CHECK_MIMETYPES {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{help} = $help;
     $conf->{'pre-commit'} = \&pre_commit;
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -100,7 +101,7 @@ in your ~/.subversion/config file. Read the Subversion book
 Automatic Property Setting subsection for more help.
 EOS
 	}
-	die $message;
+	croak $message;
     }
 }
 

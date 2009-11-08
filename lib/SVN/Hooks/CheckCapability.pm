@@ -1,7 +1,8 @@
 package SVN::Hooks::CheckCapability;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -44,7 +45,7 @@ sub CHECK_CAPABILITY {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{capabilities} = \@capabilities;
     $conf->{'start-commit'} = \&start_commit;
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -64,7 +65,7 @@ sub start_commit {
     my @missing = grep {! exists $supported{$_}} @{$self->{capabilities}};
 
     if (@missing) {
-	die "$HOOK: Your subversion client does not support the following capabilities:\n\n\t",
+	croak "$HOOK: Your subversion client does not support the following capabilities:\n\n\t",
 	    join(', ', @missing),
 	    "\n\nPlease, consider upgrading to a newer version of your client.\n";
     }

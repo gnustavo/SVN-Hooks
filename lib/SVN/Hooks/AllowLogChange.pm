@@ -1,7 +1,8 @@
 package SVN::Hooks::AllowLogChange;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -55,20 +56,22 @@ Regexp.
 =cut
 
 sub ALLOW_LOG_CHANGE {
+    my @args = @_;
+
     my $conf = $SVN::Hooks::Confs->{$HOOK};
 
-    foreach my $who (@_) {
-	if (! ref $who or ref $who eq 'Regexp') {
+    foreach my $who (@args) {
+	if (not ref $who or ref $who eq 'Regexp') {
 	    push @{$conf->{users}}, $who;
 	}
 	else {
-	    die "$HOOK: invalid argument '$who'\n";
+	    croak "$HOOK: invalid argument '$who'\n";
 	}
     }
 
     $conf->{'pre-revprop-change'} = \&pre_revprop_change;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -79,20 +82,19 @@ sub pre_revprop_change {
     my ($self, $rev, $author, $propname, $action) = @_;
 
     $propname eq 'svn:log'
-	or die "$HOOK: the revision property $propname cannot be changed.\n";
+	or croak "$HOOK: the revision property $propname cannot be changed.\n";
 
     $action eq 'M'
-	or die "$HOOK: a revision log can only be modified, not added or deleted.\n";
+	or croak "$HOOK: a revision log can only be modified, not added or deleted.\n";
 
     # If no users are specified, anyone can do it.
     return unless @{$self->{users}};
 
     for my $user (@{$self->{users}}) {
-	return if ! ref $user and $author eq $user or $author =~ $user;
+	return if not ref $user and $author eq $user or $author =~ $user;
     }
 
-    die "$HOOK: you are not allowed to change a revision log.\n";
-
+    croak "$HOOK: you are not allowed to change a revision log.\n";
 }
 
 =head1 AUTHOR

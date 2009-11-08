@@ -339,6 +339,8 @@ sub run_hook {
 	    $hook->($conf, @args);
 	}
     }
+
+    return;
 }
 
 memoize('repo');
@@ -393,6 +395,8 @@ sub _load_configs {
 	}
 	package SVN::Hooks;
     }
+
+    return;
 }
 
 =head1 AUTHOR

@@ -1,7 +1,8 @@
 package SVN::Hooks::CheckLog;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -41,18 +42,18 @@ sub CHECK_LOG {
     my ($regexp, $error_message) = @_;
 
     defined $regexp and ref $regexp eq 'Regexp'
-	or die "$HOOK: first argument must be a qr/Regexp/\n";
-    not defined $error_message or ! ref $error_message
-	or die "$HOOK: second argument must be undefined, or a STRING\n";
+	or croak "$HOOK: first argument must be a qr/Regexp/\n";
+    not defined $error_message or not ref $error_message
+	or croak "$HOOK: second argument must be undefined, or a STRING\n";
 
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     push @{$conf->{checks}}, {
 	regexp => $regexp,
-	error  => $error_message,
+	error  => $error_message || "log message must match $regexp.",
     };
     $conf->{'pre-commit'} = \&pre_commit;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -66,8 +67,10 @@ sub pre_commit {
 
     foreach my $check (@{$self->{checks}}) {
 	$log =~ $check->{regexp}
-	    or die "$HOOK: ", $check->{error} || "log message must match $check->{regexp}.";
+	    or croak "$HOOK: $check->{error}";
     }
+
+    return;
 }
 
 =head1 AUTHOR

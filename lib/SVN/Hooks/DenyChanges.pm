@@ -1,7 +1,8 @@
 package SVN::Hooks::DenyChanges;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -52,26 +53,29 @@ sub _deny_change {
 
     foreach (@regexes) {
 	ref $_ eq 'Regexp'
-	    or die "$HOOK: all arguments must be qr/Regexp/\n";
+	    or croak "$HOOK: all arguments must be qr/Regexp/\n";
     }
 
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     push @{$conf->{$change}}, @regexes;
     $conf->{'pre-commit'} = \&pre_commit;
 
-    1;
+    return 1;
 }
 
 sub DENY_ADDITION {
-    _deny_change(deny_add    => @_);
+    my @args = @_;
+    return _deny_change(deny_add    => @args);
 }
 
 sub DENY_DELETION {
-    _deny_change(deny_delete => @_);
+    my @args = @_;
+    return _deny_change(deny_delete => @args);
 }
 
 sub DENY_UPDATE {
-    _deny_change(deny_update => @_);
+    my @args = @_;
+    return _deny_change(deny_update => @args);
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -117,8 +121,10 @@ sub pre_commit {
 	}
     }
 
-    die "$HOOK:\n", join("\n", @errors), "\n"
+    croak "$HOOK:\n", join("\n", @errors), "\n"
 	if @errors;
+
+    return;
 }
 
 =head1 AUTHOR

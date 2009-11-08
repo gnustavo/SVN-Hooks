@@ -1,7 +1,7 @@
 package SVN::Hooks::Notify;
 
-use warnings;
 use strict;
+use warnings;
 use SVN::Hooks;
 use Email::Send;
 use Email::Simple;
@@ -49,7 +49,7 @@ sub NOTIFY_DEFAULTS {
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{defaults} = \%opt_defaults;
 
-    1;
+    return 1;
 }
 
 =head2 NOTIFY(%HASH)
@@ -83,7 +83,7 @@ sub NOTIFY {
     $conf->{opts} = \%opts;
     $conf->{'post-commit'} = \&post_commit;
 
-    1;
+    return 1;
 };
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -103,6 +103,7 @@ sub post_commit {
     );
     $notifier->prepare;
     $notifier->execute;
+    return;
 }
 
 =head1 AUTHOR

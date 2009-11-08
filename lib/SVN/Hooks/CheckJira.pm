@@ -1,7 +1,8 @@
 package SVN::Hooks::CheckJira;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 use JIRA::Client;
 
@@ -60,10 +61,10 @@ sub CHECK_JIRA_CONFIG {
     }
     elsif (@_ == 4) {
 	ref $match eq 'Regexp'
-	    or die "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
+	    or croak "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
     }
     else {
-	die "CHECK_JIRA_CONFIG: requires three or four arguments.\n";
+	croak "CHECK_JIRA_CONFIG: requires three or four arguments.\n";
     }
 
     $baseURL =~ s:/+$::;
@@ -74,7 +75,7 @@ sub CHECK_JIRA_CONFIG {
 	match => $match,
     };
 
-    1;
+    return 1;
 }
 
 =head2 CHECK_JIRA(REGEXP => {OPT => VALUE, ...})
@@ -178,23 +179,23 @@ commit, do this:
 
 sub _validate_projects {
     my ($opt, $val) = @_;
-    defined $val         or die "$HOOK: undefined $opt\'s value.\n";
-    ref $val            and die "$HOOK: $opt\'s value must be a scalar.\n";
-    $val =~ /^[A-Z,]+$/  or die "$HOOK: $opt\'s value must match /^[A-Z,]+\$/.\n";
-    my %projects = map {$_ => undef} grep /./, split /,/, $val;
+    defined $val         or croak "$HOOK: undefined $opt\'s value.\n";
+    ref $val            and croak "$HOOK: $opt\'s value must be a scalar.\n";
+    $val =~ /^[A-Z,]+$/  or croak "$HOOK: $opt\'s value must match /^[A-Z,]+\$/.\n";
+    my %projects = map {$_ => undef} grep {/./} split /,/, $val;
     return \%projects;
 }
 
 sub _validate_bool {
     my ($opt, $val) = @_;
-    defined $val or die "$HOOK: undefined $opt\'s value.\n";
+    defined $val or croak "$HOOK: undefined $opt\'s value.\n";
     return $val;
 }
 
 sub _validate_code {
     my ($opt, $val) = @_;
     ref $val and ref $val eq 'CODE'
-	or die "$HOOK: $opt\'s value must be a CODE-ref.\n";
+	or croak "$HOOK: $opt\'s value must be a CODE-ref.\n";
     return $val;
 }
 
@@ -210,14 +211,14 @@ my %opt_checks = (
 
 sub CHECK_JIRA {
     my ($regex, $opts) = @_;
-    die "$HOOK: first arg must be a qr/Regexp/ or the string 'default'.\n"
-	unless (ref $regex and ref $regex eq 'Regexp') or (! ref $regex and $regex eq 'default');
-    die "$HOOK: second argument must be a HASH-ref.\n"
+    croak "$HOOK: first arg must be a qr/Regexp/ or the string 'default'.\n"
+	unless (ref $regex and ref $regex eq 'Regexp') or (not ref $regex and $regex eq 'default');
+    croak "$HOOK: second argument must be a HASH-ref.\n"
 	if defined $opts and not (ref $opts and ref $opts eq 'HASH');
 
     $opts = {} unless defined $opts;
     foreach my $opt (keys %$opts) {
-	exists $opt_checks{$opt} or die "$HOOK: unknown option '$opt'.\n";
+	exists $opt_checks{$opt} or croak "$HOOK: unknown option '$opt'.\n";
 	$opts->{$opt} = $opt_checks{$opt}->($opt, $opts->{$opt});
     }
 
@@ -231,6 +232,8 @@ sub CHECK_JIRA {
 	}
     }
     $conf->{'pre-commit'} = \&pre_commit;
+
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -249,14 +252,14 @@ sub _check_jira {
     my ($self, $svnlook, $opts) = @_;
 
     my $conf = $self->{conf}
-	or die "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";
+	or croak "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";
 
     # Grok the JIRA issue keys from the commit log
     my ($match) = ($svnlook->log_msg() =~ $conf->{match});
     my @keys    = defined $match ? $match =~ /\b[A-Z]+-\d+\b/g : ();
 
     if ($opts->{require}) {
-	die "$HOOK: you must cite at least one JIRA issue key in the commit message.\n"
+	croak "$HOOK: you must cite at least one JIRA issue key in the commit message.\n"
 	    unless @keys;
     }
 
@@ -265,7 +268,7 @@ sub _check_jira {
     # Connect to JIRA if not yet connected.
     unless (exists $conf->{jira}) {
 	$conf->{jira} = eval {JIRA::Client->new(@{$conf->{conf}})};
-	die "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
+	croak "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
     }
 
     # Grok and check each JIRA issue
@@ -273,16 +276,16 @@ sub _check_jira {
     foreach my $key (@keys) {
 	my $issue = eval {$conf->{jira}->getIssue($key)};
 	if ($opts->{valid}) {
-	    die "$HOOK: issue $key is not valid: $@\n" if $@;
+	    croak "$HOOK: issue $key is not valid: $@\n" if $@;
 	}
 	$issue or next;
 	if ($opts->{unresolved}) {
-	    die "$HOOK: issue $key is already resolved.\n"
+	    croak "$HOOK: issue $key is already resolved.\n"
 		if defined $issue->{resolution};
 	}
 	if ($opts->{by_assignee}) {
 	    my $author = $svnlook->author();
-	    die "$HOOK: committer ($author) is different from issue ${key}'s assignee ($issue->{assignee}).\n"
+	    croak "$HOOK: committer ($author) is different from issue ${key}'s assignee ($issue->{assignee}).\n"
 		if $author ne $issue->{assignee};
 	}
 	if (my $check = $opts->{check_one}) {
@@ -294,6 +297,8 @@ sub _check_jira {
     if (my $check = $opts->{check_all}) {
 	$check->($conf->{jira}, @issues) if @issues;
     }
+
+    return;
 }
 
 sub pre_commit {
@@ -312,6 +317,8 @@ sub pre_commit {
 	    }
 	}
     }
+
+    return;
 }
 
 =head1 AUTHOR

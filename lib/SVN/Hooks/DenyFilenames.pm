@@ -1,7 +1,8 @@
 package SVN::Hooks::DenyFilenames;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -36,13 +37,13 @@ sub DENY_FILENAMES {
     my @regexes = @_;
     foreach my $regex (@regexes) {
 	ref $regex eq 'Regexp'
-	    or die "$HOOK: got \"$regex\" while expecting a qr/Regex/.\n";
+	    or croak "$HOOK: got \"$regex\" while expecting a qr/Regex/.\n";
     }
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     $conf->{checks} = \@regexes;
     $conf->{'pre-commit'} = \&pre_commit;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -62,9 +63,9 @@ sub pre_commit {
 	}
     }
     if (@denied) {
-	die join("\n",
-		 "$HOOK: the files below can't be added because their names aren't allowed:",
-		 @denied), "\n";
+	croak join("\n",
+		   "$HOOK: the files below can't be added because their names aren't allowed:",
+		   @denied), "\n";
     }
 }
 

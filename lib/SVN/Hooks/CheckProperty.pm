@@ -1,7 +1,8 @@
 package SVN::Hooks::CheckProperty;
 
-use warnings;
 use strict;
+use warnings;
+use Carp;
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -67,18 +68,18 @@ Example:
 sub CHECK_PROPERTY {
     my ($where, $prop, $what) = @_;
 
-    defined $where and (! ref $where or ref $where eq 'Regexp')
-	or die "$HOOK: first argument must be a STRING or a qr/Regexp/\n";
-    defined $prop and ! ref $prop
-	or die "$HOOK: second argument must be a STRING\n";
-    not defined $what or ! ref $what or ref $what eq 'Regexp'
-	or die "$HOOK: third argument must be undefined, or a NUMBER, or a STRING, or a qr/Regexp/\n";
+    defined $where and (not ref $where or ref $where eq 'Regexp')
+	or croak "$HOOK: first argument must be a STRING or a qr/Regexp/\n";
+    defined $prop and not ref $prop
+	or croak "$HOOK: second argument must be a STRING\n";
+    not defined $what or not ref $what or ref $what eq 'Regexp'
+	or croak "$HOOK: third argument must be undefined, or a NUMBER, or a STRING, or a qr/Regexp/\n";
 
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     push @{$conf->{checks}}, [$where, $prop => $what];
     $conf->{'pre-commit'} = \&pre_commit;
 
-    1;
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
@@ -126,7 +127,10 @@ sub pre_commit {
 	}
     }
 
-    die join("\n", "$HOOK:", @errors), "\n" if @errors;
+    croak join("\n", "$HOOK:", @errors), "\n"
+	if @errors;
+
+    return;
 }
 
 =head1 AUTHOR
