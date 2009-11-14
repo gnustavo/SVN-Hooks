@@ -289,6 +289,17 @@ EOS
 	    print $fd $text;
 	    close $fd;
 
+	    if (my $rotate = $conf->{rotate}) {
+		for (my $i=$rotate-1; $i >= 0; --$i) {
+		    rename "$to.$i", sprintf("$to.%d", $i+1)
+			if -e "$to.$i";
+		}
+		rename $to, "$to.0"
+		    if -e $to;
+	    }
+
+	    rename "$to.new", $to;
+
 	    if (my $actuator = $conf->{actuator}) {
 		my $rc = eval { $actuator->($text, $file) };
 		defined $rc or croak <<"EOS";
@@ -309,17 +320,6 @@ Any error message produced by the actuator appears below:
 $@
 EOS
 	    }
-
-	    if (my $rotate = $conf->{rotate}) {
-		for (my $i=$rotate-1; $i >= 0; --$i) {
-		    rename "$to.$i", sprintf("$to.%d", $i+1)
-			if -e "$to.$i";
-		}
-		rename $to, "$to.0"
-		    if -e $to;
-	    }
-
-	    rename "$to.new", $to;
 
 	    next CONF;
 	}
