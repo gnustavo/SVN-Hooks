@@ -181,7 +181,7 @@ Regexp. Usually used to disallow some characteres in the filenames.
 
 =item SVN::Hooks::Notify
 
-Sends notification emails after succesful commits.
+Sends notification emails after successful commits.
 
 =item SVN::Hooks::UpdateConfFile
 

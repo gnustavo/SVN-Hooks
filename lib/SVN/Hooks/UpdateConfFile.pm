@@ -38,7 +38,7 @@ It's configured by the following directive.
 
 =head2 UPDATE_CONF_FILE(FROM, TO, @ARGS)
 
-This directive tells that after a succesful commit the file FROM, kept
+This directive tells that after a successful commit the file FROM, kept
 under version control, must be copied to TO.
 
 FROM can be a string or a qr/Regexp/ specifying the file path relative
@@ -87,7 +87,7 @@ of FROM and the relative path to FROM.
 
 An actuator is a function or a command (specified by an array of
 strings that will be passed to the shell) that will be invoked after a
-succesful commit of FROM in the post-commit hook.
+successful commit of FROM in the post-commit hook.
 
 The function receives two string arguments: the contents of FROM and
 the relative path to FROM.
@@ -97,7 +97,7 @@ of FROM and the relative path to FROM.
 
 =item rotate => NUMBER
 
-By default, after each succesful commit the TO file is overwriten by
+By default, after each successful commit the TO file is overwriten by
 the new contents of FROM. With this option, the last NUMBER versions
 of TO are kept on disk with numeric suffixes ranging from C<.0> to
 C<.NUMBER-1>. This can be useful, for instance, in case you manage to

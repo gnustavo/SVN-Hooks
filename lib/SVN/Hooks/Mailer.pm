@@ -16,11 +16,11 @@ our $VERSION = 0.11;
 
 =head1 NAME
 
-SVN::Hooks::Mailer - Send emails after succesful commits.
+SVN::Hooks::Mailer - Send emails after successful commits.
 
 =head1 SYNOPSIS
 
-This SVN::Hooks plugin sends notification emails after succesful
+This SVN::Hooks plugin sends notification emails after successful
 commits. It's deprecated. You should use SVN::Hooks::Notify instead.
 
 The emails contain information about the commit like this:

@@ -78,7 +78,7 @@ component must be.
 =item NUMBER
 
 A positive number simply tells that whatever the current component is
-is ok and finishes the check succesfully.
+is ok and finishes the check successfully.
 
 A negative number tells that whatever the current component is is a
 structure violation and aborts the commit.
