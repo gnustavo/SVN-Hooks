@@ -186,6 +186,32 @@ commit, do this:
     CHECK_JIRA(default => {projects => 'CDS'});
     CHECK_JIRA(qr/./);
 
+The C<'post_action'> pseudo-check can be used to interact with the
+JIRA server after a successful commit. For instance, you may want to
+add a comment to each refered issue like this:
+
+    # This routine returns a closure that can be passed to
+    # post_action.  The closure receives a string to be added as a
+    # comment to each issue refered to by the commit message. The
+    # commit info can be interpolated inside the comment using the
+    # SVN::Look method names inside angle brackets.
+
+    sub add_comment {
+        my ($format) = @_;
+        return sub {
+            my ($jira, $svnlook, @keys) = @_;
+            # interpolate commit info in the comment
+            $format =~ s/\{(\w+)\}/$svnlook->$1()/gee;
+            for my $key (@keys) {
+                $jira->addComment($key, $format);
+            }
+        }
+    }
+
+    CHECK_JIRA(qr/./, => {
+        post_action => add_comment("Subversion Commit r{rev} by {author} on {date}\n{log_msg}")
+    });
+
 =cut
 
 sub _validate_projects {
