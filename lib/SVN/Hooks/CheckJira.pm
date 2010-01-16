@@ -25,7 +25,7 @@ their keys which consists of a sequence of uppercase letters separated
 by an hyfen from a sequence of digits. E.g., CDS-123, RT-1, and
 SVN-97.
 
-It's active in the C<pre-commit> hook.
+It's active in the C<pre-commit> and/or the C<post-commit> hook.
 
 It's configured by the following directives.
 
@@ -144,6 +144,17 @@ the JIRA server. The following arguments are references to RemoteIssue
 objects for every referenced issue. The subroutine must simply return
 with no value to indicate success and must die to indicate failure.
 
+=item post_action => CODE-REF
+
+This is not a check, but an opportunity to perform some action after a
+successful commit. The code reference passed will be called once
+during the post-commit hook phase. Its first argument is the
+JIRA::Client object used to talk to the JIRA server. The second
+argument is the SVN::Look object that can be used to inspect all the
+information about the commit proper.  The following arguments are the
+JIRA keys mentioned in the commit log message. The value returned by
+the routine, if any, is ignored.
+
 =back
 
 You can set defaults for these options using a CHECK_JIRA directive
@@ -207,6 +218,7 @@ my %opt_checks = (
     by_assignee => \&_validate_bool,
     check_one   => \&_validate_code,
     check_all   => \&_validate_code,
+    post_action => \&_validate_code,
 );
 
 sub CHECK_JIRA {
@@ -232,6 +244,7 @@ sub CHECK_JIRA {
 	}
     }
     $conf->{'pre-commit'} = \&pre_commit;
+    $conf->{'post-commit'} = \&post_commit if exists $opts->{post_action};
 
     return 1;
 }
@@ -248,32 +261,14 @@ $SVN::Hooks::Inits{$HOOK} = sub {
     };
 };
 
-sub _check_jira {
-    my ($self, $svnlook, $opts) = @_;
+sub _pre_checks {
+    my ($self, $svnlook, $keys, $opts) = @_;
 
-    my $conf = $self->{conf}
-	or croak "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";
-
-    # Grok the JIRA issue keys from the commit log
-    my ($match) = ($svnlook->log_msg() =~ $conf->{match});
-    my @keys    = defined $match ? $match =~ /\b[A-Z]+-\d+\b/g : ();
-
-    if ($opts->{require}) {
-	croak "$HOOK: you must cite at least one JIRA issue key in the commit message.\n"
-	    unless @keys;
-    }
-
-    return unless @keys;
-
-    # Connect to JIRA if not yet connected.
-    unless (exists $conf->{jira}) {
-	$conf->{jira} = eval {JIRA::Client->new(@{$conf->{conf}})};
-	croak "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
-    }
+    my $conf = $self->{conf};
 
     # Grok and check each JIRA issue
     my @issues;
-    foreach my $key (@keys) {
+    foreach my $key (@$keys) {
 	my $issue = eval {$conf->{jira}->getIssue($key)};
 	if ($opts->{valid}) {
 	    croak "$HOOK: issue $key is not valid: $@\n" if $@;
@@ -301,8 +296,21 @@ sub _check_jira {
     return;
 }
 
-sub pre_commit {
-    my ($self, $svnlook) = @_;
+sub _post_action {
+    my ($self, $svnlook, $keys, $opts) = @_;
+
+    if (my $action = $opts->{post_action}) {
+	$action->($self->{conf}->{jira}, $svnlook, @$keys);
+    }
+
+    return;
+}
+
+sub _check_if_needed {
+    my ($self, $svnlook, $docheck) = @_;
+
+    my $conf = $self->{conf}
+	or croak "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";
 
     my @files = $svnlook->changed();
 
@@ -311,13 +319,44 @@ sub pre_commit {
 
 	for my $file (@files) {
 	    if ($file =~ $regex) {
+
+		# Grok the JIRA issue keys from the commit log
+		my ($match) = ($svnlook->log_msg() =~ $conf->{match});
+		my @keys    = defined $match ? $match =~ /\b[A-Z]+-\d+\b/g : ();
+
 		my %opts = (%{$self->{defaults}}, %$opts);
-		_check_jira($self, $svnlook, \%opts);
+
+		if ($opts{require}) {
+		    croak "$HOOK: you must cite at least one JIRA issue key in the commit message.\n"
+			unless @keys;
+		}
+
+		return unless @keys;
+
+		# Connect to JIRA if not yet connected.
+		unless (exists $conf->{jira}) {
+		    $conf->{jira} = eval {JIRA::Client->new(@{$conf->{conf}})};
+		    croak "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
+		}
+
+		$docheck->($self, $svnlook, \@keys, \%opts);
 		last;
 	    }
 	}
     }
 
+    return;
+}
+
+sub pre_commit {
+    my ($self, $svnlook) = @_;
+    _check_if_needed($self, $svnlook, \&_pre_checks);
+    return;
+}
+
+sub post_commit {
+    my ($self, $svnlook) = @_;
+    _check_if_needed($self, $svnlook, \&_post_action);
     return;
 }
 
