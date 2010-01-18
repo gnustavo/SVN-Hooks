@@ -201,14 +201,14 @@ add a comment to each refered issue like this:
         return sub {
             my ($jira, $svnlook, @keys) = @_;
             # interpolate commit info in the comment
-            $format =~ s/\{(\w+)\}/$svnlook->$1()/gee;
+	    $format =~ s/\{(\w+)\}/"\$svnlook->$1()"/eeg;
             for my $key (@keys) {
                 $jira->addComment($key, $format);
             }
         }
     }
 
-    CHECK_JIRA(qr/./, => {
+    CHECK_JIRA(qr/./ => {
         post_action => add_comment("Subversion Commit r{rev} by {author} on {date}\n{log_msg}")
     });
 
