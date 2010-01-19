@@ -200,7 +200,8 @@ add a comment to each refered issue like this:
         my ($format) = @_;
         return sub {
             my ($jira, $svnlook, @keys) = @_;
-            # interpolate commit info in the comment
+            # Substitute keywords in the input comment with calls
+            # into the $svnlook reference
 	    $format =~ s/\{(\w+)\}/"\$svnlook->$1()"/eeg;
             for my $key (@keys) {
                 $jira->addComment($key, $format);
