@@ -1,6 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
-0.24    2010-01-19
+0.26    2010-03-08
+
+	Implements the DENY_EXEMP_USERS directive in DenyChanges.
+
+0.25    2010-01-19
 
 	Add a 'post_action' pseudo-check to CheckJira so that the
 	plugin can perform an action during the post-commit hook
