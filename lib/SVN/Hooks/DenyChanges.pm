@@ -7,7 +7,7 @@ use SVN::Hooks;
 
 use Exporter qw/import/;
 my $HOOK = 'DENY_CHANGES';
-my @HOOKS = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE');
+my @HOOKS = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE', 'DENY_EXEMPT_USERS');
 our @EXPORT = @HOOKS;
 
 our $VERSION = $SVN::Hooks::VERSION;
@@ -46,6 +46,15 @@ passed as arguments.
 
 	DENY_UPDATE(qr/^tags/); # Can't modify tags
 
+=head2 DENY_EXCEMPT_USERS(LIST)
+
+This directive receives a list of user names which are to be exempt
+from the rules specified by the other directives.
+
+	DENY_EXEMPT_USERS(qw/john mary/);
+
+This rule exempts users C<john> and C<mary> from the other deny rules.
+
 =cut
 
 sub _deny_change {
@@ -65,33 +74,49 @@ sub _deny_change {
 
 sub DENY_ADDITION {
     my @args = @_;
-    return _deny_change(deny_add    => @args);
+    return _deny_change(add    => @args);
 }
 
 sub DENY_DELETION {
     my @args = @_;
-    return _deny_change(deny_delete => @args);
+    return _deny_change(delete => @args);
 }
 
 sub DENY_UPDATE {
     my @args = @_;
-    return _deny_change(deny_update => @args);
+    return _deny_change(update => @args);
+}
+
+sub DENY_EXEMPT_USERS {
+    my @users = @_;
+    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    foreach my $user (@users) {
+	croak "DENY_EXEMPT_USERS: all arguments must be strings\n"
+	    if ref $user;
+	$conf->{exempt}{$user} = undef;
+    }
+
+    return 1;
 }
 
 $SVN::Hooks::Inits{$HOOK} = sub {
     return {
-	deny_add    => [],
-	deny_delete => [],
-	deny_update => [],
+	add    => [],
+	delete => [],
+	update => [],
+	exempt => {},
     };
 };
 
 sub pre_commit {
     my ($self, $svnlook) = @_;
 
+    # Exempt users
+    return if %{$self->{exempt}} && exists $self->{exempt}{$svnlook->author()};
+
     my @errors;
 
-    foreach my $regex (@{$self->{deny_add}}) {
+    foreach my $regex (@{$self->{add}}) {
       ADDED:
 	foreach my $file ($svnlook->added()) {
 	    if ($file =~ $regex) {
@@ -101,7 +126,7 @@ sub pre_commit {
 	}
     }
 
-    foreach my $regex (@{$self->{deny_delete}}) {
+    foreach my $regex (@{$self->{delete}}) {
       DELETED:
 	foreach my $file ($svnlook->deleted()) {
 	    if ($file =~ $regex) {
@@ -111,7 +136,7 @@ sub pre_commit {
 	}
     }
 
-    foreach my $regex (@{$self->{deny_update}}) {
+    foreach my $regex (@{$self->{update}}) {
       UPDATED:
 	foreach my $file ($svnlook->updated()) {
 	    if ($file =~ $regex) {

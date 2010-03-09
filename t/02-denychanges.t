@@ -8,7 +8,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (has_svn()) {
-    plan tests => 8;
+    plan tests => 10;
 }
 else {
     plan skip_all => 'Need svn commands in the PATH.';
@@ -74,3 +74,25 @@ svn del -q $t/wc/f
 svn ci -mx $t/wc/f
 EOS
 
+# Grok the author name
+my $author;
+open my $svn, '-|', "svn info $t/wc/del"
+    or die "Can't exec svn info\n";
+while (<$svn>) {
+    if (/Author: (.*)$/) {
+	$author = $1;
+    }
+}
+close $svn;
+ok(defined $author, 'grok author');
+
+set_conf(<<"EOS");
+DENY_ADDITION(qr/add/);
+DENY_EXEMPT_USERS($author);
+EOS
+
+work_ok('exempt user', <<"EOS");
+touch $t/wc/add
+svn add -q --no-auto-props $t/wc/add
+svn ci -mx $t/wc/add
+EOS
