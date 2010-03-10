@@ -46,7 +46,7 @@ passed as arguments.
 
 	DENY_UPDATE(qr/^tags/); # Can't modify tags
 
-=head2 DENY_EXCEMPT_USERS(LIST)
+=head2 DENY_EXCEPT_USERS(LIST)
 
 This directive receives a list of user names which are to be exempt
 from the rules specified by the other directives.
