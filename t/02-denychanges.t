@@ -88,10 +88,10 @@ ok(defined $author, 'grok author');
 
 set_conf(<<"EOS");
 DENY_ADDITION(qr/add/);
-DENY_EXEMPT_USERS($author);
+DENY_EXCEPT_USERS($author);
 EOS
 
-work_ok('exempt user', <<"EOS");
+work_ok('except user', <<"EOS");
 touch $t/wc/add
 svn add -q --no-auto-props $t/wc/add
 svn ci -mx $t/wc/add

@@ -7,7 +7,7 @@ use SVN::Hooks;
 
 use Exporter qw/import/;
 my $HOOK = 'DENY_CHANGES';
-my @HOOKS = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE', 'DENY_EXEMPT_USERS');
+my @HOOKS = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE', 'DENY_EXCEPT_USERS');
 our @EXPORT = @HOOKS;
 
 our $VERSION = $SVN::Hooks::VERSION;
@@ -51,7 +51,7 @@ passed as arguments.
 This directive receives a list of user names which are to be exempt
 from the rules specified by the other directives.
 
-	DENY_EXEMPT_USERS(qw/john mary/);
+	DENY_EXCEPT_USERS(qw/john mary/);
 
 This rule exempts users C<john> and C<mary> from the other deny rules.
 
@@ -87,13 +87,13 @@ sub DENY_UPDATE {
     return _deny_change(update => @args);
 }
 
-sub DENY_EXEMPT_USERS {
+sub DENY_EXCEPT_USERS {
     my @users = @_;
     my $conf = $SVN::Hooks::Confs->{$HOOK};
     foreach my $user (@users) {
-	croak "DENY_EXEMPT_USERS: all arguments must be strings\n"
+	croak "DENY_EXCEPT_USERS: all arguments must be strings\n"
 	    if ref $user;
-	$conf->{exempt}{$user} = undef;
+	$conf->{except}{$user} = undef;
     }
 
     return 1;
@@ -104,15 +104,15 @@ $SVN::Hooks::Inits{$HOOK} = sub {
 	add    => [],
 	delete => [],
 	update => [],
-	exempt => {},
+	except => {},
     };
 };
 
 sub pre_commit {
     my ($self, $svnlook) = @_;
 
-    # Exempt users
-    return if %{$self->{exempt}} && exists $self->{exempt}{$svnlook->author()};
+    # Except users
+    return if %{$self->{except}} && exists $self->{except}{$svnlook->author()};
 
     my @errors;
 
