@@ -1,8 +1,13 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.27    2010-03-09
+
+	Substitutes DENY_EXCEPT_USERS for DENY_EXEMPT_USERS.
+	(My wife asked me to change it.)
+
 0.26    2010-03-08
 
-	Implements the DENY_EXEMP_USERS directive in DenyChanges.
+	Implements the DENY_EXEMPT_USERS directive in DenyChanges.
 
 0.25    2010-01-19
 
