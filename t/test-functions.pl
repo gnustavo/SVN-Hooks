@@ -7,11 +7,12 @@ use warnings;
 use Cwd;
 use File::Temp qw/tempdir/;
 use File::Spec::Functions qw/catfile path/;
+use File::Path;
 
 # Make sure the svn messages come in English.
 $ENV{LC_MESSAGES} = 'C';
 
-sub has_svn {
+sub can_svn {
   CMD:
     for my $cmd (qw/svn svnadmin svnlook/) {
 	for my $path (path()) {
@@ -19,7 +20,12 @@ sub has_svn {
 	}
 	return 0;
     }
-    return 1;
+
+    my $T = tempdir('t.XXXX', DIR => getcwd());
+    my $canuseit = system("svnadmin create $T/repo") == 0;
+    rmtree($T);
+
+    return $canuseit;
 }
 
 our $T;

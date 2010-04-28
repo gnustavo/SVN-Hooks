@@ -9,8 +9,8 @@ require "test-functions.pl";
 
 my $io_available = 1;
 
-if (not has_svn()) {
-    plan skip_all => 'Need svn commands in the PATH.';
+if (not can_svn()) {
+    plan skip_all => 'Cannot find or use svn commands.';
 }
 elsif (not eval {require Email::Send}) {
     plan skip_all => 'Need Email::Send';

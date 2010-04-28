@@ -7,11 +7,11 @@ use Test::More;
 
 require "test-functions.pl";
 
-if (has_svn()) {
+if (can_svn()) {
     plan tests => 8;
 }
 else {
-    plan skip_all => 'Need svn commands in the PATH.';
+    plan skip_all => 'Cannot find or use svn commands.';
 }
 
 my $t = reset_repo();
