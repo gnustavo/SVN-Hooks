@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.28	2010-04-28
+
+	Being more careful during tests.
+
 0.27    2010-03-09
 
 	Substitutes DENY_EXCEPT_USERS for DENY_EXEMPT_USERS.
