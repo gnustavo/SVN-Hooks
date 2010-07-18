@@ -36,3 +36,16 @@
    http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
 
 * Make each plugin an object factory.
+
+- Move repo to github.
+
+- Substitute Module::Build for ExtUtils::MakeMaker
+
+- investigate Dist::Zilla
+
+- Use a xt/ directory for author tests
+
+- use utf8
+
+- perhaps use open
+
