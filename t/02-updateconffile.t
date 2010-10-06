@@ -133,7 +133,7 @@ UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
 sub actuate {
     my ($text, $file) = @_;
     die "undefined second argument" unless defined $file;
-    open F, '>', "/tmp/actuated" or die $!;
+    open F, '>', "$t/repo/conf/really-actuated" or die $!;
     print F $text;
     close F;
 }
@@ -162,5 +162,5 @@ work_ok('actuate', <<"EOS");
 echo asdf >$t/wc/actuate
 svn add -q --no-auto-props $t/wc/actuate
 svn ci -mx $t/wc/actuate
-cmp $t/wc/actuate /tmp/actuated
+cmp $t/wc/actuate $t/repo/conf/really-actuated
 EOS
