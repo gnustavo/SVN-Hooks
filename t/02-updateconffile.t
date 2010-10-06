@@ -125,7 +125,7 @@ EOSS
 cmp $t/wc/generated $t/repo/conf/generate
 EOS
 
-set_conf(<<'EOS');
+my $conf = <<'EOS';
 UPDATE_CONF_FILE(subfile => 'subdir');
 
 UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
@@ -133,7 +133,7 @@ UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
 sub actuate {
     my ($text, $file) = @_;
     die "undefined second argument" unless defined $file;
-    open F, '>', "$t/repo/conf/really-actuated" or die $!;
+    open F, '>', "TTT/repo/conf/really-actuated" or die $!;
     print F $text;
     close F;
 }
@@ -141,6 +141,10 @@ sub actuate {
 UPDATE_CONF_FILE(actuate  => 'actuate',
                  actuator => \&actuate);
 EOS
+
+$conf =~ s/TTT/$t/;
+
+set_conf($conf);
 
 mkdir "$t/repo/conf/subdir";
 
