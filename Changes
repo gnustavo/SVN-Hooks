@@ -1,5 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.29	2010-10-06
+
+	Extends the syntax of DENY_FILENAME directive to allow
+	customized error messages.
+
 0.28	2010-04-28
 
 	Being more careful during tests.
