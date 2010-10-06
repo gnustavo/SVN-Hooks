@@ -22,25 +22,52 @@ names.
 
 It's active in the C<pre-commit> hook.
 
-It's configured by the following directives.
+It's configured by the following directive.
 
-=head2 DENY_FILENAMES(REGEXP, ...)
+=head2 DENY_FILENAMES(REGEXP, [REGEXP => MESSAGE], ...)
 
 This directive denies the addition of new files matching the Regexps
-passed as arguments.
+passed as arguments. If any file or directory added in the commit
+matches one of the specified Regexps the commit is aborted with an
+error message telling about every denied file.
 
-	DENY_FILENAMES(qr/\.(doc|xls|ppt)$/); # ODF only, please
+The arguments may be compiled Regexps or two-element arrays consisting
+of a compiled Regexp and a specific error message. If a file matches
+one of the lone Regexps an error message like this is produced:
+
+        DENY_FILENAMES: filename not allowed: filename
+
+If a file matches a Regexp associated with an error message, the
+specified error message is substituted for the 'filename not allowed'
+default.
+
+Example:
+
+        DENY_FILENAMES(
+            qr/\.(doc|xls|ppt)$/i, # ODF only, please
+            [qr/\.(exe|zip|jar)/i => 'No binaries, please!'],
+        );
 
 =cut
 
 sub DENY_FILENAMES {
-    my @regexes = @_;
-    foreach my $regex (@regexes) {
-	ref $regex eq 'Regexp'
-	    or croak "$HOOK: got \"$regex\" while expecting a qr/Regex/.\n";
-    }
+    my @checks = @_;
     my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{checks} = \@regexes;
+    foreach my $check (@checks) {
+	if (ref $check eq 'Regexp') {
+	    push @{$conf->{checks}}, [$check => 'filename not allowed'];
+	} elsif (ref $check eq 'ARRAY') {
+	    @$check == 2
+		or croak "$HOOK: array arguments must have two arguments.\n";
+	    ref $check->[0] eq 'Regexp'
+		or croak "$HOOK: got \"$check->[0]\" while expecting a qr/Regex/.\n";
+	    ! ref $check->[1]
+		or croak "$HOOK: got \"$check->[1]\" while expecting a string.\n";
+	    push @{$conf->{checks}}, $check;
+	} else {
+	    croak "$HOOK: got \"$check\" while expecting a qr/Regex/ or a [qr/Regex/, 'message'].\n";
+	}
+    }
     $conf->{'pre-commit'} = \&pre_commit;
 
     return 1;
@@ -52,21 +79,18 @@ $SVN::Hooks::Inits{$HOOK} = sub {
 
 sub pre_commit {
     my ($self, $svnlook) = @_;
-    my @denied;
+    my $errors;
   ADDED:
     foreach my $added ($svnlook->added()) {
-	foreach my $regex (@{$self->{checks}}) {
-	    if ($added =~ $regex) {
-		push @denied, $added;
+	foreach my $check (@{$self->{checks}}) {
+	    if ($added =~ $check->[0]) {
+		$errors .= "$HOOK: $check->[1]: $added\n";
 		next ADDED;
 	    }
 	}
     }
-    if (@denied) {
-	croak join("\n",
-		   "$HOOK: the files below can't be added because their names aren't allowed:",
-		   @denied), "\n";
-    }
+
+    croak $errors if $errors;
 }
 
 =head1 AUTHOR
