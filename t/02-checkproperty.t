@@ -124,14 +124,14 @@ svn ci -mx $t/wc/w4
 EOS
 
 work_nok('check(string, string, regex) fail because not set',
-	 'property prop must be set and match "(?-xism:^value$)" for: w', <<"EOS");
+	 qr/property prop must be set and match "\(\?(?:-xism|\^):\^value\$\)" for: w/, <<"EOS");
 touch $t/wc/w5
 svn add -q --no-auto-props $t/wc/w5
 svn ci -mx $t/wc/w5
 EOS
 
 work_nok('check(string, string, regex) fail because of wrong value',
-	 'property prop must match "(?-xism:^value$)" but is "x" for: w', <<"EOS");
+	 qr/property prop must match "\(\?(?:-xism|\^):\^value\$\)" but is "x" for: w/, <<"EOS");
 svn ps prop x $t/wc/w5
 svn ci -mx $t/wc/w5
 EOS
