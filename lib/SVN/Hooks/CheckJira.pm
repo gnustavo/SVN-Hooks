@@ -360,6 +360,15 @@ sub _check_if_needed {
 
 		return unless @keys;
 
+		# Check if there is a restriction on the project keys allowed
+		if (exists $opts->{projects}) {
+		    foreach my $key (@keys) {
+			my ($pkey, $pnum) = split /-/, $key;
+			croak "$HOOK: issue $key is not allowed. You must cite only JIRA issues for the following projects: ", join(', ', sort keys %{$opts->{projects}}), ".\n"
+			    unless exists $opts->{projects}{$pkey};
+		    }
+		}
+
 		# Connect to JIRA if not yet connected.
 		unless (exists $conf->{jira}) {
 		    $conf->{jira} = eval {JIRA::Client->new(@{$conf->{conf}})};
