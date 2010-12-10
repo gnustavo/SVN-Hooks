@@ -179,6 +179,10 @@ the C<tags> directory.
 Deny the addition of files which file names doesn't comply with a
 Regexp. Usually used to disallow some characteres in the filenames.
 
+=item SVN::Hooks::Generic
+
+This meta plugin allows for the easy creation of custom made hooks.
+
 =item SVN::Hooks::Notify
 
 Sends notification emails after successful commits.
@@ -336,7 +340,15 @@ sub run_hook {
 
     foreach my $conf (values %{$repo->{confs}}) {
 	if (my $hook = $conf->{$hook_name}) {
-	    $hook->($conf, @args);
+	    if (ref $hook eq 'CODE') {
+		$hook->($conf, @args);
+	    } elsif (ref $hook eq 'ARRAY') {
+		foreach my $h (@$hook) {
+		    $h->($conf, @args);
+		}
+	    } else {
+		die "SVN::Hooks: internal error!\n";
+	    }
 	}
     }
 

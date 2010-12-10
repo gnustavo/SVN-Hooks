@@ -1,5 +1,12 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.31	2010-12-09
+
+	Implements the SVN::Hooks::Generic plugin to allow for the
+	easy creation of custom hooks.
+
+	Corrects CheckJira's "projects" verification.
+
 0.30	2010-10-07
 
 	Small adjustment in some test cases to accomodate changes in

@@ -11,6 +11,7 @@ lib/SVN/Hooks/CheckProperty.pm
 lib/SVN/Hooks/CheckStructure.pm
 lib/SVN/Hooks/DenyChanges.pm
 lib/SVN/Hooks/DenyFilenames.pm
+lib/SVN/Hooks/Generic.pm
 lib/SVN/Hooks/JiraAcceptance.pm
 lib/SVN/Hooks/Mailer.pm
 lib/SVN/Hooks/Notify.pm
@@ -31,6 +32,7 @@ t/02-checkstructurealone.t
 t/02-checkstructure.t
 t/02-denychanges.t
 t/02-denyfilenames.t
+t/02-generic.t
 t/02-jiraacceptance.t
 t/02-mailer.t
 t/02-notify.t
