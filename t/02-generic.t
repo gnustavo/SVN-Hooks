@@ -8,7 +8,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (can_svn()) {
-    plan tests => 7;
+    plan tests => 12;
 }
 else {
     plan skip_all => 'Cannot find or use svn commands.';
@@ -78,3 +78,54 @@ work_ok('ok', <<"EOS");
 svn ci -mx $t/wc/file.txt
 EOS
 
+set_conf(<<'EOS');
+GENERIC(
+    'start-commit' => sub { die join(',',@_), "\n"; },
+);
+EOS
+
+work_nok('cry start-commit' => "$t/repo,", <<"EOS");
+echo asdf >>$t/wc/file.txt
+svn ci -mx $t/wc/file.txt
+EOS
+
+set_conf(<<'EOS');
+GENERIC(
+    'pre-commit' => sub { die join(',',@_), "\n"; },
+);
+EOS
+
+work_nok('cry pre-commit' => 'SVN::Look=HASH', <<"EOS");
+svn ci -mx $t/wc/file.txt
+EOS
+
+set_conf(<<'EOS');
+GENERIC(
+    'pre-revprop-change' => sub { die join(',',@_), "\n"; },
+);
+EOS
+
+work_nok('cry pre-revprop-change' => 'SVN::Look=HASH', <<"EOS");
+svn ps svn:log --revprop -r 1 'changed' $t/wc
+EOS
+
+set_conf(<<'EOS');
+GENERIC(
+    'pre-lock' => sub { die join(',',@_), "\n"; },
+);
+EOS
+
+work_nok('cry pre-lock' => "$t/repo,/file.txt,", <<"EOS");
+svn lock -mx $t/wc/file.txt
+EOS
+
+set_conf(<<'EOS');
+GENERIC(
+    'pre-unlock' => sub { die join(',',@_), "\n"; },
+);
+EOS
+
+work_nok('cry pre-unlock' => "$t/repo,/file.txt,", <<"EOS");
+svn lock $t/wc/file.txt
+svn unlock $t/wc/file.txt
+EOS
