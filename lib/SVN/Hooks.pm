@@ -331,20 +331,20 @@ sub run_hook {
     # in the hooks where this makes sense.
     if ($hook_name eq 'pre-commit') {
 	# The next arg is a transaction number
-	$args[0] = SVN::Look->new($repo_path, '-t' => $args[0]);
+	$repo_path = SVN::Look->new($repo_path, '-t' => $args[0]);
     }
     elsif ($hook_name =~ /^(?:post-commit|(?:pre|post)-revprop-change)$/) {
 	# The next arg is a revision number
-	$args[0] = SVN::Look->new($repo_path, '-r' => $args[0]);
+	$repo_path = SVN::Look->new($repo_path, '-r' => $args[0]);
     }
 
     foreach my $conf (values %{$repo->{confs}}) {
 	if (my $hook = $conf->{$hook_name}) {
 	    if (ref $hook eq 'CODE') {
-		$hook->($conf, @args);
+		$hook->($conf, $repo_path, @args);
 	    } elsif (ref $hook eq 'ARRAY') {
 		foreach my $h (@$hook) {
-		    $h->($conf, @args);
+		    $h->($conf, $repo_path, @args);
 		}
 	    } else {
 		die "SVN::Hooks: internal error!\n";

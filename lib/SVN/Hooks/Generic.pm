@@ -43,21 +43,21 @@ The function signatures are the following:
 
 =item post-commit(SVN::Look)
 
-=item post-lock(repository-path, username)
+=item post-lock(repos-path, username)
 
 =item post-revprop-change(SVN::Look, username, property-name, action)
 
-=item post-unlock(repository-path, username)
+=item post-unlock(repos-path, username)
 
 =item pre-commit(SVN::Look)
 
-=item pre-lock(repository-path, username, comment, steal-lock-flag)
+=item pre-lock(repos-path, path, username, comment, steal-lock-flag)
 
 =item pre-revprop-change(SVN::Look, username, property-name, action)
 
-=item pre-unlock(repository-path, username, lock-token, break-unlock-flag)
+=item pre-unlock(repos-path, path, username, lock-token, break-unlock-flag)
 
-=item start-commit(repository-path, username, capabilities)
+=item start-commit(repos-path, username, capabilities)
 
 =back
 
@@ -108,7 +108,7 @@ sub GENERIC {
 	foreach my $foo (@$functions) {
 	    ref $foo and ref $foo eq 'CODE'
 		or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
-	    push @{$conf->{$hook}}, $foo;
+	    push @{$conf->{$hook}}, sub { shift; $foo->(@_); };
 	}
     }
 

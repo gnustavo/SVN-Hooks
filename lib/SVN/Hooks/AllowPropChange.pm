@@ -100,7 +100,7 @@ $SVN::Hooks::Inits{$HOOK} = sub {
 };
 
 sub pre_revprop_change {
-    my ($self, $rev, $author, $propname, $action) = @_;
+    my ($self, $svnlook, $rev, $author, $propname, $action) = @_;
 
     $propname =~ /^svn:(?:author|date|log)$/
 	or croak "$HOOK: the revision property $propname cannot be changed.\n";

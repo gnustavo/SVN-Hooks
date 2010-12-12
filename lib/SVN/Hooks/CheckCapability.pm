@@ -53,7 +53,7 @@ $SVN::Hooks::Inits{$HOOK} = sub {
 };
 
 sub start_commit {
-    my ($self, $user, $capabilities) = @_;
+    my ($self, $repo_path, $user, $capabilities) = @_;
 
     $capabilities ||= ''; # pre 1.5 svn clients don't pass the capabilities
 
