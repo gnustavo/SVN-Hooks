@@ -69,13 +69,13 @@ performing the Subversion action which triggered the hook.
 The sketch below shows how this directive could be used.
 
 	sub my_start_commit {
-	    my ($repo, $username, $capabilities) = @_;
-	    // ...
+	    my ($repo_path, $username, $capabilities) = @_;
+	    # ...
 	}
 
 	sub my_pre_commit {
 	    my ($svnlook) = @_;
-	    // ...
+	    # ...
 	}
 
 	GENERIC(
