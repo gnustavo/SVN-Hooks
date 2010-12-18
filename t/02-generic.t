@@ -115,7 +115,7 @@ GENERIC(
 );
 EOS
 
-work_nok('cry pre-lock' => "$t/repo,/file.txt,", <<"EOS");
+work_nok('cry pre-lock' => qr:$t/repo,/?file.txt,:, <<"EOS");
 svn lock -mx $t/wc/file.txt
 EOS
 
@@ -125,7 +125,7 @@ GENERIC(
 );
 EOS
 
-work_nok('cry pre-unlock' => "$t/repo,/file.txt,", <<"EOS");
+work_nok('cry pre-unlock' => qr:$t/repo,/?file.txt,:, <<"EOS");
 svn lock $t/wc/file.txt
 svn unlock $t/wc/file.txt
 EOS
