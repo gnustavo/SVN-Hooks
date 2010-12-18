@@ -108,7 +108,7 @@ read and you may have to maintain several of them.
 =item B<Inefficiency>
 
 This arrangement is inefficient in two ways. First because each script
-runs is a separate process, which usually have a high startup cost
+runs as a separate process, which usually have a high startup cost
 because they are, well, scripts and not binaries. And second, because
 as each script is called in turn they have no memory of the scripts
 called before and have to gather the information about the transaction
@@ -181,7 +181,8 @@ Regexp. Usually used to disallow some characteres in the filenames.
 
 =item SVN::Hooks::Generic
 
-This meta plugin allows for the easy creation of custom made hooks.
+This meta plugin allows for the easy creation of custom made hooks,
+with functionality not yet provided by any of the other plugins.
 
 =item SVN::Hooks::Notify
 
@@ -204,6 +205,7 @@ nine hook templates. Create a script there using all the plugins in
 which you are interested.
 
 	$ cd /path/to/repo/hooks
+
 	$ cat svn-hooks.pl
 	#!/usr/bin/perl
 
@@ -219,14 +221,20 @@ which you are interested.
 	use SVN::Hooks::CheckStructure;
 	use SVN::Hooks::DenyChanges;
 	use SVN::Hooks::DenyFilenames;
+	use SVN::Hooks::Generic;
 	use SVN::Hooks::Notify;
 	use SVN::Hooks::UpdateRepoFile;
 
 	run_hook($0, @ARGV);
+
 	$ chmod +x svn-hooks.pl
 
 This script will serve for any hook. Create symbolic links pointing to
-it for each hook you are interested in.
+it for each hook you are interested in. (You may create symbolic links
+for all nine hooks, but this will make Subversion call the script for
+all hooked operations, even for those that you may not be interested
+in. Nothing wrong will happen, but the server will be doing work for
+nothing.)
 
 	$ ln -s svn-hooks.pl start-commit
 	$ ln -s svn-hooks.pl pre-commit
@@ -236,7 +244,7 @@ it for each hook you are interested in.
 The default configuration file for the hook is called
 C<svn-hooks.conf> in the C<conf> directory under the directory where
 the repository was created. It's just another Perl script calling
-special functions acting as configuration directives that were defined
+special functions acting as configuration directives that are defined
 by the plugins.
 
 	$ cd ../conf
