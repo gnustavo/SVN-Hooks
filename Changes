@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.33    2011-01-16
+
+	Corrects a few gotchas in the test suite.
+
 0.32	2010-12-10
 
 	Corrects some long standing errors in the arguments passed to
