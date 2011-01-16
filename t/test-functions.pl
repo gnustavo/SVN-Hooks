@@ -90,7 +90,7 @@ sub set_hook {
 use strict;
 use warnings;
 EOS
-    if (defined $ENV{PERL5LIB}) {
+    if (defined $ENV{PERL5LIB} and length $ENV{PERL5LIB}) {
 	foreach my $path (reverse split /:/, $ENV{PERL5LIB}) {
 	    print $fd "use lib '$path';\n";
 	}
