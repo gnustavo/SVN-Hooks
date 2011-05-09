@@ -138,9 +138,7 @@ sub CHECK_STRUCTURE {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
+$SVN::Hooks::Confs->{$HOOK} = {};
 
 sub _check_structure {
     my ($structure, $path) = @_;

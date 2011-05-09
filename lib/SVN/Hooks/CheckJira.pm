@@ -276,16 +276,14 @@ sub CHECK_JIRA {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {
-	checks   => [],
-	defaults => {
-	    require     => 1,
-	    valid       => 1,
-	    unresolved  => 1,
-	    by_assignee => 0,
-	},
-    };
+$SVN::Hooks::Confs->{$HOOK} = {
+    checks   => [],
+    defaults => {
+	require     => 1,
+	valid       => 1,
+	unresolved  => 1,
+	by_assignee => 0,
+    },
 };
 
 sub _pre_checks {

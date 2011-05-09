@@ -56,9 +56,7 @@ sub CHECK_LOG {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { checks => [] };
-};
+$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

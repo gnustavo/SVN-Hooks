@@ -136,13 +136,11 @@ sub JIRA_ACCEPTANCE {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {
-	checks => [],
-	log    => {
-	    help => '',
-	},
-    };
+$SVN::Hooks::Confs->{$HOOK} = {
+    checks => [],
+    log    => {
+	help => '',
+    },
 };
 
 sub pre_commit {

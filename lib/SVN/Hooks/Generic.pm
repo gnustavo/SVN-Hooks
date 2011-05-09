@@ -119,6 +119,8 @@ $SVN::Hooks::Inits{$HOOK} = sub {
     return {};
 };
 
+$SVN::Hooks::Confs->{$HOOK} = {};
+
 =head1 AUTHOR
 
 Gustavo Chaves, C<< <gnustavo@cpan.org> >>

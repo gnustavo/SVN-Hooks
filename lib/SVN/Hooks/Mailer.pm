@@ -191,9 +191,7 @@ EOS
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { sender => {}, projects => [] };
-};
+$SVN::Hooks::Confs->{$HOOK} = { sender => {}, projects => [] };
 
 sub post_commit {
     my ($self, $svnlook) = @_;

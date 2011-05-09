@@ -83,7 +83,7 @@ sub repo {
     };
 }
 
-our (%Inits, $Repo, $Confs);
+our ($Repo, $Confs);
 
 sub _load_configs {
     ($Repo) = @_;
@@ -101,9 +101,6 @@ sub _load_configs {
 
     # Reset all configuration
     $Confs = $Repo->{confs};
-    while (my ($hook_name, $hook_init) = each %Inits) {
-	$Confs->{$hook_name} = $hook_init->();
-    }
 
     # Reload all configuration files
     foreach my $conf (@{$Repo->{conf_files}}) {

@@ -95,9 +95,7 @@ sub ALLOW_PROP_CHANGE {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { specs => [] };
-};
+$SVN::Hooks::Confs->{$HOOK} = { specs => [] };
 
 sub pre_revprop_change {
     my ($self, $svnlook, $rev, $author, $propname, $action) = @_;

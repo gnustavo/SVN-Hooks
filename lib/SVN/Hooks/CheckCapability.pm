@@ -48,9 +48,7 @@ sub CHECK_CAPABILITY {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { capabilities => [] };
-};
+$SVN::Hooks::Confs->{$HOOK} = { capabilities => [] };
 
 sub start_commit {
     my ($self, $repo_path, $user, $capabilities) = @_;

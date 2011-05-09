@@ -86,9 +86,7 @@ sub NOTIFY {
     return 1;
 };
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { defaults => {}, opts => {} };
-};
+$SVN::Hooks::Confs->{$HOOK} = { defaults => {}, opts => {} };
 
 sub post_commit {
     my ($self, $svnlook) = @_;

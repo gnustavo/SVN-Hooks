@@ -99,13 +99,11 @@ sub DENY_EXCEPT_USERS {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {
-	add    => [],
-	delete => [],
-	update => [],
-	except => {},
-    };
+$SVN::Hooks::Confs->{$HOOK} = {
+    add    => [],
+    delete => [],
+    update => [],
+    except => {},
 };
 
 sub pre_commit {

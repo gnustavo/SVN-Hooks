@@ -189,9 +189,7 @@ sub UPDATE_CONF_FILE {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
+$SVN::Hooks::Confs->{$HOOK} = {};
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

@@ -51,9 +51,7 @@ sub CHECK_MIMETYPES {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
+$SVN::Hooks::Confs->{$HOOK} = {};
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

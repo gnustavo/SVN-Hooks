@@ -74,9 +74,7 @@ sub ALLOW_LOG_CHANGE {
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { users => [] };
-};
+$SVN::Hooks::Confs->{$HOOK} = { users => [] };
 
 sub pre_revprop_change {
     my ($self, $svnlook, $rev, $author, $propname, $action) = @_;
