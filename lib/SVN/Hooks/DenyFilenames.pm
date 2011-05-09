@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
+
 =head1 NAME
 
 SVN::Hooks::DenyFilenames - Deny some file names.
@@ -72,8 +74,6 @@ sub DENY_FILENAMES {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

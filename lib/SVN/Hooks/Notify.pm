@@ -13,6 +13,11 @@ our @EXPORT = qw/NOTIFY_DEFAULTS NOTIFY/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {
+    defaults => {},
+    opts => {},
+};
+
 =head1 NAME
 
 SVN::Hooks::Notify - Subversion activity notification.
@@ -85,8 +90,6 @@ sub NOTIFY {
 
     return 1;
 };
-
-$SVN::Hooks::Confs->{$HOOK} = { defaults => {}, opts => {} };
 
 sub post_commit {
     my ($self, $svnlook) = @_;

@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {};
+
 =head1 NAME
 
 SVN::Hooks::CheckMimeTypes - Require the svn:mime-type property.
@@ -50,8 +52,6 @@ sub CHECK_MIMETYPES {
     $conf->{'pre-commit'} = \&pre_commit;
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = {};
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

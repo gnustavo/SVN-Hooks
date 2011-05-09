@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {};
+
 =head1 NAME
 
 SVN::Hooks::Generic - Implement generic checks for all Subversion hooks.
@@ -118,8 +120,6 @@ sub GENERIC {
 $SVN::Hooks::Inits{$HOOK} = sub {
     return {};
 };
-
-$SVN::Hooks::Confs->{$HOOK} = {};
 
 =head1 AUTHOR
 

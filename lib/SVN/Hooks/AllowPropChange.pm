@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = { specs => [] };
+
 =head1 NAME
 
 SVN::Hooks::AllowPropChange - Allow changes in revision properties.
@@ -94,8 +96,6 @@ sub ALLOW_PROP_CHANGE {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = { specs => [] };
 
 sub pre_revprop_change {
     my ($self, $svnlook, $rev, $author, $propname, $action) = @_;

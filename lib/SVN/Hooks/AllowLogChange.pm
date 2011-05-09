@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = { users => [] };
+
 =head1 NAME
 
 SVN::Hooks::AllowLogChange - Allow changes in revision log messages.
@@ -73,8 +75,6 @@ sub ALLOW_LOG_CHANGE {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = { users => [] };
 
 sub pre_revprop_change {
     my ($self, $svnlook, $rev, $author, $propname, $action) = @_;

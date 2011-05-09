@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = { capabilities => [] };
+
 =head1 NAME
 
 SVN::Hooks::CheckCapability - Check the svn client capabilities.
@@ -47,8 +49,6 @@ sub CHECK_CAPABILITY {
     $conf->{'start-commit'} = \&start_commit;
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = { capabilities => [] };
 
 sub start_commit {
     my ($self, $repo_path, $user, $capabilities) = @_;

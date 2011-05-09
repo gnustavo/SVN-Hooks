@@ -12,6 +12,13 @@ our @EXPORT = @HOOKS;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {
+    add    => [],
+    delete => [],
+    update => [],
+    except => {},
+};
+
 =head1 NAME
 
 SVN::Hooks::DenyChanges - Deny some changes in a repository.
@@ -98,13 +105,6 @@ sub DENY_EXCEPT_USERS {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = {
-    add    => [],
-    delete => [],
-    update => [],
-    except => {},
-};
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

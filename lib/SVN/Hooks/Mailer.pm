@@ -14,6 +14,8 @@ our @EXPORT = qw/EMAIL_CONFIG EMAIL_COMMIT/;
 
 our $VERSION = 0.11;
 
+$SVN::Hooks::Confs->{$HOOK} = { sender => {}, projects => [] };
+
 =head1 NAME
 
 SVN::Hooks::Mailer - Send emails after successful commits.
@@ -190,8 +192,6 @@ EOS
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = { sender => {}, projects => [] };
 
 sub post_commit {
     my ($self, $svnlook) = @_;

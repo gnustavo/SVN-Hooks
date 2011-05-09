@@ -15,6 +15,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {};
+
 =head1 NAME
 
 SVN::Hooks::UpdateConfFile - Maintain the repository configuration versioned.
@@ -188,8 +190,6 @@ sub UPDATE_CONF_FILE {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = {};
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
+
 =head1 NAME
 
 SVN::Hooks::CheckProperty - Check properties in added files.
@@ -81,8 +83,6 @@ sub CHECK_PROPERTY {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

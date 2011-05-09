@@ -12,6 +12,16 @@ our @EXPORT = qw/CHECK_JIRA_CONFIG CHECK_JIRA/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {
+    checks   => [],
+    defaults => {
+	require     => 1,
+	valid       => 1,
+	unresolved  => 1,
+	by_assignee => 0,
+    },
+};
+
 =head1 NAME
 
 SVN::Hooks::CheckJira - Integrate Subversion with the JIRA ticketing system.
@@ -275,16 +285,6 @@ sub CHECK_JIRA {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = {
-    checks   => [],
-    defaults => {
-	require     => 1,
-	valid       => 1,
-	unresolved  => 1,
-	by_assignee => 0,
-    },
-};
 
 sub _pre_checks {
     my ($self, $svnlook, $keys, $opts) = @_;

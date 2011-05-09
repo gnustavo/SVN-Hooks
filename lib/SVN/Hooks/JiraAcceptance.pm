@@ -12,6 +12,13 @@ our @EXPORT = qw/JIRA_CONFIG JIRA_LOG_MATCH JIRA_ACCEPTANCE/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {
+    checks => [],
+    log    => {
+	help => '',
+    },
+};
+
 =head1 NAME
 
 SVN::Hooks::JiraAcceptance - Integrate Subversion with the JIRA ticketing system.
@@ -135,13 +142,6 @@ sub JIRA_ACCEPTANCE {
 
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = {
-    checks => [],
-    log    => {
-	help => '',
-    },
-};
 
 sub pre_commit {
     my ($self, $svnlook) = @_;

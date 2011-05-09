@@ -11,6 +11,8 @@ our @EXPORT = ($HOOK, 'check_structure');
 
 our $VERSION = $SVN::Hooks::VERSION;
 
+$SVN::Hooks::Confs->{$HOOK} = {};
+
 =head1 NAME
 
 SVN::Hooks::CheckStructure - Check the structure of a repository.
@@ -137,8 +139,6 @@ sub CHECK_STRUCTURE {
     $conf->{'pre-commit'} = \&pre_commit;
     return 1;
 }
-
-$SVN::Hooks::Confs->{$HOOK} = {};
 
 sub _check_structure {
     my ($structure, $path) = @_;
