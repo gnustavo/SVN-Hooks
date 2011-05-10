@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
+$SVN::Hooks::Confs{$HOOK} = { checks => [] };
 
 =head1 NAME
 
@@ -54,7 +54,7 @@ Example:
 
 sub DENY_FILENAMES {
     my @checks = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     foreach my $check (@checks) {
 	if (ref $check eq 'Regexp') {
 	    push @{$conf->{checks}}, [$check => 'filename not allowed'];

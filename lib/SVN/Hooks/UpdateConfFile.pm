@@ -6,7 +6,6 @@ use Carp;
 use SVN::Hooks;
 use File::Spec::Functions;
 use File::Temp qw/tempdir/;
-use Memoize;
 use Cwd qw/abs_path/;
 
 use Exporter qw/import/;
@@ -15,7 +14,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {};
+$SVN::Hooks::Confs{$HOOK} = {};
 
 =head1 NAME
 
@@ -147,7 +146,7 @@ sub UPDATE_CONF_FILE {
     file_name_is_absolute($to)
 	and croak "$HOOK: second argument cannot be an absolute pathname ($to).\n";
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
 
     my %confs = (from => $from, to => $to);
 
@@ -325,8 +324,6 @@ EOS
     return;
 }
 
-# FIXME: memoize isn't working
-# memoize('_functor');
 sub _functor {
     my ($repo_path, $cmdlist) = @_;
     my $cmd = join(' ', @$cmdlist);

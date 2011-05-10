@@ -12,7 +12,7 @@ our @EXPORT = @HOOKS;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {
+$SVN::Hooks::Confs{$HOOK} = {
     add    => [],
     delete => [],
     update => [],
@@ -72,7 +72,7 @@ sub _deny_change {
 	    or croak "$HOOK: all arguments must be qr/Regexp/\n";
     }
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     push @{$conf->{$change}}, @regexes;
     $conf->{'pre-commit'} = \&pre_commit;
 
@@ -96,7 +96,7 @@ sub DENY_UPDATE {
 
 sub DENY_EXCEPT_USERS {
     my @users = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     foreach my $user (@users) {
 	croak "DENY_EXCEPT_USERS: all arguments must be strings\n"
 	    if ref $user;

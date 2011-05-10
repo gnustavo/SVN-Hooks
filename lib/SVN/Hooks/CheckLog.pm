@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
+$SVN::Hooks::Confs{$HOOK} = { checks => [] };
 
 =head1 NAME
 
@@ -48,7 +48,7 @@ sub CHECK_LOG {
     not defined $error_message or not ref $error_message
 	or croak "$HOOK: second argument must be undefined, or a STRING\n";
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     push @{$conf->{checks}}, {
 	regexp => $regexp,
 	error  => $error_message || "log message must match $regexp.",

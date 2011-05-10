@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = { specs => [] };
+$SVN::Hooks::Confs{$HOOK} = { specs => [] };
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ Specify the class of users whose names are matched by the Regexp.
 sub ALLOW_PROP_CHANGE {
     my @args = @_;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
 
     my @whos;
 

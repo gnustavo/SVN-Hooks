@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK, 'check_structure');
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {};
+$SVN::Hooks::Confs{$HOOK} = {};
 
 =head1 NAME
 
@@ -134,7 +134,7 @@ tags and the branches.
 
 sub CHECK_STRUCTURE {
     my ($structure) = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{structure} = $structure;
     $conf->{'pre-commit'} = \&pre_commit;
     return 1;

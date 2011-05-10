@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {};
+$SVN::Hooks::Confs{$HOOK} = {};
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ sub GENERIC {
 
     my %args = @args;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
 
     while (my ($hook, $functions) = each %args) {
 	$hook =~ /(?:(?:pre|post)-(?:commit|lock|revprop-change|unlock)|start-commit)/

@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = { capabilities => [] };
+$SVN::Hooks::Confs{$HOOK} = { capabilities => [] };
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ Example:
 sub CHECK_CAPABILITY {
     my @capabilities = @_;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{capabilities} = \@capabilities;
     $conf->{'start-commit'} = \&start_commit;
     return 1;

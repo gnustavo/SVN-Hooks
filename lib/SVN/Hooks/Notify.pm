@@ -13,7 +13,7 @@ our @EXPORT = qw/NOTIFY_DEFAULTS NOTIFY/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {
+$SVN::Hooks::Confs{$HOOK} = {
     defaults => {},
     opts => {},
 };
@@ -51,7 +51,7 @@ available options.
 
 sub NOTIFY_DEFAULTS {
     my %opt_defaults = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{defaults} = \%opt_defaults;
 
     return 1;
@@ -84,7 +84,7 @@ to be specified. They are grokked automatically.
 
 sub NOTIFY {
     my %opts = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{opts} = \%opts;
     $conf->{'post-commit'} = \&post_commit;
 

@@ -12,7 +12,7 @@ our @EXPORT = qw/JIRA_CONFIG JIRA_LOG_MATCH JIRA_ACCEPTANCE/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {
+$SVN::Hooks::Confs{$HOOK} = {
     checks => [],
     log    => {
 	help => '',
@@ -58,7 +58,7 @@ sub JIRA_CONFIG {
 
     $baseURL =~ s:/+$::;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{jira} = {
 	baseURL  => $baseURL,
 	login    => $login,
@@ -94,7 +94,7 @@ sub JIRA_LOG_MATCH {
 	or croak "JIRA_LOG_MATCH: first arg must be a qr/Regexp/.\n";
     not defined $message or not ref $message
 	or croak "JIRA_LOG_MATCH: second arg must be a string.\n";
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{log}{match} = $regex;
     if ($message) {
 	chomp $message;
@@ -132,7 +132,7 @@ sub JIRA_ACCEPTANCE {
 	or croak "JIRA_ACCEPTANCE: first arg must be a qr/Regexp/.\n";
     not defined $project_keys or not ref $project_keys
 	or croak "JIRA_ACCEPTANCE: second arg must be a string.\n";
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     my %keys;
     foreach (split /,/, $project_keys) {
 	$keys{$_} = undef;

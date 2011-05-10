@@ -12,7 +12,7 @@ our @EXPORT = qw/CHECK_JIRA_CONFIG CHECK_JIRA/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {
+$SVN::Hooks::Confs{$HOOK} = {
     checks   => [],
     defaults => {
 	require     => 1,
@@ -79,7 +79,7 @@ sub CHECK_JIRA_CONFIG {
 
     $baseURL =~ s:/+$::;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{conf} = {
 	conf  => [$baseURL, $login, $passwd],
 	match => $match,
@@ -271,7 +271,7 @@ sub CHECK_JIRA {
 	$opts->{$opt} = $opt_checks{$opt}->($opt, $opts->{$opt});
     }
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     if (ref $regex) {
 	push @{$conf->{checks}}, [$regex => $opts];
     }

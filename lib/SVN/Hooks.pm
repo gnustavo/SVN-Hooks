@@ -3,7 +3,6 @@ package SVN::Hooks;
 use warnings;
 use strict;
 use File::Basename;
-use Memoize;
 use SVN::Look;
 
 use Exporter qw/import/;
@@ -25,15 +24,27 @@ Version 0.33
 our $VERSION = '0.33';
 
 our @Conf_Files = ('conf/svn-hooks.conf');
+our $Repo       = undef;
+our %Confs      = ();
 
 sub run_hook {
     my ($hook_name, $repo_path, @args) = @_;
 
     $hook_name = basename $hook_name;
 
-    my $repo = repo($repo_path);
+    -d $repo_path or die "not a directory ($repo_path): $_\n";
 
-    _load_configs($repo);
+    $Repo = $repo_path;
+
+    # Reload all configuration files
+    foreach my $conf (@Conf_Files) {
+	package main;
+	unless (my $return = do "$Repo/$conf") {
+	    die "couldn't parse '$Repo/$conf': $@\n" if $@;
+	    die "couldn't do '$Repo/$conf': $!\n"    unless defined $return;
+	    die "couldn't run '$Repo/$conf'\n"       unless $return;
+	}
+    }
 
     # Substitute a SVN::Look object for the first argument
     # in the hooks where this makes sense.
@@ -46,7 +57,7 @@ sub run_hook {
 	$repo_path = SVN::Look->new($repo_path, '-r' => $args[0]);
     }
 
-    foreach my $conf (values %{$repo->{confs}}) {
+    foreach my $conf (values %Confs) {
 	if (my $hook = $conf->{$hook_name}) {
 	    if (ref $hook eq 'CODE') {
 		$hook->($conf, $repo_path, @args);
@@ -63,120 +74,67 @@ sub run_hook {
     return;
 }
 
-memoize('repo');
-sub repo {
-    my ($repo_path) = @_;
-
-    -d $repo_path or die "not a directory: $_\n";
-
-    my @conf_files;
-    foreach my $file (@Conf_Files) {
-	my $conf = ($file =~ m:^/:) ? $file : "$repo_path/$file";
-	-r $conf or die "can't read: $conf\n";
-	push @conf_files, {file => $conf, mtime => 0};
-    }
-
-    return {
-	repo_path  => $repo_path,
-	conf_files => \@conf_files,
-	confs      => {},
-    };
-}
-
-our ($Repo, $Confs);
-
-sub _load_configs {
-    ($Repo) = @_;
-
-    my $touched = 0;
-    foreach my $conf (@{$Repo->{conf_files}}) {
-	my $mtime = (stat $conf->{file})[9];
-	if ($conf->{mtime} != $mtime) {
-	    # Update the mtime of every configuration file
-	    $conf->{mtime} = $mtime;
-	    $touched = 1;
-	}
-    }
-    return unless $touched;
-
-    # Reset all configuration
-    $Confs = $Repo->{confs};
-
-    # Reload all configuration files
-    foreach my $conf (@{$Repo->{conf_files}}) {
-	package main;
-	unless (my $return = do $conf->{file}) {
-	    die "couldn't parse $conf->{file}: $@\n" if $@;
-	    die "couldn't do $conf->{file}: $!\n"    unless defined $return;
-	    die "couldn't run $conf->{file}\n"       unless $return;
-	}
-	package SVN::Hooks;
-    }
-
-    return;
-}
-
 # post-commit(SVN::Look)
 
 sub POST_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'post-commit'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'post-commit'}}, sub { shift; $hook->(@_); };
 }
 
 # post-lock(repos-path, username)
 
 sub POST_LOCK (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'post-lock'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'post-lock'}}, sub { shift; $hook->(@_); };
 }
 
 # post-revprop-change(SVN::Look, username, property-name, action)
 
 sub POST_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'post-revprop-change'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'post-revprop-change'}}, sub { shift; $hook->(@_); };
 }
 
 # post-unlock(repos-path, username)
 
 sub POST_UNLOCK (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'post-unlock'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'post-unlock'}}, sub { shift; $hook->(@_); };
 }
 
 # pre-commit(SVN::Look)
 
 sub PRE_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'pre-commit'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'pre-commit'}}, sub { shift; $hook->(@_); };
 }
 
 # pre-lock(repos-path, path, username, comment, steal-lock-flag)
 
 sub PRE_LOCK (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'pre-lock'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'pre-lock'}}, sub { shift; $hook->(@_); };
 }
 
 # pre-revprop-change(SVN::Look, username, property-name, action)
 
 sub PRE_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'pre-revprop-change'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'pre-revprop-change'}}, sub { shift; $hook->(@_); };
 }
 
 # pre-unlock(repos-path, path, username, lock-token, break-unlock-flag)
 
 sub PRE_UNLOCK (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'pre-unlock'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'pre-unlock'}}, sub { shift; $hook->(@_); };
 }
 
 # start-commit(repos-path, username, capabilities)
 
 sub START_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Confs->{HOOKS}{'start-commit'}}, sub { shift; $hook->(@_); };
+    push @{$Confs{HOOKS}{'start-commit'}}, sub { shift; $hook->(@_); };
 }
 
 1; # End of SVN::Hooks

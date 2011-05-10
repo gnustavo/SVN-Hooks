@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = {};
+$SVN::Hooks::Confs{$HOOK} = {};
 
 =head1 NAME
 
@@ -47,7 +47,7 @@ a rather verbose help message in case of errors.
 
 sub CHECK_MIMETYPES {
     my ($help) = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     $conf->{help} = $help;
     $conf->{'pre-commit'} = \&pre_commit;
     return 1;

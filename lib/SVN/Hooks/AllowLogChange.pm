@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = { users => [] };
+$SVN::Hooks::Confs{$HOOK} = { users => [] };
 
 =head1 NAME
 
@@ -60,7 +60,7 @@ Regexp.
 sub ALLOW_LOG_CHANGE {
     my @args = @_;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
 
     foreach my $who (@args) {
 	if (not ref $who or ref $who eq 'Regexp') {

@@ -14,7 +14,7 @@ our @EXPORT = qw/EMAIL_CONFIG EMAIL_COMMIT/;
 
 our $VERSION = 0.11;
 
-$SVN::Hooks::Confs->{$HOOK} = { sender => {}, projects => [] };
+$SVN::Hooks::Confs{$HOOK} = { sender => {}, projects => [] };
 
 =head1 NAME
 
@@ -65,7 +65,7 @@ sub EMAIL_CONFIG {
         if @_ != 2;
 
     my ($opt, $arg) = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
 
     $conf->{sender} = Email::Send->new({mailer => $opt});
     if    ($opt eq 'Sendmail') {
@@ -185,7 +185,7 @@ EOS
             unless exists $o{$header};
     }
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     push @{$conf->{projects}}, \%o;
 
     $conf->{'post-commit'} = \&post_commit;

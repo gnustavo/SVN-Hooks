@@ -11,7 +11,7 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs->{$HOOK} = { checks => [] };
+$SVN::Hooks::Confs{$HOOK} = { checks => [] };
 
 =head1 NAME
 
@@ -77,7 +77,7 @@ sub CHECK_PROPERTY {
     not defined $what or not ref $what or ref $what eq 'Regexp'
 	or croak "$HOOK: third argument must be undefined, or a NUMBER, or a STRING, or a qr/Regexp/\n";
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+    my $conf = $SVN::Hooks::Confs{$HOOK};
     push @{$conf->{checks}}, [$where, $prop => $what];
     $conf->{'pre-commit'} = \&pre_commit;
 
