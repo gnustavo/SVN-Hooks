@@ -21,6 +21,7 @@ MANIFEST
 META.yml
 README
 t/00-load.t
+t/01-direct.t
 t/02-allowlogchange.t
 t/02-allowpropchange.t
 t/02-checkcapability.t
