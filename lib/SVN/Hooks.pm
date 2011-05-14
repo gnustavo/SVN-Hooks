@@ -17,11 +17,11 @@ SVN::Hooks - A framework for implementing Subversion hooks.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.90
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.90';
 
 our @Conf_Files = ('conf/svn-hooks.conf');
 our $Repo       = undef;

@@ -1,5 +1,17 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.90	2011-05-14
+
+	Big refactoring of the code base. Implements hook directives
+	in SVN::Hooks and simplifies the implementation and
+	configuration of plugins.
+
+	Revises the POD documentation.
+
+	Deprecates SVN::Hooks::Generic.
+
+	Preparing for a 1.00 release.
+
 0.33    2011-01-16
 
 	Corrects a few gotchas in the test suite.
