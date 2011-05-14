@@ -18,9 +18,10 @@ SVN::Hooks::Generic - Implement generic checks for all Subversion hooks.
 =head1 SYNOPSIS
 
 This SVN::Hooks plugin allows you to easily write generic checks for
-all Subversion standard hooks.
+all Subversion standard hooks. It's deprecated. You should use the
+SVN::Hooks hook defining exported directives instead.
 
-It's configured by the following directive.
+This module is configured by the following directive.
 
 =head2 GENERIC(HOOK => FUNCTION, HOOK => [FUNCTIONS], ...)
 
