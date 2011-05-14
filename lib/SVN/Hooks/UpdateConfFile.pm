@@ -165,7 +165,7 @@ sub UPDATE_CONF_FILE {
 		    or croak "$HOOK: $function argument must have at least one element.\n";
 		-x $what->[0]
 		    or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
-		$confs{$function} = _functor($SVN::Hooks::Repo->{repo_path}, $what);
+		$confs{$function} = _functor($SVN::Hooks::Repo, $what);
 	    }
 	    else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
@@ -227,7 +227,7 @@ sub pre_commit {
 sub post_commit {
     my ($self, $svnlook) = @_;
 
-    my $absbase = abs_path(catdir($SVN::Hooks::Repo->{repo_path}, 'conf'));
+    my $absbase = abs_path(catdir($SVN::Hooks::Repo, 'conf'));
 
   CONF:
     foreach my $conf (@{$self->{confs}}) {
@@ -243,7 +243,7 @@ sub post_commit {
 		$to = eval qq{"$to"}; ## no critic
 	    }
 
-	    $to = abs_path(catfile($SVN::Hooks::Repo->{repo_path}, 'conf', $to));
+	    $to = abs_path(catfile($SVN::Hooks::Repo, 'conf', $to));
 	    if (-d $to) {
 		$to = catfile($to, (File::Spec->splitpath($file))[2]);
 	    }
