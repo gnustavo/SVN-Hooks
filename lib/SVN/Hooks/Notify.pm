@@ -44,10 +44,10 @@ available options.
 
 =cut
 
+my %Defaults;
+
 sub NOTIFY_DEFAULTS {
-    my %opt_defaults = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{defaults} = \%opt_defaults;
+    %Defaults = @_;
 
     return 1;
 }
@@ -77,27 +77,24 @@ to be specified. They are grokked automatically.
 
 =cut
 
+my %Options;
+
 sub NOTIFY {
-    my %opts = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{opts} = \%opts;
-    $conf->{'post-commit'} = \&post_commit;
+    %Options = @_;
+
+    POST_COMMIT(\&post_commit);
 
     return 1;
 };
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { defaults => {}, opts => {} };
-};
-
 sub post_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     require SVN::Notify;
 
     my $notifier = SVN::Notify->new(
-	%{$self->{defaults}},
-	%{$self->{opts}},
+	%Defaults,
+	%Options,
 	repos_path => $svnlook->repo(),
 	revision   => $svnlook->rev(),
     );

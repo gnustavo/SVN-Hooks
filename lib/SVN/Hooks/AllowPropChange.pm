@@ -69,10 +69,10 @@ Specify the class of users whose names are matched by the Regexp.
 
 =cut
 
+my @Specs;
+
 sub ALLOW_PROP_CHANGE {
     my @args = @_;
-
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
 
     my @whos;
 
@@ -89,18 +89,15 @@ sub ALLOW_PROP_CHANGE {
 	or croak "$HOOK: you must specify at least the first argument\n";
 
     my $prop = shift @whos;
-    push @{$conf->{specs}}, [$prop => \@whos];
-    $conf->{'pre-revprop-change'} = \&pre_revprop_change;
+    push @Specs, [$prop => \@whos];
+
+    PRE_REVPROP_CHANGE(\&pre_revprop_change);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { specs => [] };
-};
-
 sub pre_revprop_change {
-    my ($self, $svnlook, $rev, $author, $propname, $action) = @_;
+    my ($svnlook, $rev, $author, $propname, $action) = @_;
 
     $propname =~ /^svn:(?:author|date|log)$/
 	or croak "$HOOK: the revision property $propname cannot be changed.\n";
@@ -108,7 +105,7 @@ sub pre_revprop_change {
     $action eq 'M'
 	or croak "$HOOK: revision properties can only be modified, not added or deleted.\n";
 
-    foreach my $spec (@{$self->{specs}}) {
+    foreach my $spec (@Specs) {
 	my ($prop, $whos) = @$spec;
 	if (! ref $prop) {
 	    next if $propname ne $prop;

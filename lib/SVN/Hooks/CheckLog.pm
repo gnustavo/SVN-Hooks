@@ -38,6 +38,8 @@ user in case the check fails.
 
 =cut
 
+my @checks;
+
 sub CHECK_LOG {
     my ($regexp, $error_message) = @_;
 
@@ -46,26 +48,22 @@ sub CHECK_LOG {
     not defined $error_message or not ref $error_message
 	or croak "$HOOK: second argument must be undefined, or a STRING\n";
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    push @{$conf->{checks}}, {
+    push @checks, {
 	regexp => $regexp,
 	error  => $error_message || "log message must match $regexp.",
     };
-    $conf->{'pre-commit'} = \&pre_commit;
+
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { checks => [] };
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my $log = $svnlook->log_msg();
 
-    foreach my $check (@{$self->{checks}}) {
+    foreach my $check (@checks) {
 	$log =~ $check->{regexp}
 	    or croak "$HOOK: $check->{error}";
     }

@@ -18,9 +18,10 @@ SVN::Hooks::Generic - Implement generic checks for all Subversion hooks.
 =head1 SYNOPSIS
 
 This SVN::Hooks plugin allows you to easily write generic checks for
-all Subversion standard hooks.
+all Subversion standard hooks. It's deprecated. You should use the
+SVN::Hooks hook defining exported directives instead.
 
-It's configured by the following directive.
+This module is configured by the following directive.
 
 =head2 GENERIC(HOOK => FUNCTION, HOOK => [FUNCTIONS], ...)
 
@@ -93,8 +94,6 @@ sub GENERIC {
 
     my %args = @args;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-
     while (my ($hook, $functions) = each %args) {
 	$hook =~ /(?:(?:pre|post)-(?:commit|lock|revprop-change|unlock)|start-commit)/
 	    or die "$HOOK: invalid hook name ($hook)";
@@ -108,16 +107,12 @@ sub GENERIC {
 	foreach my $foo (@$functions) {
 	    ref $foo and ref $foo eq 'CODE'
 		or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
-	    push @{$conf->{$hook}}, sub { shift; $foo->(@_); };
+	    $SVN::Hooks::Hooks{$hook}{$foo} ||= sub { $foo->(@_); };
 	}
     }
 
     return 1;
 }
-
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
 
 =head1 AUTHOR
 

@@ -57,6 +57,9 @@ This rule exempts users C<john> and C<mary> from the other deny rules.
 
 =cut
 
+my %Deny;			# List of deny regexen
+my %Except;			# Users exempt from the checks
+
 sub _deny_change {
     my ($change, @regexes) = @_;
 
@@ -65,9 +68,9 @@ sub _deny_change {
 	    or croak "$HOOK: all arguments must be qr/Regexp/\n";
     }
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    push @{$conf->{$change}}, @regexes;
-    $conf->{'pre-commit'} = \&pre_commit;
+    push @{$Deny{$change}}, @regexes;
+
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
@@ -89,34 +92,25 @@ sub DENY_UPDATE {
 
 sub DENY_EXCEPT_USERS {
     my @users = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+
     foreach my $user (@users) {
 	croak "DENY_EXCEPT_USERS: all arguments must be strings\n"
 	    if ref $user;
-	$conf->{except}{$user} = undef;
+	$Except{$user} = undef;
     }
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {
-	add    => [],
-	delete => [],
-	update => [],
-	except => {},
-    };
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     # Except users
-    return if %{$self->{except}} && exists $self->{except}{$svnlook->author()};
+    return if exists $Except{$svnlook->author()};
 
     my @errors;
 
-    foreach my $regex (@{$self->{add}}) {
+    foreach my $regex (@{$Deny{add}}) {
       ADDED:
 	foreach my $file ($svnlook->added()) {
 	    if ($file =~ $regex) {
@@ -126,7 +120,7 @@ sub pre_commit {
 	}
     }
 
-    foreach my $regex (@{$self->{delete}}) {
+    foreach my $regex (@{$Deny{delete}}) {
       DELETED:
 	foreach my $file ($svnlook->deleted()) {
 	    if ($file =~ $regex) {
@@ -136,7 +130,7 @@ sub pre_commit {
 	}
     }
 
-    foreach my $regex (@{$self->{update}}) {
+    foreach my $regex (@{$Deny{update}}) {
       UPDATED:
 	foreach my $file ($svnlook->updated()) {
 	    if ($file =~ $regex) {

@@ -43,20 +43,24 @@ a rather verbose help message in case of errors.
 
 =cut
 
+my $Help = <<"EOS";
+You may want to consider uncommenting the auto-props section
+in your ~/.subversion/config file. Read the Subversion book
+(http://svnbook.red-bean.com/), Chapter 7, Properties section,
+Automatic Property Setting subsection for more help.
+EOS
+
 sub CHECK_MIMETYPES {
     my ($help) = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{help} = $help;
-    $conf->{'pre-commit'} = \&pre_commit;
+    $Help = $help if defined $help;
+
+    PRE_COMMIT(\&pre_commit);
+
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @errors;
 
@@ -75,7 +79,7 @@ sub pre_commit {
     }
 
     if (@errors) {
-	my $message = "$HOOK:\n" . join("\n", @errors) . <<'EOS';
+	croak "$HOOK:\n", join("\n", @errors), <<'EOS', $Help;
 
 Every added file must have the svn:mime-type property set. In
 addition, text files must have the svn:eol-style and svn:keywords
@@ -90,18 +94,6 @@ svn propset svn:eol-style native path/of/file
 svn propset svn:keywords 'Author Date Id Revision' path/of/file
 
 EOS
-	if (my $help = $self->{help}) {
-	    $message .= $help;
-	}
-	else {
-	    $message .= <<"EOS";
-You may want to consider uncommenting the auto-props section
-in your ~/.subversion/config file. Read the Subversion book
-(http://svnbook.red-bean.com/), Chapter 7, Properties section,
-Automatic Property Setting subsection for more help.
-EOS
-	}
-	croak $message;
     }
 }
 

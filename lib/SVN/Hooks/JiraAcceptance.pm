@@ -44,19 +44,14 @@ rights.
 
 =cut
 
-sub JIRA_CONFIG {
-    my ($baseURL, $login, $password) = @_;
+my ($BaseURL, $Login, $Passwd);
 
+sub JIRA_CONFIG {
     @_ == 3 or croak "JIRA_CONFIG: requires three arguments.\n";
 
-    $baseURL =~ s:/+$::;
+    ($BaseURL, $Login, $Passwd) = @_;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{jira} = {
-	baseURL  => $baseURL,
-	login    => $login,
-	password => $password,
-    };
+    $BaseURL =~ s:/+$::;
 
     return 1;
 }
@@ -81,17 +76,19 @@ user in case the JIRA test fails.
 
 =cut
 
+my ($Match, $Help);
+
 sub JIRA_LOG_MATCH {
     my ($regex, $message) = @_;
     ref $regex eq 'Regexp'
 	or croak "JIRA_LOG_MATCH: first arg must be a qr/Regexp/.\n";
     not defined $message or not ref $message
 	or croak "JIRA_LOG_MATCH: second arg must be a string.\n";
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{log}{match} = $regex;
+
+    $Match = $regex;
     if ($message) {
 	chomp $message;
-	$conf->{log}{help} = <<"EOS";
+	$Help = <<"EOS";
 JIRA_ACCEPTANCE: The administrator offered the following help:
 $message
 EOS
@@ -119,40 +116,34 @@ you don't want to specify any exact project key.
 
 =cut
 
+my @Checks;
+
 sub JIRA_ACCEPTANCE {
     my ($regex, $project_keys) = @_;
     ref $regex eq 'Regexp'
 	or croak "JIRA_ACCEPTANCE: first arg must be a qr/Regexp/.\n";
     not defined $project_keys or not ref $project_keys
 	or croak "JIRA_ACCEPTANCE: second arg must be a string.\n";
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
+
     my %keys;
     foreach (split /,/, $project_keys) {
 	$keys{$_} = undef;
     }
-    push @{$conf->{checks}}, [$regex => \%keys];
-    $conf->{'pre-commit'} = \&pre_commit;
+    push @Checks, [$regex => \%keys];
+
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {
-	checks => [],
-	log    => {
-	    help => '',
-	},
-    };
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @files = $svnlook->changed();
 
     my %keys;
 
-    foreach my $check (@{$self->{checks}}) {
+    foreach my $check (@Checks) {
 	my ($regex, $project_keys) = @$check;
 
 	for my $file (@files) {
@@ -164,20 +155,20 @@ sub pre_commit {
     }
 
     if (%keys) {
-	my $jira = $self->{jira}
+	defined $BaseURL
 	    or croak "JIRA_ACCEPTANCE: plugin not configured.";
 
 	# Grok JIRA references from the log
 	my $jira_refs = $svnlook->log_msg();
-	if (exists $self->{log}{match}) {
-	    if ($jira_refs =~ $self->{log}{match}) {
+	if (defined $Match) {
+	    if ($jira_refs =~ $Match) {
 		$jira_refs = $1;
 	    }
 	    else {
 		chomp $jira_refs;
 		croak <<"EOS";
 JIRA_ACCEPTANCE: Could not extract JIRA references from the log message.
-$self->{log}{help}
+$Help
 EOS
 	    }
 	}
@@ -185,18 +176,18 @@ EOS
 	# invoke JIRA web service
 	my $result = eval {
 	    XMLRPC::Lite
-	        ->proxy("$jira->{baseURL}/rpc/xmlrpc")
+	        ->proxy("$BaseURL/rpc/xmlrpc")
 		->call(
 		    'commitacc.acceptCommit',
-		    $jira->{login},
-		    $jira->{password},
+		    $Login,
+		    $Passwd,
 		    $svnlook->author(),
 		    join(',', keys %keys),
 		    $jira_refs,
 		)
 		->result();
 	};
-	croak "JIRA_ACCEPTANCE: Unable to connect to the JIRA server at \"$jira->{baseURL}/rpc/xmlrpc\": $@.\n"
+	croak "JIRA_ACCEPTANCE: Unable to connect to the JIRA server at \"$BaseURL/rpc/xmlrpc\": $@.\n"
 	    if $@;
 
 	# This can happen if there's an error in the JIRA plugin

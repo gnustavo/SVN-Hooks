@@ -6,7 +6,6 @@ use Carp;
 use SVN::Hooks;
 use File::Spec::Functions;
 use File::Temp qw/tempdir/;
-use Memoize;
 use Cwd qw/abs_path/;
 
 use Exporter qw/import/;
@@ -130,6 +129,8 @@ commit a wrong authz file that denies any subsequent commit.
 
 =cut
 
+my @Config;
+
 sub UPDATE_CONF_FILE {
     my ($from, $to, @args) = @_;
 
@@ -145,11 +146,7 @@ sub UPDATE_CONF_FILE {
     file_name_is_absolute($to)
 	and croak "$HOOK: second argument cannot be an absolute pathname ($to).\n";
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-
     my %confs = (from => $from, to => $to);
-
-    push @{$conf->{confs}}, \%confs;
 
     my %args = @args;
 
@@ -164,12 +161,13 @@ sub UPDATE_CONF_FILE {
 		    or croak "$HOOK: $function argument must have at least one element.\n";
 		-x $what->[0]
 		    or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
-		$confs{$function} = _functor($SVN::Hooks::Repo->{repo_path}, $what);
+		$confs{$function} = _functor($SVN::Hooks::Repo, $what);
 	    }
 	    else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
 	    }
-	    $conf->{'pre-commit'} = \&pre_commit;
+
+	    PRE_COMMIT(\&pre_commit);
 	}
     }
 
@@ -184,20 +182,18 @@ sub UPDATE_CONF_FILE {
     keys %args == 0
 	or croak "$HOOK: invalid function names: ", join(', ', sort keys %args), ".\n";
 
-    $conf->{'post-commit'} = \&post_commit;
+    push @Config, \%confs;
+
+    POST_COMMIT(\&post_commit);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
   CONF:
-    foreach my $conf (@{$self->{confs}}) {
+    foreach my $conf (@Config) {
 	if (my $validator = $conf->{validator}) {
 	    my $from = $conf->{from};
 	    for my $file ($svnlook->added(), $svnlook->updated()) {
@@ -228,12 +224,12 @@ sub pre_commit {
 }
 
 sub post_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
-    my $absbase = abs_path(catdir($SVN::Hooks::Repo->{repo_path}, 'conf'));
+    my $absbase = abs_path(catdir($SVN::Hooks::Repo, 'conf'));
 
   CONF:
-    foreach my $conf (@{$self->{confs}}) {
+    foreach my $conf (@Config) {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
 	    my $to = $conf->{to};
@@ -246,7 +242,7 @@ sub post_commit {
 		$to = eval qq{"$to"}; ## no critic
 	    }
 
-	    $to = abs_path(catfile($SVN::Hooks::Repo->{repo_path}, 'conf', $to));
+	    $to = abs_path(catfile($SVN::Hooks::Repo, 'conf', $to));
 	    if (-d $to) {
 		$to = catfile($to, (File::Spec->splitpath($file))[2]);
 	    }
@@ -327,8 +323,6 @@ EOS
     return;
 }
 
-# FIXME: memoize isn't working
-# memoize('_functor');
 sub _functor {
     my ($repo_path, $cmdlist) = @_;
     my $cmd = join(' ', @$cmdlist);

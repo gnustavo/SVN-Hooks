@@ -39,21 +39,18 @@ Example:
 
 =cut
 
-sub CHECK_CAPABILITY {
-    my @capabilities = @_;
+my @Capabilities;
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{capabilities} = \@capabilities;
-    $conf->{'start-commit'} = \&start_commit;
+sub CHECK_CAPABILITY {
+    push @Capabilities, @_;
+
+    START_COMMIT(\&start_commit);
+
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { capabilities => [] };
-};
-
 sub start_commit {
-    my ($self, $repo_path, $user, $capabilities) = @_;
+    my ($repo_path, $user, $capabilities) = @_;
 
     $capabilities ||= ''; # pre 1.5 svn clients don't pass the capabilities
 
@@ -62,7 +59,7 @@ sub start_commit {
     @supported{split /:/, $capabilities} = undef;
 
     # Grok which required capabilities are missing
-    my @missing = grep {! exists $supported{$_}} @{$self->{capabilities}};
+    my @missing = grep {! exists $supported{$_}} @Capabilities;
 
     if (@missing) {
 	croak "$HOOK: Your subversion client does not support the following capabilities:\n\n\t",

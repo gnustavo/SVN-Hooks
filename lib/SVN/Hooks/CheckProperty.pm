@@ -65,6 +65,8 @@ Example:
 
 =cut
 
+my @Checks;
+
 sub CHECK_PROPERTY {
     my ($where, $prop, $what) = @_;
 
@@ -75,24 +77,20 @@ sub CHECK_PROPERTY {
     not defined $what or not ref $what or ref $what eq 'Regexp'
 	or croak "$HOOK: third argument must be undefined, or a NUMBER, or a STRING, or a qr/Regexp/\n";
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    push @{$conf->{checks}}, [$where, $prop => $what];
-    $conf->{'pre-commit'} = \&pre_commit;
+    push @Checks, [$where, $prop => $what];
+
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { checks => [] };
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @errors;
 
     foreach my $added ($svnlook->added()) {
-	foreach my $check (@{$self->{checks}}) {
+	foreach my $check (@Checks) {
 	    my ($where, $prop, $what) = @$check;
 	    if (ref $where eq 'Regexp' and $added =~ $where or
 		    $where eq substr($added, 0, length $where)) {

@@ -8,6 +8,7 @@ use Cwd;
 use File::Temp qw/tempdir/;
 use File::Spec::Functions qw/catfile path/;
 use File::Path;
+use File::Copy;
 
 # Make sure the svn messages come in English.
 $ENV{LC_MESSAGES} = 'C';
@@ -45,6 +46,8 @@ sub do_script {
 	close $script;
 	chmod 0755, "$dir/script";
     }
+    copy("$T/repo/hooks/svn-hooks.pl", "$dir/svn-hooks.pl");
+    copy("$T/repo/conf/svn-hooks.conf", "$dir/svn-hooks.conf");
 
     system("$dir/script 1>$dir/stdout 2>$dir/stderr");
 }
@@ -85,8 +88,9 @@ sub set_hook {
     my ($text) = @_;
     open my $fd, '>', "$T/repo/hooks/svn-hooks.pl"
 	or die "Can't create $T/repo/hooks/svn-hooks.pl: $!";
+    my $debug = exists $ENV{DBG} ? '-d' : '';
     print $fd <<"EOS";
-#!$^X
+#!$^X $debug
 use strict;
 use warnings;
 EOS

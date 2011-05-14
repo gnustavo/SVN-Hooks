@@ -130,17 +130,15 @@ tags and the branches.
 
 =cut
 
+my $Structure;
+
 sub CHECK_STRUCTURE {
-    my ($structure) = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    $conf->{structure} = $structure;
-    $conf->{'pre-commit'} = \&pre_commit;
+    ($Structure) = @_;
+
+    PRE_COMMIT(\&pre_commit);
+
     return 1;
 }
-
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
 
 sub _check_structure {
     my ($structure, $path) = @_;
@@ -243,7 +241,7 @@ sub check_structure {
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @errors;
 
@@ -254,7 +252,7 @@ sub pre_commit {
 	# components so that we can differentiate directory paths from
 	# file paths.
 	my @added = split '/', "/$added", -1;
-	my ($code, $error) = _check_structure($self->{structure}, \@added);
+	my ($code, $error) = _check_structure($Structure, \@added);
 	push @errors, "$error: $added" if $code == 0;
     }
 

@@ -12,7 +12,7 @@ use Exporter qw/import/;
 my $HOOK = 'MAILER';
 our @EXPORT = qw/EMAIL_CONFIG EMAIL_COMMIT/;
 
-our $VERSION = 0.11;
+our $VERSION = $SVN::Hooks::VERSION;
 
 =head1 NAME
 
@@ -58,23 +58,24 @@ The first two are the most common. The last can be used for debugging.
 
 =cut
 
+my $Sender;
+
 sub EMAIL_CONFIG {
     croak "EMAIL_CONFIG: requires two arguments"
         if @_ != 2;
 
     my ($opt, $arg) = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
 
-    $conf->{sender} = Email::Send->new({mailer => $opt});
+    $Sender = Email::Send->new({mailer => $opt});
     if    ($opt eq 'Sendmail') {
         -x $arg or croak "EMAIL_CONFIG: not an executable file ($arg)";
         $Email::Send::Sendmail::SENDMAIL = $arg;
     }
     elsif ($opt eq 'SMTP') {
-        $conf->{sender}->mailer_args([Host => $arg]);
+        $Sender->mailer_args([Host => $arg]);
     }
     elsif ($opt eq 'IO') {
-        $conf->{sender}->mailer_args([$arg]);
+        $Sender->mailer_args([$arg]);
     }
     else {
         croak "EMAIL_CONFIG: unknown option '$opt'"
@@ -153,6 +154,8 @@ Print differences against the copy source.
 
 =cut
 
+my @Projects;
+
 sub EMAIL_COMMIT {
     croak "EMAIL_COMMIT: odd number of arguments"
         if @_ % 2;
@@ -183,25 +186,20 @@ EOS
             unless exists $o{$header};
     }
 
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    push @{$conf->{projects}}, \%o;
+    push @Projects, \%o;
 
-    $conf->{'post-commit'} = \&post_commit;
+    POST_COMMIT(\&post_commit);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { sender => {}, projects => [] };
-};
-
 sub post_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my ($body, $rev, $author, $date);
 
   PROJECT:
-    foreach my $p (@{$self->{projects}}) {
+    foreach my $p (@Projects) {
         foreach my $file ($svnlook->changed()) {
             if ($file =~ $p->{match}) {
                 unless ($body) {
@@ -234,7 +232,7 @@ EOS
                         $body   .= "\n$diff";
                     }
                 }
-                _send_email($self->{sender}, $p, $rev, $author, $body);
+                _send_email($Sender, $p, $rev, $author, $body);
                 next PROJECT;
             }
         }

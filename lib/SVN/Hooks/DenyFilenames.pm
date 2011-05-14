@@ -50,12 +50,13 @@ Example:
 
 =cut
 
+my @Checks;
+
 sub DENY_FILENAMES {
-    my @checks = @_;
-    my $conf = $SVN::Hooks::Confs->{$HOOK};
-    foreach my $check (@checks) {
+
+    foreach my $check (@_) {
 	if (ref $check eq 'Regexp') {
-	    push @{$conf->{checks}}, [$check => 'filename not allowed'];
+	    push @Checks, [$check => 'filename not allowed'];
 	} elsif (ref $check eq 'ARRAY') {
 	    @$check == 2
 		or croak "$HOOK: array arguments must have two arguments.\n";
@@ -63,26 +64,23 @@ sub DENY_FILENAMES {
 		or croak "$HOOK: got \"$check->[0]\" while expecting a qr/Regex/.\n";
 	    ! ref $check->[1]
 		or croak "$HOOK: got \"$check->[1]\" while expecting a string.\n";
-	    push @{$conf->{checks}}, $check;
+	    push @Checks, $check;
 	} else {
 	    croak "$HOOK: got \"$check\" while expecting a qr/Regex/ or a [qr/Regex/, 'message'].\n";
 	}
     }
-    $conf->{'pre-commit'} = \&pre_commit;
+
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return { checks => [] };
-};
-
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
     my $errors;
   ADDED:
     foreach my $added ($svnlook->added()) {
-	foreach my $check (@{$self->{checks}}) {
+	foreach my $check (@Checks) {
 	    if ($added =~ $check->[0]) {
 		$errors .= "$HOOK: $check->[1]: $added\n";
 		next ADDED;
