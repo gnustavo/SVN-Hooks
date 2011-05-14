@@ -2,6 +2,8 @@
 
 use strict;
 use warnings;
+use lib 't';
+use lib 'blib/lib';
 use Test::More tests => 14;
 use SVN::Hooks::CheckStructure;
 
