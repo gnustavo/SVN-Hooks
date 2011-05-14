@@ -16,5 +16,5 @@ if ( $EVAL_ERROR ) {
     plan( skip_all => $msg );
 }
 
-Test::Perl::Critic->import( -verbose => 5 );
+Test::Perl::Critic->import( -verbose => 5, -profile => 't/.perlcriticrc');
 all_critic_ok();
