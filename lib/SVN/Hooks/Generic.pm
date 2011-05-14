@@ -106,7 +106,7 @@ sub GENERIC {
 	foreach my $foo (@$functions) {
 	    ref $foo and ref $foo eq 'CODE'
 		or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
-	    push @{$SVN::Hooks::Confs{$HOOK}->{$hook}}, sub { shift; $foo->(@_); };
+	    $SVN::Hooks::Hooks{$hook}{$foo} ||= sub { $foo->(@_); };
 	}
     }
 

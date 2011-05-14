@@ -70,13 +70,13 @@ sub DENY_FILENAMES {
 	}
     }
 
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
     my $errors;
   ADDED:
     foreach my $added ($svnlook->added()) {

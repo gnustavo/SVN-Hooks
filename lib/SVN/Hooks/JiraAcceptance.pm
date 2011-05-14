@@ -131,13 +131,13 @@ sub JIRA_ACCEPTANCE {
     }
     push @Checks, [$regex => \%keys];
 
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @files = $svnlook->changed();
 

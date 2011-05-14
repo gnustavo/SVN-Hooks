@@ -70,7 +70,7 @@ sub _deny_change {
 
     push @{$Deny{$change}}, @regexes;
 
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
@@ -103,7 +103,7 @@ sub DENY_EXCEPT_USERS {
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     # Except users
     return if exists $Except{$svnlook->author()};

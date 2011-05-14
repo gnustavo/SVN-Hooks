@@ -134,7 +134,9 @@ my $Structure;
 
 sub CHECK_STRUCTURE {
     ($Structure) = @_;
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+
+    PRE_COMMIT(\&pre_commit);
+
     return 1;
 }
 
@@ -239,7 +241,7 @@ sub check_structure {
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @errors;
 

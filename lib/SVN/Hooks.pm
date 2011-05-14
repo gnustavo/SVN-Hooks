@@ -25,7 +25,7 @@ our $VERSION = '0.33';
 
 our @Conf_Files = ('conf/svn-hooks.conf');
 our $Repo       = undef;
-our %Confs      = ();
+our %Hooks      = ();
 
 sub run_hook {
     my ($hook_name, $repo_path, @args) = @_;
@@ -57,17 +57,15 @@ sub run_hook {
 	$repo_path = SVN::Look->new($repo_path, '-r' => $args[0]);
     }
 
-    foreach my $conf (values %Confs) {
-	if (my $hook = $conf->{$hook_name}) {
-	    if (ref $hook eq 'CODE') {
-		$hook->($conf, $repo_path, @args);
-	    } elsif (ref $hook eq 'ARRAY') {
-		foreach my $h (@$hook) {
-		    $h->($conf, $repo_path, @args);
-		}
-	    } else {
-		die "SVN::Hooks: internal error!\n";
+    foreach my $hook (values %{$Hooks{$hook_name}}) {
+	if (ref $hook eq 'CODE') {
+	    $hook->($repo_path, @args);
+	} elsif (ref $hook eq 'ARRAY') {
+	    foreach my $h (@$hook) {
+		$h->($repo_path, @args);
 	    }
+	} else {
+	    die "SVN::Hooks: internal error!\n";
 	}
     }
 
@@ -78,63 +76,63 @@ sub run_hook {
 
 sub POST_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'post-commit'}}, sub { shift; $hook->(@_); };
+    $Hooks{'post-commit'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # post-lock(repos-path, username)
 
 sub POST_LOCK (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'post-lock'}}, sub { shift; $hook->(@_); };
+    $Hooks{'post-lock'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # post-revprop-change(SVN::Look, username, property-name, action)
 
 sub POST_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'post-revprop-change'}}, sub { shift; $hook->(@_); };
+    $Hooks{'post-revprop-change'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # post-unlock(repos-path, username)
 
 sub POST_UNLOCK (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'post-unlock'}}, sub { shift; $hook->(@_); };
+    $Hooks{'post-unlock'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # pre-commit(SVN::Look)
 
 sub PRE_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'pre-commit'}}, sub { shift; $hook->(@_); };
+    $Hooks{'pre-commit'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # pre-lock(repos-path, path, username, comment, steal-lock-flag)
 
 sub PRE_LOCK (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'pre-lock'}}, sub { shift; $hook->(@_); };
+    $Hooks{'pre-lock'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # pre-revprop-change(SVN::Look, username, property-name, action)
 
 sub PRE_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'pre-revprop-change'}}, sub { shift; $hook->(@_); };
+    $Hooks{'pre-revprop-change'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # pre-unlock(repos-path, path, username, lock-token, break-unlock-flag)
 
 sub PRE_UNLOCK (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'pre-unlock'}}, sub { shift; $hook->(@_); };
+    $Hooks{'pre-unlock'}{$hook} ||= sub { $hook->(@_); };
 }
 
 # start-commit(repos-path, username, capabilities)
 
 sub START_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Confs{HOOKS}{'start-commit'}}, sub { shift; $hook->(@_); };
+    $Hooks{'start-commit'}{$hook} ||= sub { $hook->(@_); };
 }
 
 1; # End of SVN::Hooks

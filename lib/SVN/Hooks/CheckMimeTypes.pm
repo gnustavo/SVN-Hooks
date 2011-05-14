@@ -53,12 +53,14 @@ EOS
 sub CHECK_MIMETYPES {
     my ($help) = @_;
     $Help = $help if defined $help;
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+
+    PRE_COMMIT(\&pre_commit);
+
     return 1;
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my @errors;
 

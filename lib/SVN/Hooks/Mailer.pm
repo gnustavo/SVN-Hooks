@@ -188,13 +188,13 @@ EOS
 
     push @Projects, \%o;
 
-    $SVN::Hooks::Confs{$HOOK}->{'post-commit'} = \&post_commit;
+    POST_COMMIT(\&post_commit);
 
     return 1;
 }
 
 sub post_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my ($body, $rev, $author, $date);
 

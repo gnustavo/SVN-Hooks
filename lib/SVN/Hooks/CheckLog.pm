@@ -52,13 +52,14 @@ sub CHECK_LOG {
 	regexp => $regexp,
 	error  => $error_message || "log message must match $regexp.",
     };
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+
+    PRE_COMMIT(\&pre_commit);
 
     return 1;
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my $log = $svnlook->log_msg();
 

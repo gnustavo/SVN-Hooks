@@ -166,7 +166,8 @@ sub UPDATE_CONF_FILE {
 	    else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
 	    }
-	    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+
+	    PRE_COMMIT(\&pre_commit);
 	}
     }
 
@@ -183,13 +184,13 @@ sub UPDATE_CONF_FILE {
 
     push @Config, \%confs;
 
-    $SVN::Hooks::Confs{$HOOK}->{'post-commit'} = \&post_commit;
+    POST_COMMIT(\&post_commit);
 
     return 1;
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
   CONF:
     foreach my $conf (@Config) {
@@ -223,7 +224,7 @@ sub pre_commit {
 }
 
 sub post_commit {
-    my ($self, $svnlook) = @_;
+    my ($svnlook) = @_;
 
     my $absbase = abs_path(catdir($SVN::Hooks::Repo, 'conf'));
 

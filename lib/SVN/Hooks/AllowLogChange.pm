@@ -55,27 +55,27 @@ Regexp.
 
 =cut
 
-my @valid_users;
+my @Valid_Users;
 
 sub ALLOW_LOG_CHANGE {
     my @args = @_;
 
     foreach my $who (@args) {
 	if (not ref $who or ref $who eq 'Regexp') {
-	    push @valid_users, $who;
+	    push @Valid_Users, $who;
 	}
 	else {
 	    croak "$HOOK: invalid argument '$who'\n";
 	}
     }
 
-    $SVN::Hooks::Confs{$HOOK}->{'pre-revprop-change'} = \&pre_revprop_change;
+    PRE_REVPROP_CHANGE(\&pre_revprop_change);
 
     return 1;
 }
 
 sub pre_revprop_change {
-    my ($self, $svnlook, $rev, $author, $propname, $action) = @_;
+    my ($svnlook, $rev, $author, $propname, $action) = @_;
 
     $propname eq 'svn:log'
 	or croak "$HOOK: the revision property $propname cannot be changed.\n";
@@ -84,9 +84,9 @@ sub pre_revprop_change {
 	or croak "$HOOK: a revision log can only be modified, not added or deleted.\n";
 
     # If no users are specified, anyone can do it.
-    return unless @valid_users;
+    return unless @Valid_Users;
 
-    for my $user (@valid_users) {
+    for my $user (@Valid_Users) {
 	return if not ref $user and $author eq $user or $author =~ $user;
     }
 

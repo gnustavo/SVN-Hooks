@@ -273,14 +273,14 @@ sub CHECK_JIRA {
 	    $Defaults{$opt} = $val;
 	}
     }
-    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
-    $SVN::Hooks::Confs{$HOOK}->{'post-commit'} = \&post_commit if exists $opts->{post_action};
+    PRE_COMMIT(\&pre_commit);
+    POST_COMMIT(\&post_commit) if exists $opts->{post_action};
 
     return 1;
 }
 
 sub _pre_checks {
-    my ($self, $svnlook, $keys, $opts) = @_;
+    my ($svnlook, $keys, $opts) = @_;
 
     # Grok and check each JIRA issue
     my @issues;
@@ -313,7 +313,7 @@ sub _pre_checks {
 }
 
 sub _post_action {
-    my ($self, $svnlook, $keys, $opts) = @_;
+    my ($svnlook, $keys, $opts) = @_;
 
     if (my $action = $opts->{post_action}) {
 	$action->($JIRA, $svnlook, @$keys);
@@ -323,7 +323,7 @@ sub _post_action {
 }
 
 sub _check_if_needed {
-    my ($self, $svnlook, $docheck) = @_;
+    my ($svnlook, $docheck) = @_;
 
     defined $BaseURL
 	or croak "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";
@@ -364,7 +364,7 @@ sub _check_if_needed {
 		    croak "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
 		}
 
-		$docheck->($self, $svnlook, \@keys, \%opts);
+		$docheck->($svnlook, \@keys, \%opts);
 		last;
 	    }
 	}
@@ -374,14 +374,14 @@ sub _check_if_needed {
 }
 
 sub pre_commit {
-    my ($self, $svnlook) = @_;
-    _check_if_needed($self, $svnlook, \&_pre_checks);
+    my ($svnlook) = @_;
+    _check_if_needed($svnlook, \&_pre_checks);
     return;
 }
 
 sub post_commit {
-    my ($self, $svnlook) = @_;
-    _check_if_needed($self, $svnlook, \&_post_action);
+    my ($svnlook) = @_;
+    _check_if_needed($svnlook, \&_post_action);
     return;
 }
 
