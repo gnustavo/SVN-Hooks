@@ -11,8 +11,6 @@ our @EXPORT = ($HOOK, 'check_structure');
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = {};
-
 =head1 NAME
 
 SVN::Hooks::CheckStructure - Check the structure of a repository.
@@ -132,11 +130,11 @@ tags and the branches.
 
 =cut
 
+my $Structure;
+
 sub CHECK_STRUCTURE {
-    my ($structure) = @_;
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-    $conf->{structure} = $structure;
-    $conf->{'pre-commit'} = \&pre_commit;
+    ($Structure) = @_;
+    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
     return 1;
 }
 
@@ -252,7 +250,7 @@ sub pre_commit {
 	# components so that we can differentiate directory paths from
 	# file paths.
 	my @added = split '/', "/$added", -1;
-	my ($code, $error) = _check_structure($self->{structure}, \@added);
+	my ($code, $error) = _check_structure($Structure, \@added);
 	push @errors, "$error: $added" if $code == 0;
     }
 

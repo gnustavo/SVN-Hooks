@@ -11,8 +11,6 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = { users => [] };
-
 =head1 NAME
 
 SVN::Hooks::AllowLogChange - Allow changes in revision log messages.
@@ -57,21 +55,21 @@ Regexp.
 
 =cut
 
+my @valid_users;
+
 sub ALLOW_LOG_CHANGE {
     my @args = @_;
 
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-
     foreach my $who (@args) {
 	if (not ref $who or ref $who eq 'Regexp') {
-	    push @{$conf->{users}}, $who;
+	    push @valid_users, $who;
 	}
 	else {
 	    croak "$HOOK: invalid argument '$who'\n";
 	}
     }
 
-    $conf->{'pre-revprop-change'} = \&pre_revprop_change;
+    $SVN::Hooks::Confs{$HOOK}->{'pre-revprop-change'} = \&pre_revprop_change;
 
     return 1;
 }
@@ -86,9 +84,9 @@ sub pre_revprop_change {
 	or croak "$HOOK: a revision log can only be modified, not added or deleted.\n";
 
     # If no users are specified, anyone can do it.
-    return unless @{$self->{users}};
+    return unless @valid_users;
 
-    for my $user (@{$self->{users}}) {
+    for my $user (@valid_users) {
 	return if not ref $user and $author eq $user or $author =~ $user;
     }
 

@@ -11,8 +11,6 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = {};
-
 =head1 NAME
 
 SVN::Hooks::Generic - Implement generic checks for all Subversion hooks.
@@ -95,8 +93,6 @@ sub GENERIC {
 
     my %args = @args;
 
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-
     while (my ($hook, $functions) = each %args) {
 	$hook =~ /(?:(?:pre|post)-(?:commit|lock|revprop-change|unlock)|start-commit)/
 	    or die "$HOOK: invalid hook name ($hook)";
@@ -110,16 +106,12 @@ sub GENERIC {
 	foreach my $foo (@$functions) {
 	    ref $foo and ref $foo eq 'CODE'
 		or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
-	    push @{$conf->{$hook}}, sub { shift; $foo->(@_); };
+	    push @{$SVN::Hooks::Confs{$HOOK}->{$hook}}, sub { shift; $foo->(@_); };
 	}
     }
 
     return 1;
 }
-
-$SVN::Hooks::Inits{$HOOK} = sub {
-    return {};
-};
 
 =head1 AUTHOR
 

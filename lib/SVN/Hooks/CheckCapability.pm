@@ -11,8 +11,6 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = { capabilities => [] };
-
 =head1 NAME
 
 SVN::Hooks::CheckCapability - Check the svn client capabilities.
@@ -41,12 +39,12 @@ Example:
 
 =cut
 
-sub CHECK_CAPABILITY {
-    my @capabilities = @_;
+my @capabilities;
 
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-    $conf->{capabilities} = \@capabilities;
-    $conf->{'start-commit'} = \&start_commit;
+sub CHECK_CAPABILITY {
+    push @capabilities, @_;
+
+    $SVN::Hooks::Confs{$HOOK}->{'start-commit'} = \&start_commit;
     return 1;
 }
 
@@ -60,7 +58,7 @@ sub start_commit {
     @supported{split /:/, $capabilities} = undef;
 
     # Grok which required capabilities are missing
-    my @missing = grep {! exists $supported{$_}} @{$self->{capabilities}};
+    my @missing = grep {! exists $supported{$_}} @capabilities;
 
     if (@missing) {
 	croak "$HOOK: Your subversion client does not support the following capabilities:\n\n\t",

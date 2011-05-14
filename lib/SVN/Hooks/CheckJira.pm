@@ -12,16 +12,6 @@ our @EXPORT = qw/CHECK_JIRA_CONFIG CHECK_JIRA/;
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = {
-    checks   => [],
-    defaults => {
-	require     => 1,
-	valid       => 1,
-	unresolved  => 1,
-	by_assignee => 0,
-    },
-};
-
 =head1 NAME
 
 SVN::Hooks::CheckJira - Integrate Subversion with the JIRA ticketing system.
@@ -63,27 +53,31 @@ C<qr/\b([A-Z]+-\d+)\b/g>;
 
 =cut
 
+my ($BaseURL, $Login, $Passwd, $Match);
+my $JIRA;
+my @Checks;
+my %Defaults = (
+    require     => 1,
+    valid       => 1,
+    unresolved  => 1,
+    by_assignee => 0,
+);
+
 sub CHECK_JIRA_CONFIG {
-    my ($baseURL, $login, $passwd, $match) = @_;
+    ($BaseURL, $Login, $Passwd, $Match) = @_;
 
     if (@_ == 3) {
-	$match = qr/(.*)/;
+	$Match = qr/(.*)/;
     }
     elsif (@_ == 4) {
-	ref $match eq 'Regexp'
+	ref $Match eq 'Regexp'
 	    or croak "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
     }
     else {
 	croak "CHECK_JIRA_CONFIG: requires three or four arguments.\n";
     }
 
-    $baseURL =~ s:/+$::;
-
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-    $conf->{conf} = {
-	conf  => [$baseURL, $login, $passwd],
-	match => $match,
-    };
+    $BaseURL =~ s/\/+$//;
 
     return 1;
 }
@@ -271,17 +265,16 @@ sub CHECK_JIRA {
 	$opts->{$opt} = $opt_checks{$opt}->($opt, $opts->{$opt});
     }
 
-    my $conf = $SVN::Hooks::Confs{$HOOK};
     if (ref $regex) {
-	push @{$conf->{checks}}, [$regex => $opts];
+	push @Checks, [$regex => $opts];
     }
     else {
 	while (my ($opt, $val) = each %$opts) {
-	    $conf->{defaults}{$opt} = $val;
+	    $Defaults{$opt} = $val;
 	}
     }
-    $conf->{'pre-commit'} = \&pre_commit;
-    $conf->{'post-commit'} = \&post_commit if exists $opts->{post_action};
+    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
+    $SVN::Hooks::Confs{$HOOK}->{'post-commit'} = \&post_commit if exists $opts->{post_action};
 
     return 1;
 }
@@ -289,12 +282,10 @@ sub CHECK_JIRA {
 sub _pre_checks {
     my ($self, $svnlook, $keys, $opts) = @_;
 
-    my $conf = $self->{conf};
-
     # Grok and check each JIRA issue
     my @issues;
     foreach my $key (@$keys) {
-	my $issue = eval {$conf->{jira}->getIssue($key)};
+	my $issue = eval {$JIRA->getIssue($key)};
 	if ($opts->{valid}) {
 	    croak "$HOOK: issue $key is not valid: $@\n" if $@;
 	}
@@ -309,13 +300,13 @@ sub _pre_checks {
 		if $author ne $issue->{assignee};
 	}
 	if (my $check = $opts->{check_one}) {
-	    $check->($conf->{jira}, $issue);
+	    $check->($JIRA, $issue);
 	}
 	push @issues, $issue;
     }
 
     if (my $check = $opts->{check_all}) {
-	$check->($conf->{jira}, @issues) if @issues;
+	$check->($JIRA, @issues) if @issues;
     }
 
     return;
@@ -325,7 +316,7 @@ sub _post_action {
     my ($self, $svnlook, $keys, $opts) = @_;
 
     if (my $action = $opts->{post_action}) {
-	$action->($self->{conf}->{jira}, $svnlook, @$keys);
+	$action->($JIRA, $svnlook, @$keys);
     }
 
     return;
@@ -334,22 +325,22 @@ sub _post_action {
 sub _check_if_needed {
     my ($self, $svnlook, $docheck) = @_;
 
-    my $conf = $self->{conf}
+    defined $BaseURL
 	or croak "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";
 
     my @files = $svnlook->changed();
 
-    foreach my $check (@{$self->{checks}}) {
+    foreach my $check (@Checks) {
 	my ($regex, $opts) = @$check;
 
 	for my $file (@files) {
 	    if ($file =~ $regex) {
 
 		# Grok the JIRA issue keys from the commit log
-		my ($match) = ($svnlook->log_msg() =~ $conf->{match});
+		my ($match) = ($svnlook->log_msg() =~ $Match);
 		my @keys    = defined $match ? $match =~ /\b[A-Z]+-\d+\b/g : ();
 
-		my %opts = (%{$self->{defaults}}, %$opts);
+		my %opts = (%Defaults, %$opts);
 
 		if ($opts{require}) {
 		    croak "$HOOK: you must cite at least one JIRA issue key in the commit message.\n"
@@ -368,8 +359,8 @@ sub _check_if_needed {
 		}
 
 		# Connect to JIRA if not yet connected.
-		unless (exists $conf->{jira}) {
-		    $conf->{jira} = eval {JIRA::Client->new(@{$conf->{conf}})};
+		unless (defined $JIRA) {
+		    $JIRA = eval {JIRA::Client->new($BaseURL, $Login, $Passwd)};
 		    croak "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
 		}
 

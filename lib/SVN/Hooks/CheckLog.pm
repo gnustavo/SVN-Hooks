@@ -11,8 +11,6 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = { checks => [] };
-
 =head1 NAME
 
 SVN::Hooks::CheckLog - Check log messages in commits.
@@ -40,6 +38,8 @@ user in case the check fails.
 
 =cut
 
+my @checks;
+
 sub CHECK_LOG {
     my ($regexp, $error_message) = @_;
 
@@ -48,12 +48,11 @@ sub CHECK_LOG {
     not defined $error_message or not ref $error_message
 	or croak "$HOOK: second argument must be undefined, or a STRING\n";
 
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-    push @{$conf->{checks}}, {
+    push @checks, {
 	regexp => $regexp,
 	error  => $error_message || "log message must match $regexp.",
     };
-    $conf->{'pre-commit'} = \&pre_commit;
+    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
 
     return 1;
 }
@@ -63,7 +62,7 @@ sub pre_commit {
 
     my $log = $svnlook->log_msg();
 
-    foreach my $check (@{$self->{checks}}) {
+    foreach my $check (@checks) {
 	$log =~ $check->{regexp}
 	    or croak "$HOOK: $check->{error}";
     }

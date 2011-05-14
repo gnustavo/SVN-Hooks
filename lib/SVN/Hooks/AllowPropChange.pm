@@ -11,8 +11,6 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = { specs => [] };
-
 =head1 NAME
 
 SVN::Hooks::AllowPropChange - Allow changes in revision properties.
@@ -71,10 +69,10 @@ Specify the class of users whose names are matched by the Regexp.
 
 =cut
 
+my @specs;
+
 sub ALLOW_PROP_CHANGE {
     my @args = @_;
-
-    my $conf = $SVN::Hooks::Confs{$HOOK};
 
     my @whos;
 
@@ -91,8 +89,8 @@ sub ALLOW_PROP_CHANGE {
 	or croak "$HOOK: you must specify at least the first argument\n";
 
     my $prop = shift @whos;
-    push @{$conf->{specs}}, [$prop => \@whos];
-    $conf->{'pre-revprop-change'} = \&pre_revprop_change;
+    push @specs, [$prop => \@whos];
+    $SVN::Hooks::Confs{$HOOK}->{'pre-revprop-change'} = \&pre_revprop_change;
 
     return 1;
 }
@@ -106,7 +104,7 @@ sub pre_revprop_change {
     $action eq 'M'
 	or croak "$HOOK: revision properties can only be modified, not added or deleted.\n";
 
-    foreach my $spec (@{$self->{specs}}) {
+    foreach my $spec (@specs) {
 	my ($prop, $whos) = @$spec;
 	if (! ref $prop) {
 	    next if $propname ne $prop;

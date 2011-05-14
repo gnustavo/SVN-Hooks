@@ -14,8 +14,6 @@ our @EXPORT = ($HOOK);
 
 our $VERSION = $SVN::Hooks::VERSION;
 
-$SVN::Hooks::Confs{$HOOK} = {};
-
 =head1 NAME
 
 SVN::Hooks::UpdateConfFile - Maintain the repository configuration versioned.
@@ -131,6 +129,8 @@ commit a wrong authz file that denies any subsequent commit.
 
 =cut
 
+my @Config;
+
 sub UPDATE_CONF_FILE {
     my ($from, $to, @args) = @_;
 
@@ -146,11 +146,7 @@ sub UPDATE_CONF_FILE {
     file_name_is_absolute($to)
 	and croak "$HOOK: second argument cannot be an absolute pathname ($to).\n";
 
-    my $conf = $SVN::Hooks::Confs{$HOOK};
-
     my %confs = (from => $from, to => $to);
-
-    push @{$conf->{confs}}, \%confs;
 
     my %args = @args;
 
@@ -170,7 +166,7 @@ sub UPDATE_CONF_FILE {
 	    else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
 	    }
-	    $conf->{'pre-commit'} = \&pre_commit;
+	    $SVN::Hooks::Confs{$HOOK}->{'pre-commit'} = \&pre_commit;
 	}
     }
 
@@ -185,7 +181,9 @@ sub UPDATE_CONF_FILE {
     keys %args == 0
 	or croak "$HOOK: invalid function names: ", join(', ', sort keys %args), ".\n";
 
-    $conf->{'post-commit'} = \&post_commit;
+    push @Config, \%confs;
+
+    $SVN::Hooks::Confs{$HOOK}->{'post-commit'} = \&post_commit;
 
     return 1;
 }
@@ -194,7 +192,7 @@ sub pre_commit {
     my ($self, $svnlook) = @_;
 
   CONF:
-    foreach my $conf (@{$self->{confs}}) {
+    foreach my $conf (@Config) {
 	if (my $validator = $conf->{validator}) {
 	    my $from = $conf->{from};
 	    for my $file ($svnlook->added(), $svnlook->updated()) {
@@ -230,7 +228,7 @@ sub post_commit {
     my $absbase = abs_path(catdir($SVN::Hooks::Repo, 'conf'));
 
   CONF:
-    foreach my $conf (@{$self->{confs}}) {
+    foreach my $conf (@Config) {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
 	    my $to = $conf->{to};
