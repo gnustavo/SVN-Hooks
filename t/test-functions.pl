@@ -88,8 +88,9 @@ sub set_hook {
     my ($text) = @_;
     open my $fd, '>', "$T/repo/hooks/svn-hooks.pl"
 	or die "Can't create $T/repo/hooks/svn-hooks.pl: $!";
+    my $debug = exists $ENV{DBG} ? '-d' : '';
     print $fd <<"EOS";
-#!$^X
+#!$^X $debug
 use strict;
 use warnings;
 EOS
