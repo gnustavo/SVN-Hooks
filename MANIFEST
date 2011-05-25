@@ -1,4 +1,3 @@
-.cvsignore
 Changes
 lib/SVN/Hooks.pm
 lib/SVN/Hooks/AllowLogChange.pm
