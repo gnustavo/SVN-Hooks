@@ -40,7 +40,7 @@ set_conf(<<'EOS');
 CHECK_JIRA_CONFIG();
 EOS
 
-work_nok('config sans args', 'CHECK_JIRA_CONFIG: requires three or four arguments', work(''));
+work_nok('config sans args', 'CHECK_JIRA_CONFIG: requires three, four, or five arguments', work(''));
 
 set_conf(<<'EOS');
 CHECK_JIRA_CONFIG('http://jira.atlassian.com/', 'user', 'pass', 'asdf');
