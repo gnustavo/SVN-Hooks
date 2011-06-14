@@ -147,14 +147,14 @@ A single script can implement several hooks:
 	use SVN::Hooks;
 
 	START_COMMIT {
-	my ($repo_path, $username, $capabilities) = @_;
+	    my ($repo_path, $username, $capabilities) = @_;
 	    # ...
-	}
+	};
 
 	PRE_COMMIT {
 	    my ($svnlook) = @_;
 	    # ...
-	}
+	};
 
 	run_hook($0, @ARGV);
 
