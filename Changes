@@ -1,5 +1,15 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+0.91	2011-07-07
+
+	CHECK_JIRA_CONFIG accepts a fifth argument to match JIRA
+	project keys.
+
+	Fixes an error on UpdateConfFile.
+
+	Configuration files should be optional, but they were always
+	required. Now it's fixed.
+
 0.90	2011-05-14
 
 	Big refactoring of the code base. Implements hook directives
