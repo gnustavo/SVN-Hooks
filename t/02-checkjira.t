@@ -14,7 +14,7 @@ elsif (not eval {require JIRA::Client}) {
     plan skip_all => 'Need JIRA::Client';
 }
 else {
-    plan tests => 14;
+    plan tests => 15;
 }
 
 my $t = reset_repo();
@@ -23,16 +23,20 @@ set_hook(<<'EOS');
 use SVN::Hooks::CheckJira;
 EOS
 
+my $wc   = catfile($t, 'wc');
+my $file = catfile($wc, 'file');
+
+work_ok('prepare', <<"EOS");
+echo line >$file
+svn add -q --no-auto-props $file
+svn ci -m"prepare" --force-log $wc
+EOS
+
 sub work {
     my ($msg) = @_;
     <<"EOS";
-if [ -f $t/wc/file ]; then
-  echo line >>$t/wc/file
-else
-  touch $t/wc/file
-  svn add -q --no-auto-props $t/wc/file
-fi
-svn ci -m'$msg' --force-log $t/wc
+echo line >>$file
+svn ci -m"$msg" --force-log $wc
 EOS
 }
 
