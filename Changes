@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.00	2011-07-20
+
+	Ported to Windows with Strawberry Perl and with Active Perl.
+
 0.91	2011-07-07
 
 	CHECK_JIRA_CONFIG accepts a fifth argument to match JIRA
