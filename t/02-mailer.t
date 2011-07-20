@@ -26,22 +26,19 @@ else {
     plan tests => 17;
 }
 
-my $t = reset_repo();
+my $t    = reset_repo();
+my $wc   = catdir($t, 'wc');
 
 set_hook(<<'EOS');
 use SVN::Hooks::Mailer;
 EOS
 
 sub work {
-    my $text = '';
-    for my $file (@_) {
-	$text .= <<"EOS";
-touch $t/wc/$file
-svn add -q --no-auto-props $t/wc/$file
-EOS
-    }
-    $text .= <<"EOS";
-svn ci -mmessage $t/wc
+    my $file = catfile($wc, $_[0]);
+    <<"EOS";
+echo txt >$file
+svn add -q --no-auto-props $file
+svn ci -mmessage $wc
 EOS
 }
 

@@ -15,8 +15,6 @@ else {
 }
 
 my $t = reset_repo();
-chomp(my $cwd = `pwd`);
-my $repo = "file://$t/repo";
 
 set_hook(<<'EOS');
 START_COMMIT {
@@ -30,21 +28,26 @@ PRE_COMMIT {
     my ($svnlook) = @_;
 
     foreach my $added ($svnlook->added()) {
+        warn "= $added\n";
 	$added !~ /\.(exe|o|jar|zip)$/
 	    or die "Please, don't commit binary files such as '$added'.\n";
     }
 };
 EOS
 
+my $txtfile = catfile($t, 'wc', 'file.txt');
+
 work_ok('setup', <<"EOS");
-touch $t/wc/file.txt
-svn add -q --no-auto-props $t/wc/file.txt
-svn ci -mx $t/wc/file.txt
+echo txt >$txtfile
+svn add -q --no-auto-props $txtfile
+svn ci -mx $txtfile
 EOS
 
+my $zipfile = catfile($t, 'wc', 'file.zip');
+
 work_nok('binary' => 'Please, don\'t commit binary files', <<"EOS");
-touch $t/wc/file.zip
-svn add -q --no-auto-props $t/wc/file.zip
-svn ci -mx $t/wc/file.zip
+echo txt >$zipfile
+svn add -q --no-auto-props $zipfile
+svn ci -mx $zipfile
 EOS
 

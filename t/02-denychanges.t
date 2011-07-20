@@ -14,7 +14,9 @@ else {
     plan skip_all => 'Cannot find or use svn commands.';
 }
 
-my $t = reset_repo();
+my $t    = reset_repo();
+my $wc   = catdir($t, 'wc');
+my $file = catfile($wc, 'file');
 
 set_hook(<<'EOS');
 use SVN::Hooks::DenyChanges;
@@ -25,9 +27,9 @@ DENY_ADDITION('string');
 EOS
 
 work_nok('conf: no regex', 'DENY_CHANGES: all arguments must be qr/Regexp/', <<"EOS");
-touch $t/wc/f
-svn add -q --no-auto-props $t/wc/f
-svn ci -mx $t/wc/f
+echo txt >$file
+svn add -q --no-auto-props $file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -36,47 +38,53 @@ DENY_DELETION(qr/del/);
 DENY_UPDATE  (qr/upd/);
 EOS
 
+my $add = catfile($wc, 'add');
+my $ADD = catfile($wc, 'ADD');
+my $del = catfile($wc, 'del');
+my $upd = catfile($wc, 'upd');
+
 work_nok('deny add', 'Cannot add:', <<"EOS");
-touch $t/wc/add
-svn add -q --no-auto-props $t/wc/add
-svn ci -mx $t/wc/add
+echo txt >$add
+svn add -q --no-auto-props $add
+svn ci -mx $add
 EOS
 
 work_nok('deny second arg', 'Cannot add:', <<"EOS");
-touch $t/wc/ADD
-svn add -q --no-auto-props $t/wc/ADD
-svn ci -mx $t/wc/ADD
+echo txt >$ADD
+svn add -q --no-auto-props $ADD
+svn ci -mx $ADD
 EOS
 
 work_ok('add del upd', <<"EOS");
-touch $t/wc/del $t/wc/upd
-svn add -q --no-auto-props $t/wc/del $t/wc/upd
-svn ci -mx $t/wc/del $t/wc/upd
+echo txt >$del
+echo txt >$upd
+svn add -q --no-auto-props $del $upd
+svn ci -mx $del $upd
 EOS
 
 work_nok('deny del', 'Cannot delete:', <<"EOS");
-svn rm -q $t/wc/del
-svn ci -mx $t/wc/del
+svn rm -q $del
+svn ci -mx $del
 EOS
 
 work_nok('deny upd', 'Cannot update:', <<"EOS");
-echo adsf >$t/wc/upd
-svn ci -mx $t/wc/upd
+echo adsf >$upd
+svn ci -mx $upd
 EOS
 
 work_ok('update f', <<"EOS");
-echo adsf >$t/wc/f
-svn ci -mx $t/wc/f
+echo adsf >$file
+svn ci -mx $file
 EOS
 
 work_ok('del f', <<"EOS");
-svn del -q $t/wc/f
-svn ci -mx $t/wc/f
+svn del -q $file
+svn ci -mx $file
 EOS
 
 # Grok the author name
 my $author;
-open my $svn, '-|', "svn info $t/wc/del"
+open my $svn, '-|', "svn info $del"
     or die "Can't exec svn info\n";
 while (<$svn>) {
     if (/Author: (.*)$/) {
@@ -92,7 +100,7 @@ DENY_EXCEPT_USERS($author);
 EOS
 
 work_ok('except user', <<"EOS");
-touch $t/wc/add
-svn add -q --no-auto-props $t/wc/add
-svn ci -mx $t/wc/add
+echo txt >$add
+svn add -q --no-auto-props $add
+svn ci -mx $add
 EOS

@@ -15,17 +15,18 @@ else {
 }
 
 my $t = reset_repo();
-chomp(my $cwd = `pwd`);
-my $repo = "file://$t/repo";
+my $repo = URI::file->new(catdir($t, 'repo'));
 
 set_hook(<<'EOS');
 use SVN::Hooks::AllowPropChange;
 EOS
 
+my $file = catfile($t, 'wc', 'file');
+
 work_ok('setup', <<"EOS");
-touch $t/wc/file
-svn add -q --no-auto-props $t/wc/file
-svn ci -mx $t/wc/file
+echo txt >$file
+svn add -q --no-auto-props $file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -48,7 +49,7 @@ work_nok('cannot delete' => 'ALLOW_PROP_CHANGE: revision properties can only be 
 svn pd svn:log --revprop -r 1 $repo
 EOS
 
-my $username = getpwuid($<);
+my $username = $^O eq 'MSWin32' ? getlogin() : getpwuid($<);
 
 set_conf(<<"EOS");
 ALLOW_PROP_CHANGE('svn:log' => 'x$username');

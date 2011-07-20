@@ -17,7 +17,9 @@ else {
     plan tests => 9;
 }
 
-my $t = reset_repo();
+my $t    = reset_repo();
+my $wc   = catdir($t, 'wc');
+my $file = catfile($wc, 'file');
 
 set_hook(<<'EOS');
 use SVN::Hooks::JiraAcceptance;
@@ -26,9 +28,9 @@ EOS
 sub work {
     my ($msg) = @_;
     <<"EOS";
-touch $t/wc/file
-svn add -q --no-auto-props $t/wc/file
-svn ci -m'$msg' --force-log $t/wc
+echo txt >$file
+svn add -q --no-auto-props $file
+svn ci -m"$msg" --force-log $wc
 EOS
 }
 
