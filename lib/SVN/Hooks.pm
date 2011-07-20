@@ -18,11 +18,11 @@ SVN::Hooks - A framework for implementing Subversion hooks.
 
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =cut
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 our @Conf_Files = (catfile('conf', 'svn-hooks.conf'));
 our $Repo       = undef;
@@ -40,6 +40,7 @@ sub run_hook {
     # Reload all configuration files
     foreach my $conf (@Conf_Files) {
 	my $conffile = catfile($Repo, $conf);
+	next unless -e $conffile; # Configuration files are optional
 	package main;
 	unless (my $return = do $conffile) {
 	    die "couldn't parse '$conffile': $@\n" if $@;
@@ -149,14 +150,14 @@ A single script can implement several hooks:
 	use SVN::Hooks;
 
 	START_COMMIT {
-	my ($repo_path, $username, $capabilities) = @_;
+	    my ($repo_path, $username, $capabilities) = @_;
 	    # ...
-	}
+	};
 
 	PRE_COMMIT {
 	    my ($svnlook) = @_;
 	    # ...
-	}
+	};
 
 	run_hook($0, @ARGV);
 
@@ -195,7 +196,7 @@ repository to a new revision.
 
 A hook is a specifically named program that is called by the
 Subversion server during the execution of some operations. There are
-exactly nine hooks which must reside under the C<conf> directory in
+exactly nine hooks which must reside under the C<hooks> directory in
 the repository. When you create a new repository, you get nine
 template files in this directory, all of them having the C<.tmpl>
 suffix and helpful instructions inside explaining how to convert them

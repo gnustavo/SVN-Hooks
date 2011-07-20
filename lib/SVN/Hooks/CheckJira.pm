@@ -29,7 +29,7 @@ It's active in the C<pre-commit> and/or the C<post-commit> hook.
 
 It's configured by the following directives.
 
-=head2 CHECK_JIRA_CONFIG(BASEURL, LOGIN, PASSWORD, [REGEXP])
+=head2 CHECK_JIRA_CONFIG(BASEURL, LOGIN, PASSWORD [, REGEXP [, REGEXP]])
 
 This directive specifies how to connect and to authenticate to the
 JIRA server. BASEURL is the base URL of the JIRA server, usually,
@@ -37,15 +37,22 @@ something like C<http://jira.example.com/jira>. LOGIN and PASSWORD are
 the credentials of a JIRA user who has browsing rights to the JIRA
 projects that will be referenced in the commit logs.
 
-The fourth argument is optional. It must be a qr/Regexp/ object that
-will be used to match against the commit logs in order to extract the
-list of JIRA issue keys. By default, the JIRA keys are looked for in
-the whole commit log. Sometimes this can be suboptimal because the
-user can introduce in the message some text that inadvertently looks
-like a JIRA issue key whithout being so. With this argument, the log
-message is matched against the REGEXP and only the first matched group
-(i.e., the part of the message captured by the first parenthesis
-(C<$1>)) is used to look for JIRA issue keys.
+The fourth argument is an optional qr/Regexp/ object. It will be used
+to match against the commit logs in order to extract the list of JIRA
+issue keys. By default, the JIRA keys are looked for in the whole
+commit log, which is equivalent to qr/(.*)/. Sometimes this can be
+suboptimal because the user can introduce in the message some text
+that inadvertently looks like a JIRA issue key whithout being so. With
+this argument, the log message is matched against the REGEXP and only
+the first matched group (i.e., the part of the message captured by the
+first parenthesis (C<$1>)) is used to look for JIRA issue keys.
+
+The fifth argument is another optional qr/Regexp/ object. It is used
+to match JIRA project keys, which match qr/[A-Z]{2,}/ by
+default. However, since you can specify different patterns for JIRA
+project keys
+(L<http://confluence.atlassian.com/display/JIRA/Configuring+Project+Keys>),
+you need to be able to specify this here too.
 
 The JIRA issue keys are extracted from the commit log (or the part of
 it specified by the REGEXP) with the following pattern:
@@ -53,7 +60,7 @@ C<qr/\b([A-Z]+-\d+)\b/g>;
 
 =cut
 
-my ($BaseURL, $Login, $Passwd, $Match);
+my ($BaseURL, $Login, $Passwd, $MatchLog, $MatchKey);
 my $JIRA;
 my @Checks;
 my %Defaults = (
@@ -64,18 +71,24 @@ my %Defaults = (
 );
 
 sub CHECK_JIRA_CONFIG {
-    ($BaseURL, $Login, $Passwd, $Match) = @_;
+    ($BaseURL, $Login, $Passwd, $MatchLog, $MatchKey) = @_;
 
-    if (@_ == 3) {
-	$Match = qr/(.*)/;
+    if (defined $MatchKey) {
+	ref $MatchKey && ref $MatchKey eq 'Regexp'
+	    or croak "CHECK_JIRA_CONFIG: fifth argument must be a Regexp.\n";
+    } else {
+	$MatchKey = qr/[A-Z]{2,}/;
     }
-    elsif (@_ == 4) {
-	ref $Match eq 'Regexp'
+
+    if (defined $MatchLog) {
+	ref $MatchLog && ref $MatchLog eq 'Regexp'
 	    or croak "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
+    } else {
+	$MatchLog = qr/[A-Z]{2,}/;
     }
-    else {
-	croak "CHECK_JIRA_CONFIG: requires three or four arguments.\n";
-    }
+
+    @_ >= 3 && @_ <= 5
+	or croak "CHECK_JIRA_CONFIG: requires three, four, or five arguments.\n";
 
     $BaseURL =~ s/\/+$//;
 
@@ -337,8 +350,8 @@ sub _check_if_needed {
 	    if ($file =~ $regex) {
 
 		# Grok the JIRA issue keys from the commit log
-		my ($match) = ($svnlook->log_msg() =~ $Match);
-		my @keys    = defined $match ? $match =~ /\b[A-Z]+-\d+\b/g : ();
+		my ($match) = ($svnlook->log_msg() =~ $MatchLog);
+		my @keys    = defined $match ? $match =~ /\b$MatchKey-\d+\b/g : ();
 
 		my %opts = (%Defaults, %$opts);
 
