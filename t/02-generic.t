@@ -24,10 +24,13 @@ set_conf(<<'EOS');
 GENERIC(1);
 EOS
 
+my $wc   = catdir($t, 'wc');
+my $file = catfile($wc, 'file.txt');
+
 work_nok('odd' => 'odd number of arguments', <<"EOS");
-touch $t/wc/file.txt
-svn add -q --no-auto-props $t/wc/file.txt
-svn ci -mx $t/wc/file.txt
+echo txt >$file
+svn add -q --no-auto-props $file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -35,7 +38,7 @@ GENERIC('non_hook' => sub {});
 EOS
 
 work_nok('non hook' => 'invalid hook name', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -43,7 +46,7 @@ GENERIC('start-commit' => 'non ref');
 EOS
 
 work_nok('non ref' => 'should be mapped to a reference', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -51,7 +54,7 @@ GENERIC('start-commit' => {});
 EOS
 
 work_nok('non array' => 'should be mapped to a CODE-ref or to an ARRAY of CODE-refs', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -59,7 +62,7 @@ GENERIC('start-commit' => ['non code']);
 EOS
 
 work_nok('non code' => 'should be mapped to CODE-refs', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -67,7 +70,7 @@ GENERIC('start-commit' => sub { die "died from within"; });
 EOS
 
 work_nok('died from within' => 'died from within', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -75,7 +78,7 @@ GENERIC('start-commit' => sub { return 1; });
 EOS
 
 work_ok('ok', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -84,9 +87,11 @@ GENERIC(
 );
 EOS
 
-work_nok('cry start-commit' => "$t/repo,", <<"EOS");
-echo asdf >>$t/wc/file.txt
-svn ci -mx $t/wc/file.txt
+my $repo = catdir($t, 'repo');
+
+work_nok('cry start-commit' => "$repo,", <<"EOS");
+echo asdf >>$file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -96,7 +101,7 @@ GENERIC(
 EOS
 
 work_nok('cry pre-commit' => 'SVN::Look=HASH', <<"EOS");
-svn ci -mx $t/wc/file.txt
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -115,8 +120,8 @@ GENERIC(
 );
 EOS
 
-work_nok('cry pre-lock' => qr:\Q$t\E/repo,/?file.txt,:, <<"EOS");
-svn lock -mx $t/wc/file.txt
+work_nok('cry pre-lock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
+svn lock -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -125,7 +130,7 @@ GENERIC(
 );
 EOS
 
-work_nok('cry pre-unlock' => qr:\Q$t\E/repo,/?file.txt,:, <<"EOS");
-svn lock $t/wc/file.txt
-svn unlock $t/wc/file.txt
+work_nok('cry pre-unlock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
+svn lock $file
+svn unlock $file
 EOS

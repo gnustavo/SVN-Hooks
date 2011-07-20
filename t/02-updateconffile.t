@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use lib 't';
 use Test::More;
+use Config;
 
 require "test-functions.pl";
 
@@ -14,7 +15,9 @@ else {
     plan skip_all => 'Cannot find or use svn commands.';
 }
 
-my $t = reset_repo();
+my $t    = reset_repo();
+my $wc   = catdir($t, 'wc');
+my $file = catfile($wc, 'file');
 
 set_hook(<<'EOS');
 use SVN::Hooks::UpdateConfFile;
@@ -25,9 +28,9 @@ UPDATE_CONF_FILE();
 EOS
 
 work_nok('require first arg', 'UPDATE_CONF_FILE: invalid first argument.', <<"EOS");
-echo asdf >$t/wc/file
-svn add -q --no-auto-props $t/wc/file
-svn ci -mx $t/wc/file
+echo asdf >$file
+svn add -q --no-auto-props $file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -35,7 +38,7 @@ UPDATE_CONF_FILE('first');
 EOS
 
 work_nok('require second arg', 'UPDATE_CONF_FILE: invalid second argument.', <<"EOS");
-svn ci -mx $t/wc/file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -43,7 +46,7 @@ UPDATE_CONF_FILE('first', qr/regexp/);
 EOS
 
 work_nok('invalid second arg', 'UPDATE_CONF_FILE: invalid second argument', <<"EOS");
-svn ci -mx $t/wc/file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -51,7 +54,7 @@ UPDATE_CONF_FILE('first', 'second', 'third');
 EOS
 
 work_nok('odd number of args', 'UPDATE_CONF_FILE: odd number of arguments.', <<"EOS");
-svn ci -mx $t/wc/file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -59,7 +62,7 @@ UPDATE_CONF_FILE('first', 'second', validator => 'string');
 EOS
 
 work_nok('not code-ref', 'UPDATE_CONF_FILE: validator argument must be a CODE-ref or an ARRAY-ref', <<"EOS");
-svn ci -mx $t/wc/file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -67,7 +70,7 @@ UPDATE_CONF_FILE('first', 'second', foo => 'string');
 EOS
 
 work_nok('invalid function', 'UPDATE_CONF_FILE: invalid function names:', <<"EOS");
-svn ci -mx $t/wc/file
+svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
@@ -97,35 +100,64 @@ UPDATE_CONF_FILE(generate  => 'generate',
                  generator => \&generate);
 EOS
 
+my $conf  = catdir($t, 'repo', 'conf');
+my $cfile = catfile($conf, 'file');
+
+# Implement a script to compare two files. In Unix we would use 'cmp'
+# but in Windows I couldn't use 'comp' because it's interactive.
+
+my $cmp = catfile($t, 'cmp.pl');
+{
+    open my $fh, '>', $cmp or die "Can't open '$cmp' for writing: $!\n";
+    print $fh <<'EOS';
+use File::Compare;
+compare(@ARGV);
+EOS
+}
+
+my $perl = $Config{perlpath};
+
 work_ok('update without validation', <<"EOS");
-svn ci -mx $t/wc/file
-cmp $t/wc/file $t/repo/conf/file
+svn ci -mx $file
+$perl $cmp $file $cfile
 EOS
 
+my $validate  = catfile($wc, 'validate');
+my $cvalidate = catfile($conf, 'validate');
+
 work_ok('update valid', <<"EOS");
-echo asdf >$t/wc/validate
-svn add -q --no-auto-props $t/wc/validate
-svn ci -mx $t/wc/validate
-cmp $t/wc/validate $t/repo/conf/validate
+echo asdf >$validate
+svn add -q --no-auto-props $validate
+svn ci -mx $validate
+$perl $cmp $validate $cvalidate
 EOS
 
 work_nok('update aborting', 'UPDATE_CONF_FILE: Validator aborted for:', <<"EOS");
-echo abort >$t/wc/validate
-svn ci -mx $t/wc/validate
+echo abort >$validate
+svn ci -mx $validate
 EOS
 
-work_ok('generate', <<"EOS");
-echo asdf >$t/wc/generate
-svn add -q --no-auto-props $t/wc/generate
-svn ci -mx $t/wc/generate
-cat >$t/wc/generated <<'EOSS'
+my $generate  = catfile($wc, 'generate');
+my $cgenerate = catfile($conf, 'generate');
+my $generated = catfile($wc, 'generated');
+
+{
+    open my $fh, '>', $generated
+      or die "Can't create $generated: $!\n";
+    print $fh <<'EOS';
 [generate, asdf
 ]
-EOSS
-cmp $t/wc/generated $t/repo/conf/generate
+EOS
+}
+
+work_ok('generate', <<"EOS");
+echo asdf >$generate
+svn add -q --no-auto-props $generate
+svn ci -mx $generate
+$perl $cmp $generated $cgenerate
 EOS
 
-my $conf = <<'EOS';
+my $config = <<'EOS';
 UPDATE_CONF_FILE(subfile => 'subdir');
 
 UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
@@ -142,29 +174,39 @@ UPDATE_CONF_FILE(actuate  => 'actuate',
                  actuator => \&actuate);
 EOS
 
-$conf =~ s/TTT/$t/;
+$config =~ s/TTT/$t/;
 
-set_conf($conf);
+set_conf($config);
 
-mkdir "$t/repo/conf/subdir";
+my $subdir = catdir($conf, 'subdir');
+
+mkdir $subdir;
+
+my $subfile  = catfile($wc, 'subfile');
+my $csubfile = catfile($subdir, 'subfile');
 
 work_ok('to subdir', <<"EOS");
-echo asdf >$t/wc/subfile
-svn add -q --no-auto-props $t/wc/subfile
-svn ci -mx $t/wc/subfile
-cmp $t/wc/subfile $t/repo/conf/subdir/subfile
+echo asdf >$subfile
+svn add -q --no-auto-props $subfile
+svn ci -mx $subfile
+$perl $cmp $subfile $csubfile
 EOS
+
+my $cfile1 = catfile($conf, '1-file');
 
 work_ok('regexp', <<"EOS");
-echo asdf >$t/wc/file1
-svn add -q --no-auto-props $t/wc/file1
-svn ci -mx $t/wc/file1
-cmp $t/wc/file1 $t/repo/conf/1-file
+echo asdf >${file}1
+svn add -q --no-auto-props ${file}1
+svn ci -mx ${file}1
+$perl $cmp ${file}1 $cfile1
 EOS
 
+my $actuate  = catfile($wc, 'actuate');
+my $cactuate = catfile($conf, 'really-actuated');
+
 work_ok('actuate', <<"EOS");
-echo asdf >$t/wc/actuate
-svn add -q --no-auto-props $t/wc/actuate
-svn ci -mx $t/wc/actuate
-cmp $t/wc/actuate $t/repo/conf/really-actuated
+echo asdf >$actuate
+svn add -q --no-auto-props $actuate
+svn ci -mx $actuate
+$perl $cmp $actuate $cactuate
 EOS

@@ -21,7 +21,8 @@ set_hook(<<'EOS');
 use SVN::Hooks::AllowLogChange;
 EOS
 
-my $file = catfile($t, 'wc', 'file');
+my $wc   = catdir($t, 'wc');
+my $file = catfile($wc, 'file');
 
 work_ok('setup', <<"EOS");
 echo txt >$file
