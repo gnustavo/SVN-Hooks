@@ -1,13 +1,5 @@
 # Copyright (C) 2008 by CPqD
 
-BEGIN {
-    if ($^O eq 'MSWin32') {
-	$ENV{PATH} .= ';C:\Program Files (x86)\VisualSVN Server\bin';
-    } else {
-	$ENV{PATH} .= ':/usr/local/bin:/usr/bin:/bin';
-    }
-}
-
 use strict;
 use warnings;
 use Cwd;
