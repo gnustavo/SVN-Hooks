@@ -7,7 +7,6 @@ use File::Temp qw/tempdir/;
 use File::Spec::Functions;
 use File::Path;
 use File::Copy;
-use File::Slurp;
 use URI::file;
 
 # Make sure the svn messages come in English.
@@ -51,6 +50,13 @@ sub do_script {
     copy(catfile($T, 'repo', 'conf',  'svn-hooks.conf') => catfile($dir, 'svn-hooks.conf'));
 
     system("$script 1>$stdout 2>$stderr");
+}
+
+sub read_file {
+    my ($file) = @_;
+    open my $fd, '<', $file or die "Can't open '$file': $!\n";
+    local $/ = undef;		# slurp mode
+    return <$fd>;
 }
 
 sub work_ok {
