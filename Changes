@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.01	2011-07-21
+
+	Avoiding dependency from File::Slurp in the tests.
+
 1.00	2011-07-20
 
 	Ported to Windows with Strawberry Perl and with Active Perl.
