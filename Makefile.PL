@@ -1,11 +1,14 @@
 use strict;
 use warnings;
+use File::Spec::Functions;
 use ExtUtils::MakeMaker qw(WriteMakefile prompt);
 use IO::Socket ();
 use Getopt::Long  qw(GetOptions);
 
 # clean up the testing flag files.
-unlink('t/online.enabled', 't/author.enabled');
+my $t_online = catfile('t', 'online.enabled');
+my $t_author = catfile('t', 'author.enabled');
+unlink($t_online, $t_author);
 
 my $usage        = "$0 [--online-tests] [--author-tests]\n";
 my $online_tests = 0;
@@ -37,26 +40,28 @@ EOT
 }
 
 if ($online_tests) {
-    open(ENABLED, ">t/online.enabled") or die "Can't touch ./t/online.enabled: $!";
-    close(ENABLED)                     or die "Can't touch ./t/online.enabled: $!";
+    open(ENABLED, '>', $t_online) or die "Can't touch $t_online: $!\n";
+    close(ENABLED)                or die "Can't touch $t_online: $!\n";
 }
 
 if ($author_tests) {
-    open(ENABLED, ">t/author.enabled") or die "Can't touch ./t/author.enabled: $!";
-    close(ENABLED)                     or die "Can't touch ./t/author.enabled: $!";
+    open(ENABLED, '>', $t_author) or die "Can't touch $t_author: $!\n";
+    close(ENABLED)                or die "Can't touch $t_author: $!\n";
 }
+
+my $hooks_pm = catfile('lib', 'SVN', 'Hooks.pm');
 
 WriteMakefile(
     NAME                => 'SVN::Hooks',
     AUTHOR              => 'Gustavo Chaves <gnustavo@cpan.org>',
-    VERSION_FROM        => 'lib/SVN/Hooks.pm',
-    ABSTRACT_FROM       => 'lib/SVN/Hooks.pm',
+    VERSION_FROM        => $hooks_pm,
+    ABSTRACT_FROM       => $hooks_pm,
     PL_FILES            => {},
     PREREQ_PM => {
 	'Email::Send'   => 0,
 	'Email::Simple' => 0,
 	'Email::Simple::Creator' => 0,
-	'SVN::Look'     => 0,
+	'SVN::Look'     => '0.21',
 	'SVN::Notify'   => 0,
         'Test::More'    => 0,
 	'XMLRPC::Lite'  => 0,

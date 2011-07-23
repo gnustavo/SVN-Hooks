@@ -9,7 +9,7 @@ generated_by: Gustavo Chaves
 distribution_type: module
 requires:
   Test::More: 0
-  SVN::Look: 0.10
+  SVN::Look: 0.21
 optional_features:
 - Jira::Client:
     description: An extended interface to JIRAs SOAP API.
