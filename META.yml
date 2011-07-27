@@ -10,6 +10,7 @@ distribution_type: module
 requires:
   Test::More: 0
   SVN::Look: 0.21
+  URI::file: 0
 optional_features:
 - Jira::Client:
     description: An extended interface to JIRAs SOAP API.

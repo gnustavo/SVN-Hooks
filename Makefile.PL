@@ -64,6 +64,7 @@ WriteMakefile(
 	'SVN::Look'     => '0.21',
 	'SVN::Notify'   => 0,
         'Test::More'    => 0,
+	'URI::file'     => 0,
 	'XMLRPC::Lite'  => 0,
 	'JIRA::Client'  => 0,
     },
