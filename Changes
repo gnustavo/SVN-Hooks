@@ -1,5 +1,12 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.02	2011-07-27
+
+	Porting Makefile.PL to Windows.
+	Adjusting dependency from SVN::Look version.
+	Supporting absolute file names for SVN::Hooks configuration files.
+	Adding URI::file to the dependencies.
+
 1.01	2011-07-21
 
 	Avoiding dependency from File::Slurp in the tests.
