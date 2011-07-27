@@ -39,7 +39,7 @@ sub run_hook {
 
     # Reload all configuration files
     foreach my $conf (@Conf_Files) {
-	my $conffile = catfile($Repo, $conf);
+	my $conffile = file_name_is_absolute($conf) ? $conf : catfile($Repo, $conf);
 	next unless -e $conffile; # Configuration files are optional
 	package main;
 	unless (my $return = do $conffile) {
