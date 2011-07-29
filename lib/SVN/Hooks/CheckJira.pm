@@ -143,13 +143,23 @@ reference issues to which she is the current assignee.
 
 If the above checks aren't enough you can pass a code reference
 (subroutine) to this option. The subroutine will be called once for
-each referenced issue with two arguments: the JIRA::Client object used
-to talk to the JIRA server and a reference to a RemoteIssue
-object. The subroutine must simply return with no value to indicate
-success and must die to indicate failure.
+each referenced issue with three arguments:
 
-Plese, read the JIRA::Client module documentation to understand how to
-use these objects.
+=over
+
+=item the JIRA::Client object used to talk to the JIRA server.
+
+=item the RemoteIssue object representing the issue.
+
+=item the SVN::Look object used to grok information about the commit.
+
+=back
+
+The subroutine must simply return with no value to indicate success
+and must die to indicate failure.
+
+Plese, read the JIRA::Client and SVN::Look modules documentation to
+understand how to use these objects.
 
 =item check_all => CODE-REF
 
@@ -158,8 +168,16 @@ to check some relation among all the referenced issues. In this case,
 pass a code reference to this option. It will be called once for the
 commit. Its first argument is the JIRA::Client object used to talk to
 the JIRA server. The following arguments are references to RemoteIssue
-objects for every referenced issue. The subroutine must simply return
-with no value to indicate success and must die to indicate failure.
+objects for every referenced issue. The last argument is the SVN::Look
+object used to grok information about the commit. The subroutine must
+simply return with no value to indicate success and must die to
+indicate failure.
+
+=item check_all_svnlook => CODE-REF
+
+This check is the same as the previous one, except that the first
+argument passed to the routine is the SVN::Look object used to grok
+information about the commit. The rest of the arguments are the same.
 
 =item post_action => CODE-REF
 
@@ -188,7 +206,7 @@ qr/Regexp/.
     # JIRA issues that have at least one fix version.
 
     sub is_scheduled {
-        my ($jira, $issue) = @_;
+        my ($jira, $issue, $svnlook) = @_;
         return scalar @{$issue->{fixVersions}};
     }
     CHECK_JIRA(qr/^(trunk|branches/fix)/ => {
@@ -255,14 +273,15 @@ sub _validate_code {
 }
 
 my %opt_checks = (
-    projects    => \&_validate_projects,
-    require     => \&_validate_bool,
-    valid       => \&_validate_bool,
-    unresolved  => \&_validate_bool,
-    by_assignee => \&_validate_bool,
-    check_one   => \&_validate_code,
-    check_all   => \&_validate_code,
-    post_action => \&_validate_code,
+    projects          => \&_validate_projects,
+    require           => \&_validate_bool,
+    valid             => \&_validate_bool,
+    unresolved        => \&_validate_bool,
+    by_assignee       => \&_validate_bool,
+    check_one         => \&_validate_code,
+    check_all         => \&_validate_code,
+    check_all_svnlook => \&_validate_code,
+    post_action       => \&_validate_code,
 );
 
 sub CHECK_JIRA {
@@ -313,13 +332,17 @@ sub _pre_checks {
 		if $author ne $issue->{assignee};
 	}
 	if (my $check = $opts->{check_one}) {
-	    $check->($JIRA, $issue);
+	    $check->($JIRA, $issue, $svnlook);
 	}
 	push @issues, $issue;
     }
 
     if (my $check = $opts->{check_all}) {
 	$check->($JIRA, @issues) if @issues;
+    }
+
+    if (my $check = $opts->{check_all_svnlook}) {
+	$check->($svnlook, $JIRA, @issues) if @issues;
     }
 
     return;

@@ -121,7 +121,8 @@ EOS
 sub fix_for {
     my ($version) = @_;
     return sub {
-	my ($jira, $issue) = @_;
+	my ($jira, $issue, $svnlook) = @_;
+	die "CHECK_JIRA: missing SVN::Look object" unless ref $svnlook eq 'SVN::Look';
 	foreach my $fv ($issue->{fixVersion}) {
 	    return if $version eq $fv;
 	}
