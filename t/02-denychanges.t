@@ -83,16 +83,7 @@ svn ci -mx $file
 EOS
 
 # Grok the author name
-my $author;
-open my $svn, '-|', "svn info $del"
-    or die "Can't exec svn info\n";
-while (<$svn>) {
-    if (/Author: (.*)$/) {
-	$author = $1;
-    }
-}
-close $svn;
-ok(defined $author, 'grok author');
+ok(my $author = get_author($t), 'grok author');
 
 set_conf(<<"EOS");
 DENY_ADDITION(qr/add/);

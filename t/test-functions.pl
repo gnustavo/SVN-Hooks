@@ -152,6 +152,17 @@ sub set_conf {
     close $fd;
 }
 
+sub get_author {
+    my ($t) = @_;
+    my $repo = catfile($t, 'repo');
+    open my $cmd, '-|', "svnlook info $repo"
+	or die "Can't exec svn info\n";
+    chomp(my $author = <$cmd>);
+    local $/ = undef; <$cmd>;
+    close $cmd;
+    return $author;
+}
+
 sub reset_repo {
     my $cleanup = exists $ENV{REPO_CLEANUP} ? $ENV{REPO_CLEANUP} : 1;
     $T = tempdir('t.XXXX', DIR => getcwd(), CLEANUP => $cleanup);

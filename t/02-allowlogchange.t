@@ -8,7 +8,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (can_svn()) {
-    plan tests => 8;
+    plan tests => 9;
 }
 else {
     plan skip_all => 'Cannot find or use svn commands.';
@@ -50,10 +50,11 @@ work_nok('cannot delete' => 'ALLOW_LOG_CHANGE: a revision log can only be modifi
 svn pd svn:log --revprop -r 1 $repo
 EOS
 
-my $username = $^O eq 'MSWin32' ? getlogin() : getpwuid($<);
+# Grok the author name
+ok(my $author = get_author($t), 'grok author');
 
 set_conf(<<"EOS");
-ALLOW_LOG_CHANGE('x$username');
+ALLOW_LOG_CHANGE('x$author');
 EOS
 
 work_nok('deny user' => 'ALLOW_LOG_CHANGE: you are not allowed to change a revision log.', <<"EOS");
@@ -61,7 +62,7 @@ svn ps svn:log --revprop -r 1 value $repo
 EOS
 
 set_conf(<<"EOS");
-ALLOW_LOG_CHANGE($username);
+ALLOW_LOG_CHANGE($author);
 EOS
 
 work_ok('can modify', <<"EOS");
