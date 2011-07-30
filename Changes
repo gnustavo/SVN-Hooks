@@ -1,5 +1,13 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.03	2011-07-30
+
+	SVN::Hooks::CheckJira's check_one and check_all_svnlook checks
+	now get a SVN::Look object to make it possible to grok
+	information about the commit.
+
+	Tests made a little more robust.
+
 1.02	2011-07-27
 
 	Porting Makefile.PL to Windows.
