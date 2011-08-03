@@ -1,5 +1,4 @@
 --- #YAML:1.0
-# http://module-build.sourceforge.net/META-spec.html
 name: SVN-Hooks
 abstract: Framework for implementing Subversion hooks.
 version: 1.03
@@ -8,8 +7,10 @@ license: perl
 generated_by: Gustavo Chaves
 distribution_type: module
 requires:
+  perl: 5.008
   Test::More: 0
   SVN::Look: 0.21
+build_requires:
   URI::file: 0
 optional_features:
 - Jira::Client:
@@ -33,6 +34,10 @@ optional_features:
 provides:
   SVN::Hooks::AllowLogChange:
     file: lib/SVN/Hooks/AllowLogChange.pm
+  SVN::Hooks::AllowPropChange:
+    file: lib/SVN/Hooks/AllowPropChange.pm
+  SVN::Hooks::CheckCapability:
+    file: lib/SVN/Hooks/CheckCapability.pm
   SVN::Hooks::CheckJira:
     file: lib/SVN/Hooks/CheckJira.pm
   SVN::Hooks::CheckLog:
@@ -47,6 +52,8 @@ provides:
     file: lib/SVN/Hooks/DenyChanges.pm
   SVN::Hooks::DenyFilenames:
     file: lib/SVN/Hooks/DenyFilenames.pm
+  SVN::Hooks::Generic:
+    file: lib/SVN/Hooks/Generic.pm
   SVN::Hooks::JiraAcceptance:
     file: lib/SVN/Hooks/JiraAcceptance.pm
   SVN::Hooks::Mailer:
@@ -57,3 +64,8 @@ provides:
     file: lib/SVN/Hooks/UpdateConfFile.pm
 resources:
   license: http://dev.perl.org/licenses/
+  homepage: http://code.google.com/p/svn-hooks/
+  repository: http://svn-hooks.googlecode.com/svn/trunk/
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
