@@ -7,8 +7,7 @@ use SVN::Hooks;
 
 use Exporter qw/import/;
 my $HOOK = 'DENY_CHANGES';
-my @HOOKS = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE', 'DENY_EXCEPT_USERS');
-our @EXPORT = @HOOKS;
+our @EXPORT = ('DENY_ADDITION', 'DENY_DELETION', 'DENY_UPDATE', 'DENY_EXCEPT_USERS');
 
 our $VERSION = $SVN::Hooks::VERSION;
 
