@@ -1,5 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.04	2011-08-11
+
+	Implementing directive DENY_FILENAMES_PER_PATH in
+	SVN::Hooks::DenyFilenames.
+
 1.03	2011-07-30
 
 	SVN::Hooks::CheckJira's check_one and check_all_svnlook checks
