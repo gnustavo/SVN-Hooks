@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.05	2011-08-12
+
+	Fixing a bug in the new DENY_FILENAMES_PER_PATH directive.
+
 1.04	2011-08-11
 
 	Implementing directive DENY_FILENAMES_PER_PATH in
