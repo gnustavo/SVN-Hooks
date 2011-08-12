@@ -105,8 +105,9 @@ by B<DENY_FILENAMES> be imposed.
 Example:
 
         DENY_FILENAMES_PER_PATH(
-            qr:/src/: => [qr/[^\w.-]/ => 'source files must be strict'],
-            qr:/doc/: => qr/[^\w\s.-]/i, # document files allow spaces too.
+            qr:/src/:   => [qr/[^\w.-]/ => 'source files must be strict'],
+            qr:/doc/:   => qr/[^\w\s.-]/i, # document files allow spaces too.
+            qr:/notes/: => qr/^$/,         # notes directory allows anything.
         );
 
 =cut
