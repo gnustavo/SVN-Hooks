@@ -125,7 +125,7 @@ svn add -q --no-auto-props $bvalid
 svn ci -mx $bvalid
 EOS
 
-my $cfile = catfile($adir, 'c');
+my $cfile = catfile($cdir, 'c');
 work_nok('invalid c', ': no c:', <<"EOS");
 echo txt >$cfile
 svn add -q --no-auto-props $cfile

@@ -141,10 +141,9 @@ sub pre_commit {
     foreach my $added ($svnlook->added()) {
 	foreach my $rule (@Per_path_checks) {
 	    if ($added =~ $rule->[0]) {
-		if ($added =~ $rule->[1][0]) {
-		    $errors .= "$HOOK: $rule->[1][1]: $added\n";
-		    next ADDED;
-		}
+		$errors .= "$HOOK: $rule->[1][1]: $added\n"
+		    if $added =~ $rule->[1][0];
+		next ADDED;
 	    }
 	}
 	foreach my $check (@Checks) {
