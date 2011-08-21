@@ -1,5 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.06	2011-08-21
+
+	Checking in Makefile.PL if we can exec svnlook. Just
+	specifying the dependency from SVN::Look in it doesn't do.
+
 1.05	2011-08-12
 
 	Fixing a bug in the new DENY_FILENAMES_PER_PATH directive.
