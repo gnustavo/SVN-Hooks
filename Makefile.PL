@@ -18,6 +18,16 @@ GetOptions(
     'author-tests' => \$author_tests,
 ) or die $usage;
 
+# Check if we have the svnlook command.
+eval {
+    open my $svnlook, '-|', 'svnlook --version' or die;
+    local $/ = undef;		# slurp mode
+    <$svnlook>;
+    close $svnlook or die;
+};
+die "Aborting because I couldn't find the 'svnlook' executable.\n"
+    if $@;
+
 #
 # Check if we have internet connection
 # (I lifted this code from Net::DNS, which lifted it from LWP... )
