@@ -21,7 +21,7 @@ GetOptions(
 # Check if we have a suitable version of the svnlook command.
 {
     open my $svnlook, '-|', 'svnlook --version'
-	or die "Aborting because I couldn't find the 'svnlook' executable.\n";
+	or die "Aborting because I couldn't find the 'svnlook' executable in PATH=$ENV{PATH}.\n";
     $_ = <$svnlook>;
     if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
 	$major > 1 || $major == 1 && $minor >= 4
