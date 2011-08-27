@@ -18,15 +18,21 @@ GetOptions(
     'author-tests' => \$author_tests,
 ) or die $usage;
 
-# Check if we have the svnlook command.
-eval {
-    open my $svnlook, '-|', 'svnlook --version' or die;
+# Check if we have a suitable version of the svnlook command.
+{
+    open my $svnlook, '-|', 'svnlook --version'
+	or die "Aborting because I couldn't find the 'svnlook' executable.\n";
+    $_ = <$svnlook>;
+    if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
+	$major > 1 || $major == 1 && $minor >= 4
+	    or die "I need at least version 1.4.0 of svnlook but you have only $major.$minor.$patch.\n";
+    } else {
+	die "Can't grok Subversion version from svnlook --version command.\n";
+    }
     local $/ = undef;		# slurp mode
     <$svnlook>;
-    close $svnlook or die;
-};
-die "Aborting because I couldn't find the 'svnlook' executable.\n"
-    if $@;
+    close $svnlook or die "Can't close svnlook commnand.\n";
+}
 
 #
 # Check if we have internet connection
