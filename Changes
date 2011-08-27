@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.07    2011-08-27
+
+	Requiring at least svnlook version 1.4.0.
+
 1.06	2011-08-21
 
 	Checking in Makefile.PL if we can exec svnlook. Just
