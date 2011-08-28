@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use lib 't';
 use Test::More;
-use Config;
 
 require "test-functions.pl";
 
@@ -115,7 +114,7 @@ compare(@ARGV);
 EOS
 }
 
-my $perl = $Config{perlpath};
+my $perl = $^X;
 
 work_ok('update without validation', <<"EOS");
 svn ci -mx $file
