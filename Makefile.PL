@@ -32,7 +32,7 @@ eval {
     local $/ = undef;		# slurp mode
     <$svnlook>;
     close $svnlook or die "Can't close svnlook commnand.\n";
-}
+};
 if ($@) {
     warn $@;
     # CPAN Testers says
