@@ -19,9 +19,9 @@ GetOptions(
 ) or die $usage;
 
 # Check if we have a suitable version of the svnlook command.
-{
+eval {
     open my $svnlook, '-|', 'svnlook --version'
-	or die "Aborting because I couldn't find the 'svnlook' executable in PATH=$ENV{PATH}.\n";
+	or die "Aborting because I couldn't find the 'svnlook' executable in PATH=$ENV{PATH}\n";
     $_ = <$svnlook>;
     if (my ($major, $minor, $patch) = (/(\d+)\.(\d+)\.(\d+)/)) {
 	$major > 1 || $major == 1 && $minor >= 4
@@ -32,6 +32,14 @@ GetOptions(
     local $/ = undef;		# slurp mode
     <$svnlook>;
     close $svnlook or die "Can't close svnlook commnand.\n";
+}
+if ($@) {
+    warn $@;
+    # CPAN Testers says
+    # (http://wiki.cpantesters.org/wiki/CPANAuthorNotes) that we
+    # should simply exit normally before generating the Makefile if
+    # there is an unmet depencency.
+    exit 0;
 }
 
 #
