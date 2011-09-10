@@ -3,9 +3,6 @@ package SVN::Hooks::Notify;
 use strict;
 use warnings;
 use SVN::Hooks;
-use Email::Send;
-use Email::Simple;
-use Email::Simple::Creator;
 
 use Exporter qw/import/;
 my $HOOK = 'NOTIFY';
