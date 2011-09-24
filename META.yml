@@ -21,12 +21,6 @@ optional_features:
     description: Plugin to integrate Subversion with the JIRA ticketing system.
     requires:
       XMLRPC::Lite: 0
-- Mailer:
-    description: Plugin to send emails after succesful commits.
-    requires:
-      Email::Send: 0
-      Email::Simple: 0
-      Email::Simple::Creator: 0
 - Notify:
     description: Plugin to send emails after succesful commits.
     requires:

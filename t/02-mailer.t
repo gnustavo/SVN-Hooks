@@ -12,18 +12,8 @@ my $io_available = 1;
 if (not can_svn()) {
     plan skip_all => 'Cannot find or use svn commands.';
 }
-elsif (not eval {require Email::Send}) {
-    plan skip_all => 'Need Email::Send';
-}
-elsif (not eval {require Email::Simple::Creator}) {
-    plan skip_all => 'Need Email::Simple::Creator';
-}
-elsif (! Email::Send->new()->mailer_available('IO')) {
-    $io_available = 0;
-    plan tests => 7;
-}
 else {
-    plan tests => 17;
+    plan tests => 10;
 }
 
 my $t    = reset_repo();
@@ -46,43 +36,43 @@ set_conf(<<'EOS');
 EMAIL_CONFIG();
 EOS
 
-work_nok('config sans args', 'EMAIL_CONFIG: requires two arguments', work('f'));
+work_nok('config sans args', 'DEPRECATED', work('f'));
 
 set_conf(<<'EOS');
 EMAIL_CONFIG(WHAT => 1);
 EOS
 
-work_nok('config invalid', 'EMAIL_CONFIG: unknown option', work('f'));
+work_nok('config invalid', 'DEPRECATED', work('f'));
 
 set_conf(<<'EOS');
 EMAIL_COMMIT(1);
 EOS
 
-work_nok('commit odd args', 'EMAIL_COMMIT: odd number of arguments', work('f'));
+work_nok('commit odd args', 'DEPRECATED', work('f'));
 
 set_conf(<<'EOS');
 EMAIL_COMMIT(what => 1);
 EOS
 
-work_nok('commit invalid opt', 'EMAIL_COMMIT: unknown option', work('f'));
+work_nok('commit invalid opt', 'DEPRECATED', work('f'));
 
 set_conf(<<'EOS');
 EMAIL_COMMIT(match => 1);
 EOS
 
-work_nok('commit invalid match', "EMAIL_COMMIT: 'match' argument must be a qr/Regexp/", work('f'));
+work_nok('commit invalid match', "DEPRECATED", work('f'));
 
 set_conf(<<'EOS');
 EMAIL_COMMIT(match => qr/./);
 EOS
 
-work_nok('commit missing from', "EMAIL_COMMIT: missing 'from' address", work('f'));
+work_nok('commit missing from', "DEPRECATED", work('f'));
 
 set_conf(<<'EOS');
 EMAIL_COMMIT(match => qr/./, from => 's@a.b');
 EOS
 
-work_nok('commit missing to', "EMAIL_COMMIT: missing 'to' address", work('f'));
+work_nok('commit missing to', "DEPRECATED", work('f'));
 
 exit 0 unless $io_available;
 
@@ -106,26 +96,8 @@ EMAIL_COMMIT(
 );
 EOS
 
-work_ok('commit none', work('none'));
+work_nok('commit none', 'DEPRECATED', work('none'));
 
-ok(! -f $log, 'commit none dontsend');
+work_nok('commit A', 'DEPRECATED', work('a'));
 
-work_ok('commit A', work('a'));
-
-ok(-f $log, 'commit A send');
-
-my $mail = `cat $log`;
-  like($mail, qr/Subject: \[A\]/, 'commit A right');
-unlike($mail, qr/Subject: \[B\]/, 'commit A right sans B');
-
-unlink $log;
-
-work_ok('commit B', work('b'));
-
-ok(-f $log, 'commit B send');
-
-$mail = `cat $log`;
-  like($mail, qr/Subject: \[B\]/, 'commit B right');
-unlike($mail, qr/Subject: \[A\]/, 'commit B right sans A');
-
-unlink $log;
+work_nok('commit B', 'DEPRECATED', work('b'));
