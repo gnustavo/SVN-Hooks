@@ -176,8 +176,10 @@ Or you can use already implemented hooks via plugins:
 =head1 INTRODUCTION
 
 In order to really understand what this is all about you need to
-understand Subversion L<http://subversion.tigris.org/> and its hooks
-L<http://svnbook.red-bean.com/nightly/en/svn.reposadmin.create.html#svn.reposadmin.create.hooks>.
+understand Subversion L<http://subversion.apache.org/> and its
+hooks. You can read everything about this in the svnbook,
+a.k.a. Version Control with Subversion, at
+L<http://svnbook.red-bean.com/nightly/en/index.html>.
 
 Subversion is a version control system, and as such it is used to keep
 historical revisions of files and directories. Each revision maintains
@@ -209,6 +211,14 @@ can gather all sorts of information about the specific commit
 transaction being performed and decide to reject it in case it doesn't
 comply to specified policies. The C<post-commit> can be used to log or
 alert interested parties about the commit just done.
+
+IMPORTANT NOTE from the svnbook: "For security reasons, the Subversion
+repository executes hook programs with an empty environment—that is,
+no environment variables are set at all, not even $PATH (or %PATH%,
+under Windows). Because of this, many administrators are baffled when
+their hook program runs fine by hand, but doesn't work when run by
+Subversion. Be sure to explicitly set any necessary environment
+variables in your hook program and/or use absolute paths to programs."
 
 There are several useful hook scripts available elsewhere
 L<http://svn.apache.org/repos/asf/subversion/trunk/contrib/hook-scripts/>,
