@@ -1,4 +1,6 @@
 /Makefile
 /blib/
 /pm_to_blib
+/Debian_CPANTS.txt
+/t/author.enabled
 *~
