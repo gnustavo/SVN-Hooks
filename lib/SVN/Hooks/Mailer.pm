@@ -22,7 +22,7 @@ SVN::Hooks::Notify instead.
 
 =cut
 
-sub deprecated {
+sub _deprecated {
     croak <<"EOS";
 DEPRECATED: The SVN::Hooks::Mailer plugin was deprecated in 2008 and
 became nonoperational in version 1.08. You must edit your hook
@@ -32,13 +32,25 @@ sending email notifications.
 EOS
 }
 
+=over
+
+=item EMAIL_CONFIG
+
+=cut
+
 sub EMAIL_CONFIG {
-    deprecated();
+    _deprecated();
 }
 
+=item EMAIL_COMMIT
+
+=cut
+
 sub EMAIL_COMMIT {
-    deprecated();
+    _deprecated();
 }
+
+=back
 
 =head1 AUTHOR
 
