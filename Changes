@@ -1,5 +1,13 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.09	2011-11-02
+
+	Document importance of defining the PATH properly and set it
+	properly in the hooks used during testing. (This was a problem
+	in FreeBSD systems.)
+
+	Repository moved to git (http://code.google.com/p/svn-hooks/source).
+
 1.08    2011-09-26
 
 	Deprecate SVN::Hooks::Mailer. Its directives now produce

@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: SVN-Hooks
 abstract: Framework for implementing Subversion hooks.
-version: 1.08
+version: 1.09
 author: Gustavo Chaves <gnustavo@cpan.org>
 license: perl
 generated_by: Gustavo Chaves
@@ -59,7 +59,7 @@ provides:
 resources:
   license: http://dev.perl.org/licenses/
   homepage: http://code.google.com/p/svn-hooks/
-  repository: http://svn-hooks.googlecode.com/svn/trunk/
+  repository: https://code.google.com/p/svn-hooks
 meta-spec:
   version: 1.3
   url: http://module-build.sourceforge.net/META-spec-v1.3.html
