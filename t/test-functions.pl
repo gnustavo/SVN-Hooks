@@ -8,6 +8,7 @@ use File::Spec::Functions;
 use File::Path;
 use File::Copy;
 use URI::file;
+use Config;
 
 # Make sure the svn messages come in English.
 $ENV{LC_MESSAGES} = 'C';
@@ -103,7 +104,7 @@ sub set_hook {
 	or die "Can't create $hookscript: $!";
     my $debug = exists $ENV{DBG} ? '-d' : '';
     print $fd <<"EOS";
-#!$^X $debug
+#!$Config{perlpath} $debug
 use strict;
 use warnings;
 EOS
