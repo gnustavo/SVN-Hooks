@@ -108,11 +108,22 @@ sub set_hook {
 use strict;
 use warnings;
 EOS
+
+    # Subversion hooks are invoked with an empty PATH. This means that
+    # if the user doesn't define it explicitly, bare commands will be
+    # invoked with execvp, which usually works as if the PATH was
+    # ":/bin:/usr/bin". During the tests we try to set up the hooks so
+    # that they will use the PATH as it is in the test environment.
+    if (defined $ENV{PATH} and length $ENV{PATH}) {
+	print $fd "BEGIN { \$ENV{PATH} = '$ENV{PATH}' }\n";
+    }
+
     if (defined $ENV{PERL5LIB} and length $ENV{PERL5LIB}) {
 	foreach my $path (reverse split "$pathsep", $ENV{PERL5LIB}) {
 	    print $fd "use lib '$path';\n";
 	}
     }
+
     print $fd <<"EOS";
 use lib '$bliblib';
 use SVN::Hooks;
