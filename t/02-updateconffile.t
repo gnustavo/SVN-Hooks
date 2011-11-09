@@ -76,8 +76,9 @@ set_conf(<<'EOS');
 UPDATE_CONF_FILE(file => 'file');
 
 sub validate {
-    my ($text, $file) = @_;
+    my ($text, $file, $svnlook) = @_;
     die "undefined second argument" unless defined $file;
+    die "undefined third argument" unless defined $svnlook;
     if ($text =~ /abort/) {
 	die "Aborting!"
     }
@@ -90,8 +91,9 @@ UPDATE_CONF_FILE(validate  => 'validate',
                  validator => \&validate);
 
 sub generate {
-    my ($text, $file) = @_;
+    my ($text, $file, $svnlook) = @_;
     die "undefined second argument" unless defined $file;
+    die "undefined third argument" unless defined $svnlook;
     return "[$file, $text]\n";
 }
 
@@ -162,8 +164,9 @@ UPDATE_CONF_FILE(subfile => 'subdir');
 UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
 
 sub actuate {
-    my ($text, $file) = @_;
+    my ($text, $file, $svnlook) = @_;
     die "undefined second argument" unless defined $file;
+    die "undefined third argument" unless defined $svnlook;
     open F, '>', "TTT/repo/conf/really-actuated" or die $!;
     print F $text;
     close F;

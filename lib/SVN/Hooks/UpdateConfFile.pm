@@ -63,11 +63,29 @@ strings that will be passed to the shell) that will check the contents
 of FROM in the pre-commit hook to see if it's valid. If there is no
 validator, the contents are considered valid.
 
-The function receives two string arguments: the contents of FROM and
-the relative path to FROM.
+The function receives three arguments:
 
-The command is called with two arguments: the path to a temporary copy
-of FROM and the relative path to FROM.
+=over
+
+=item A string with the contents of FROM
+
+=item A string with the relative path to FROM in the repository
+
+=item An SVN::Look object representing the commit transaction
+
+=back
+
+The command is called with three arguments:
+
+=over
+
+=item The path to a temporary copy of FROM
+
+=item The relative path to FROM in the repository
+
+=item The path to the root of the repository in the server
+
+=back
 
 =item generator => ARRAY or CODE
 
@@ -76,11 +94,11 @@ strings that will be passed to the shell) that will transform the
 contents of FROM in the post-commit hook before copying it to TO. If
 there is no generator, the contents are copied as is.
 
-The function receives two string arguments: the contents of FROM and
-the relative path to FROM.
+The function receives the same three arguments as the validator's
+function above.
 
-The command is called with two arguments: the path to a temporary copy
-of FROM and the relative path to FROM.
+The command is called with the same three arguments as the validator's
+command above.
 
 =item actuator => ARRAY or CODE
 
@@ -88,11 +106,11 @@ An actuator is a function or a command (specified by an array of
 strings that will be passed to the shell) that will be invoked after a
 successful commit of FROM in the post-commit hook.
 
-The function receives two string arguments: the contents of FROM and
-the relative path to FROM.
+The function receives the same three arguments as the validator's
+function above.
 
-The command is called with two arguments: the path to a temporary copy
-of FROM and the relative path to FROM.
+The command is called with the same three arguments as the validator's
+command above.
 
 =item rotate => NUMBER
 
@@ -207,12 +225,12 @@ sub pre_commit {
 		my $text = $svnlook->cat($file);
 
 		if (my $generator = $conf->{generator}) {
-		    $text = eval { $generator->($text, $file) };
+		    $text = eval { $generator->($text, $file, $svnlook) };
 		    defined $text
 			or croak "$HOOK: Generator aborted for: $file\n", $@, "\n";
 		}
 
-		my $validation = eval { $validator->($text, $file) };
+		my $validation = eval { $validator->($text, $file, $svnlook) };
 		defined $validation
 		    or croak "$HOOK: Validator aborted for: $file\n", $@, "\n";
 
@@ -263,7 +281,7 @@ EOS
 	    my $text = $svnlook->cat($file);
 
 	    if (my $generator = $conf->{generator}) {
-		$text = eval { $generator->($text, $file) };
+		$text = eval { $generator->($text, $file, $svnlook) };
 		defined $text or croak <<"EOS";
 $HOOK: generator in post-commit aborted for: $file
 
@@ -297,7 +315,7 @@ EOS
 	    rename "$to.new", $to;
 
 	    if (my $actuator = $conf->{actuator}) {
-		my $rc = eval { $actuator->($text, $file) };
+		my $rc = eval { $actuator->($text, $file, $svnlook) };
 		defined $rc or croak <<"EOS";
 $HOOK: actuator in post-commit aborted for: $file
 
