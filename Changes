@@ -1,5 +1,10 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.10    2011-11-09
+
+	Pass the SVN::Look object as the third argument to the
+	validator, generator, and actuator in UpdateConfFile.
+
 1.09	2011-11-02
 
 	Document importance of defining the PATH properly and set it
