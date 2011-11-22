@@ -53,6 +53,7 @@
 \bcover_db\b
 #!end included /usr/share/perl/5.12/ExtUtils/MANIFEST.SKIP
 
+Debian_CPANTS\.txt$
 MANIFEST\.SKIP$
 \.tar\.gz$
 \.perlcriticrc$
