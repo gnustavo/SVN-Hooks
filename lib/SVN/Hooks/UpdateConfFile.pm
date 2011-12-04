@@ -179,7 +179,7 @@ sub UPDATE_CONF_FILE {
 		    or croak "$HOOK: $function argument must have at least one element.\n";
 		-x $what->[0]
 		    or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
-		$confs{$function} = _functor($SVN::Hooks::Repo, $what);
+		$confs{$function} = _functor($what);
 	    }
 	    else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
@@ -342,11 +342,11 @@ EOS
 }
 
 sub _functor {
-    my ($repo_path, $cmdlist) = @_;
+    my ($cmdlist) = @_;
     my $cmd = join(' ', @$cmdlist);
 
     return sub {
-	my ($text, $path) = @_;
+	my ($text, $path, $svnlook) = @_;
 
 	my $temp = tempdir('UpdateConfFile.XXXXXX', TMPDIR => 1, CLEANUP => 1);
 
@@ -356,8 +356,8 @@ sub _functor {
 	print $th $text;
 	close $th;
 
-	local $ENV{SVNREPOPATH} = $repo_path;
-	if (system("$cmd $temp/file $path 1>$temp/output 2>$temp/error") == 0) {
+	local $ENV{SVNREPOPATH} = $svnlook->repo();
+	if (system("$cmd $temp/file $path $ENV{SVNREPOPATH} 1>$temp/output 2>$temp/error") == 0) {
 	    return `cat $temp/output`;
 	}
 	else {
