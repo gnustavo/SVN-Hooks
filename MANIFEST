@@ -1,5 +1,6 @@
 Changes
 examples/check-filesize-limit.pl
+examples/check-java-style.pl
 examples/check-perl-critic.pl
 examples/check-valid-utf8.pl
 examples/README.txt
