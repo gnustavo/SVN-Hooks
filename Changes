@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.11    2011-12-04
+
+	Fix UpdateConfFile's shell command invokation.
+
 1.10    2011-11-09
 
 	Pass the SVN::Look object as the third argument to the
