@@ -2,6 +2,8 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.12      2012-02-25 23:34:48 America/Sao_Paulo
+
 	Convert distribution to Dist::Zilla.
 
 1.11    2011-12-04
