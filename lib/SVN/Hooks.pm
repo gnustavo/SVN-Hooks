@@ -1,7 +1,9 @@
-package SVN::Hooks;
-
 use warnings;
 use strict;
+
+package SVN::Hooks;
+# ABSTRACT: A framework for implementing Subversion hooks.
+
 use File::Basename;
 use File::Spec::Functions;
 use SVN::Look;
@@ -11,18 +13,6 @@ use Exporter qw/import/;
 our @EXPORT = qw/run_hook POST_COMMIT POST_LOCK POST_REVPROP_CHANGE
                  POST_UNLOCK PRE_COMMIT PRE_LOCK PRE_REVPROP_CHANGE
                  PRE_UNLOCK START_COMMIT/;
-
-=head1 NAME
-
-SVN::Hooks - A framework for implementing Subversion hooks.
-
-=head1 VERSION
-
-Version 1.11
-
-=cut
-
-our $VERSION = '1.11';
 
 our @Conf_Files = (catfile('conf', 'svn-hooks.conf'));
 our $Repo       = undef;
@@ -140,6 +130,8 @@ sub START_COMMIT (&) {
 
 1; # End of SVN::Hooks
 __END__
+
+=for Pod::Coverage run_hook POST_COMMIT POST_LOCK POST_REVPROP_CHANGE POST_UNLOCK PRE_COMMIT PRE_LOCK PRE_REVPROP_CHANGE PRE_UNLOCK START_COMMIT
 
 =head1 SYNOPSIS
 
@@ -557,52 +549,3 @@ But as these are exactly the arguments Subversion passes when it calls
 the hooks, you usually call C<run_hook> like this:
 
 	run_hook($0, @ARGV);
-
-=head1 AUTHOR
-
-Gustavo Chaves, C<< <gnustavo@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-svn-hooks at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SVN-Hooks>.  I will
-be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc SVN::Hooks
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Hooks>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/SVN-Hooks>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/SVN-Hooks>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/SVN-Hooks>
-
-=back
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2011 CPqD, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut

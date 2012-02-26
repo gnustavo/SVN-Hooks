@@ -24,6 +24,3 @@
 * Implement a clone of
    http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
 
-* Substitute Module::Build for ExtUtils::MakeMaker and investigate Dist::Zilla.
-
-* Use a xt/ directory for author tests

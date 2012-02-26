@@ -1,5 +1,9 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+{{$NEXT}}
+
+	Convert distribution to Dist::Zilla.
+
 1.11    2011-12-04
 
 	Fix UpdateConfFile's shell command invokation.
