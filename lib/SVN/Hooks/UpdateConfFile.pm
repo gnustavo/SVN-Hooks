@@ -39,16 +39,19 @@ This directive tells that after a successful commit the file FROM, kept
 under version control, must be copied to TO.
 
 FROM can be a string or a qr/Regexp/ specifying the file path relative
-to the repository's root (e.g. "trunk/src/version.c").
+to the repository's root (e.g. "trunk/src/version.c" or
+"qr:^conf/(\w+).conf$:").
 
 TO is a path relative to the C</repo/conf> directory in the server. It
 can be an explicit file name or a directory, in which case the
 basename of FROM is used as the name of the destination file.
 
-If FROM is a qr/Regexp/ TO is evaluated as a string in order to allow
+If FROM is a qr/Regexp/, TO is evaluated as a string in order to allow
 for the interpolation of capture buffers from the regular
 expression. This is useful to map the copy operation to a diferent
-directory structure, for example.
+directory structure. For example, this configuration
+"qr:^conf/(\w+).conf$: => '$1.conf'" updates any .conf file in the
+repository conf directory.
 
 The optional @ARGS must be a sequence of pairs like these:
 
