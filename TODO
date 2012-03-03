@@ -21,6 +21,13 @@
   if there is some interesting functionality there that is missing
   here.
 
+* Check the hook ideas in
+  http://stackoverflow.com/questions/884608/share-common-useful-svn-pre-commit-hooks.
+
+* Implement a plugin for kicking of Jenkins builds.
+
+* Implement a scmbug integration plugin.
+
 * Implement a clone of
    http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
 
