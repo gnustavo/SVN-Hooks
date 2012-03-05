@@ -2,6 +2,8 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.13      2012-03-05 11:49:34 America/Sao_Paulo
+
 	Fix RT#75547 by making Windows test scripts non-verbose.
 	(Thanks Mike Brimer!)
 
