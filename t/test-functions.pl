@@ -146,6 +146,7 @@ EOS
 	    $hookfile .= '.cmd';
 	    open my $fd, '>', $hookfile
 		or die "Can't create $hookfile: $!";
++	    print $fd "\@echo off\n";
 	    print $fd "$^X $hookscript $hook %1 %2 %3 %4 %5\n";
 	    close $fd;
 	    chmod 0755 => $hookfile;

@@ -2,6 +2,9 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+	Fix RT#75547 by making Windows test scripts non-verbose.
+	(Thanks Mike Brimer!)
+
 1.12      2012-02-25 23:34:48 America/Sao_Paulo
 
 	Convert distribution to Dist::Zilla.
