@@ -31,10 +31,13 @@ PRE_COMMIT {
 	# Try to get properties for the file in HEAD
 	my $head_props = eval { $headlook->proplist($path) };
 
-	# Check if it didn't exist, didn't have the svn:mergeinfo
-	# property or if the property was different then.
-	if (! $head_props ||
-	    ! exists $head_props->{'svn:mergeinfo'} ||
+	# If the path didn't exist previously and it has svn:mergeinfo
+	# now it must be a copy and not a merge root.
+	next unless $head_props;
+
+	# If it didn't have the svn:mergeinfo property or if the
+	# property was different then it is the merge root.
+	if (! exists $head_props->{'svn:mergeinfo'} ||
 	    $head_props->{'svn:mergeinfo'} ne $svnlook->proplist($path)->{'svn:mergeinfo'}
 	) {
 	    # We've found a path that had the svn:mergeinfo property
