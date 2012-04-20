@@ -12,38 +12,39 @@ my @allowed_merge_roots = (
     qr@^(?:trunk|branches/[^/]+)/$@, # only on trunk and on branches roots
 );
 
-# This hook first groks every modified path that has the svn:mergeinfo
-# property. Then, for each such path in string order, it checks if its
-# svn:mergeinfo property has changed in the commit. The first such
-# path must be the merge root and it must match at least one of the
-# allowed merge roots or die otherwise.
+# This hook loops over every path which had the svn:mergeinfo property
+# changed in this commit in string order. The first such path must be
+# the merge root and it must match at least one of the allowed merge
+# roots or die otherwise.
 
 PRE_COMMIT {
     my ($svnlook) = @_;
-    my @mergeds = grep {exists $svnlook->proplist($_)->{'svn:mergeinfo'}} $svnlook->prop_modified();
-    return unless @mergeds;
 
-    # Get a SVN::Look to the HEAD revision in order to see what has
-    # changed in this commit transaction
-    my $headlook = SVN::Look->new($svnlook->repo());
+    my $headlook;		# initialized inside the loop if needed
 
-    foreach my $path (sort @mergeds) {
+    foreach my $path (sort $svnlook->prop_modified()) {
+	next unless exists $svnlook->proplist($_)->{'svn:mergeinfo'};
+
+	# Get a SVN::Look to the HEAD revision in order to see what
+	# has changed in this commit transaction
+	$headlook ||= SVN::Look->new($svnlook->repo());
+
 	# Try to get properties for the file in HEAD
 	my $head_props = eval { $headlook->proplist($path) };
 
-	# If the path didn't exist previously and it has svn:mergeinfo
-	# now it must be a copy and not a merge root.
+	# If path didn't exist in HEAD it must be a copy and not a
+	# merge root, so we skip it.
 	next unless $head_props;
 
 	# If it didn't have the svn:mergeinfo property or if the
-	# property was different then it is the merge root.
+	# property was different then, it must be the merge root.
 	if (! exists $head_props->{'svn:mergeinfo'} ||
 	    $head_props->{'svn:mergeinfo'} ne $svnlook->proplist($path)->{'svn:mergeinfo'}
 	) {
 	    # We've found a path that had the svn:mergeinfo property
 	    # modified in this commit. Since we're looking at them in
 	    # string order, the first one found must be the merge
-	    # root. Check if it matches any of the allowed roots and
+	    # root. Check if it matches any of the allowed roots or
 	    # die otherwise.
 	    foreach my $allowed_root (@allowed_merge_roots) {
 		return if $path =~ $allowed_root;
