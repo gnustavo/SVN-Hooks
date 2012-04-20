@@ -2,6 +2,10 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.15      2012-04-19 23:06:42 America/Sao_Paulo
+
+	Fix and optimize example/check-mergeinfo.pl.
+
 1.14      2012-04-19 22:22:39 America/Sao_Paulo
 
 	Implement example/check-mergeinfo.pl showing how to garantee
