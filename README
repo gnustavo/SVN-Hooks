@@ -1,5 +1,23 @@
 SVN::Hooks - A framework for implementing Subversion hooks.
 
+It comes with a bunch of plugins (actually, sub-modules of SVN::Hooks)
+that implement some of the most used standalone Subversion hooks
+available, such as pre-commit hooks for enforcing:
+
+ * the log message format,
+ * property settings,
+ * the repository structure,
+ * restrictions on the modification of repository areas (e.g., /tags)
+ * restrictions on filenames, and
+ * the integration with ticketing systems.
+
+It also comes with post-commit hooks for
+
+ * sending commit emails, and
+ * updating configuration files in the server from changes made in the repository.
+
+But as a framework, it can be extended to implement all types of hooks.
+
 Copyright (c) 2012 by CPqD (http://www.cpqd.com.br/)
 
 This is free software; you can redistribute it and/or modify it under
