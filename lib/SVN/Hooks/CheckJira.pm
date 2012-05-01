@@ -5,6 +5,7 @@ package SVN::Hooks::CheckJira;
 # ABSTRACT: Integrate Subversion with the JIRA ticketing system.
 
 use Carp;
+use Data::Util qw(:check);
 use SVN::Hooks;
 use JIRA::Client;
 
@@ -74,15 +75,13 @@ sub CHECK_JIRA_CONFIG {
     ($BaseURL, $Login, $Passwd, $MatchLog, $MatchKey) = @_;
 
     if (defined $MatchKey) {
-	ref $MatchKey && ref $MatchKey eq 'Regexp'
-	    or croak "CHECK_JIRA_CONFIG: fifth argument must be a Regexp.\n";
+	is_rx($MatchKey) or croak "CHECK_JIRA_CONFIG: fifth argument must be a Regexp.\n";
     } else {
 	$MatchKey = qr/[A-Z]{2,}/;
     }
 
     if (defined $MatchLog) {
-	ref $MatchLog && ref $MatchLog eq 'Regexp'
-	    or croak "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
+	is_rx($MatchLog) or croak "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
     } else {
 	$MatchLog = qr/[A-Z]{2,}/;
     }
@@ -252,9 +251,8 @@ add a comment to each refered issue like this:
 
 sub _validate_projects {
     my ($opt, $val) = @_;
-    defined $val         or croak "$HOOK: undefined $opt\'s value.\n";
-    ref $val            and croak "$HOOK: $opt\'s value must be a scalar.\n";
-    $val =~ /^[A-Z,]+$/  or croak "$HOOK: $opt\'s value must match /^[A-Z,]+\$/.\n";
+    is_string($val) && $val =~ /^[A-Z,]+$/
+	or croak "$HOOK: $opt\'s value must be a string matching /^[A-Z,]+\$/.\n";
     my %projects = map {$_ => undef} grep {/./} split /,/, $val;
     return \%projects;
 }
@@ -267,8 +265,7 @@ sub _validate_bool {
 
 sub _validate_code {
     my ($opt, $val) = @_;
-    ref $val and ref $val eq 'CODE'
-	or croak "$HOOK: $opt\'s value must be a CODE-ref.\n";
+    is_code_ref($val) or croak "$HOOK: $opt\'s value must be a CODE-ref.\n";
     return $val;
 }
 
@@ -286,10 +283,10 @@ my %opt_checks = (
 
 sub CHECK_JIRA {
     my ($regex, $opts) = @_;
-    croak "$HOOK: first arg must be a qr/Regexp/ or the string 'default'.\n"
-	unless (ref $regex and ref $regex eq 'Regexp') or (not ref $regex and $regex eq 'default');
-    croak "$HOOK: second argument must be a HASH-ref.\n"
-	if defined $opts and not (ref $opts and ref $opts eq 'HASH');
+    is_rx($regex) || (is_string($regex) && $regex eq 'default')
+	or croak "$HOOK: first arg must be a qr/Regexp/ or the string 'default'.\n";
+    ! defined $opts || is_hash_ref($opts)
+	or croak "$HOOK: second argument must be a HASH-ref.\n";
 
     $opts = {} unless defined $opts;
     foreach my $opt (keys %$opts) {

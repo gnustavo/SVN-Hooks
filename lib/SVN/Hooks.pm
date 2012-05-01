@@ -6,6 +6,7 @@ package SVN::Hooks;
 
 use File::Basename;
 use File::Spec::Functions;
+use Data::Util qw(:check);
 use SVN::Look;
 
 use Exporter qw/import/;
@@ -51,9 +52,9 @@ sub run_hook {
     }
 
     foreach my $hook (values %{$Hooks{$hook_name}}) {
-	if (ref $hook eq 'CODE') {
+	if (is_code_ref($hook)) {
 	    $hook->($repo_path, @args);
-	} elsif (ref $hook eq 'ARRAY') {
+	} elsif (is_array_ref($hook)) {
 	    foreach my $h (@$hook) {
 		$h->($repo_path, @args);
 	    }

@@ -74,7 +74,7 @@ set_conf(<<'EOS');
 CHECK_JIRA(default => {projects => 1});
 EOS
 
-work_nok('invalid projects arg', 'CHECK_JIRA: projects\'s value must match', work(''));
+work_nok('invalid projects arg', 'CHECK_JIRA: projects\'s value must be a string matching', work(''));
 
 set_conf(<<'EOS');
 CHECK_JIRA(default => {require => undef});

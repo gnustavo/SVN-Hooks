@@ -5,6 +5,7 @@ package SVN::Hooks::DenyChanges;
 # ABSTRACT: Deny some changes in a repository.
 
 use Carp;
+use Data::Util qw(:check);
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -61,8 +62,7 @@ sub _deny_change {
     my ($change, @regexes) = @_;
 
     foreach (@regexes) {
-	ref $_ eq 'Regexp'
-	    or croak "$HOOK: all arguments must be qr/Regexp/\n";
+	is_rx($_) or croak "$HOOK: all arguments must be qr/Regexp/\n";
     }
 
     push @{$Deny{$change}}, @regexes;
@@ -91,8 +91,7 @@ sub DENY_EXCEPT_USERS {
     my @users = @_;
 
     foreach my $user (@users) {
-	croak "DENY_EXCEPT_USERS: all arguments must be strings\n"
-	    if ref $user;
+	is_string($user) or croak "DENY_EXCEPT_USERS: all arguments must be strings\n";
 	$Except{$user} = undef;
     }
 

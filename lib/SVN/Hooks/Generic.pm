@@ -5,6 +5,7 @@ package SVN::Hooks::Generic;
 # ABSTRACT: Implement generic checks for all Subversion hooks.
 
 use Carp;
+use Data::Util qw(:check);
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -93,16 +94,13 @@ sub GENERIC {
     while (my ($hook, $functions) = each %args) {
 	$hook =~ /(?:(?:pre|post)-(?:commit|lock|revprop-change|unlock)|start-commit)/
 	    or die "$HOOK: invalid hook name ($hook)";
-	if (! ref $functions) {
-	    die "$HOOK: hook '$hook' should be mapped to a reference.\n";
-	} elsif (ref $functions eq 'CODE') {
+	if (is_code_ref($functions)) {
 	    $functions = [$functions];
-	} elsif (ref $functions ne 'ARRAY') {
-	    die "$HOOK: hook '$hook' should be mapped to a CODE-ref or to an ARRAY of CODE-refs.\n";
+	} elsif (! is_array_ref($functions)) {
+	    die "$HOOK: hook '$hook' should be mapped to a CODE-ref or to an ARRAY-ref.\n";
 	}
 	foreach my $foo (@$functions) {
-	    ref $foo and ref $foo eq 'CODE'
-		or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
+	    is_code_ref($foo) or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
 	    $SVN::Hooks::Hooks{$hook}{$foo} ||= sub { $foo->(@_); };
 	}
     }

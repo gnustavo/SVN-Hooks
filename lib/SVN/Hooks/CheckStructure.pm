@@ -5,6 +5,7 @@ package SVN::Hooks::CheckStructure;
 # ABSTRACT: Check the structure of a repository.
 
 use Carp;
+use Data::Util qw(:check);
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -143,7 +144,7 @@ sub _check_structure {
 
     @$path > 0 or croak "Can't happen!";
 
-    if (! ref $structure) {
+    if (is_string($structure)) {
 	if ($structure eq 'DIR') {
 	    return (1) if @$path > 1;
 	    return (0, "the component ($path->[0]) should be a DIR in");
@@ -151,16 +152,14 @@ sub _check_structure {
 	elsif ($structure eq 'FILE') {
 	    return (0, "the component ($path->[0]) should be a FILE in") if @$path > 1;
 	    return (1);
-	}
-	elsif ($structure =~ /^\d+$/) {
+	} elsif (is_integer($structure)) {
 	    return (1) if $structure;
 	    return (0, "invalid path");
 	}
 	else {
 	    return (0, "syntax error: unknown string spec ($structure), while checking");
 	}
-    }
-    elsif (ref $structure eq 'ARRAY') {
+    } elsif (is_array_ref($structure)) {
 	return (0, "syntax error: odd number of elements in the structure spec, while checking")
 	    unless scalar(@$structure) % 2 == 0;
 	return (0, "the component ($path->[0]) should be a DIR in")
@@ -171,23 +170,21 @@ sub _check_structure {
 
 	for (my $s=0; $s<$#$structure; $s+=2) {
 	    my ($lhs, $rhs) = @{$structure}[$s, $s+1];
-	    if (! ref $lhs) {
+	    if (is_string($lhs)) {
 		if ($lhs eq $path->[0]) {
 		    return _check_structure($rhs, $path);
 		}
 		elsif ($lhs =~ /^\d+$/) {
 		    if ($lhs) {
 			return _check_structure($rhs, $path);
-		    }
-		    elsif (! ref $rhs) {
+		    } elsif (is_string($rhs)) {
 			return (0, "$rhs, while checking");
 		    }
 		    else {
 			return (0, "syntax error: the right hand side of a number must be string, while checking");
 		    }
 		}
-	    }
-	    elsif (ref $lhs eq 'Regexp') {
+	    } elsif (is_rx($lhs)) {
 		if ($path->[0] =~ $lhs) {
 		    return _check_structure($rhs, $path);
 		}

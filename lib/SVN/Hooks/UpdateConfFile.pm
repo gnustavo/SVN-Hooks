@@ -5,10 +5,11 @@ package SVN::Hooks::UpdateConfFile;
 # ABSTRACT: Maintain the repository configuration versioned.
 
 use Carp;
-use SVN::Hooks;
+use Data::Util qw(:check);
 use File::Spec::Functions;
 use File::Temp qw/tempdir/;
 use Cwd qw/abs_path/;
+use SVN::Hooks;
 
 use Exporter qw/import/;
 my $HOOK = 'UPDATE_CONF_FILE';
@@ -153,17 +154,10 @@ my @Config;
 sub UPDATE_CONF_FILE {
     my ($from, $to, @args) = @_;
 
-    defined $from and (not ref $from or ref $from eq 'Regexp')
-	or croak "$HOOK: invalid first argument.\n";
-
-    defined $to and not ref $to
-	or croak "$HOOK: invalid second argument.\n";
-
-    (@args % 2) == 0
-	or croak "$HOOK: odd number of arguments.\n";
-
-    file_name_is_absolute($to)
-	and croak "$HOOK: second argument cannot be an absolute pathname ($to).\n";
+    is_string($from) || is_rx($from) or croak "$HOOK: invalid first argument.\n";
+    is_string($to)                   or croak "$HOOK: invalid second argument.\n";
+    (@args % 2) == 0                 or croak "$HOOK: odd number of arguments.\n";
+    file_name_is_absolute($to)      and croak "$HOOK: second argument cannot be an absolute pathname ($to).\n";
 
     my %confs = (from => $from, to => $to);
 
@@ -171,15 +165,12 @@ sub UPDATE_CONF_FILE {
 
     for my $function (qw/validator generator actuator/) {
 	if (my $what = delete $args{$function}) {
-	    if (ref $what eq 'CODE') {
+	    if (is_code_ref($what)) {
 		$confs{$function} = $what;
-	    }
-	    elsif (ref $what eq 'ARRAY') {
+	    } elsif (is_array_ref($what)) {
 		# This should point to list of command arguments
-		@$what > 0
-		    or croak "$HOOK: $function argument must have at least one element.\n";
-		-x $what->[0]
-		    or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
+		@$what > 0    or croak "$HOOK: $function argument must have at least one element.\n";
+		-x $what->[0] or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
 		$confs{$function} = _functor($what);
 	    }
 	    else {
@@ -216,7 +207,7 @@ sub pre_commit {
 	if (my $validator = $conf->{validator}) {
 	    my $from = $conf->{from};
 	    for my $file ($svnlook->added(), $svnlook->updated()) {
-		if (! ref $from) {
+		if (is_string($from)) {
 		    next if $file ne $from;
 		}
 		else {
@@ -252,7 +243,7 @@ sub post_commit {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
 	    my $to = $conf->{to};
-	    if (! ref $from) {
+	    if (is_string($from)) {
 		next if $file ne $from;
 	    }
 	    else {

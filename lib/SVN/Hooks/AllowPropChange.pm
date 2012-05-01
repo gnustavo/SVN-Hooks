@@ -5,6 +5,7 @@ package SVN::Hooks::AllowPropChange;
 # ABSTRACT: Allow changes in revision properties.
 
 use Carp;
+use Data::Util qw(:check);
 use SVN::Hooks;
 
 use Exporter qw/import/;
@@ -75,7 +76,7 @@ sub ALLOW_PROP_CHANGE {
     my @whos;
 
     foreach my $arg (@args) {
-	if (not ref $arg or ref $arg eq 'Regexp') {
+	if (is_string($arg) || is_rx($arg)) {
 	    push @whos, $arg;
 	}
 	else {
@@ -105,14 +106,14 @@ sub pre_revprop_change {
 
     foreach my $spec (@Specs) {
 	my ($prop, $whos) = @$spec;
-	if (! ref $prop) {
+	if (is_string($prop)) {
 	    next if $propname ne $prop;
 	}
 	else {
 	    next if $propname !~ $prop;
 	}
 	for my $who (@$whos) {
-	    if (! ref $who) {
+	    if (is_string($who)) {
 		return if $author eq $who;
 	    }
 	    else {

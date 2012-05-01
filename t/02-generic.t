@@ -45,7 +45,7 @@ set_conf(<<'EOS');
 GENERIC('start-commit' => 'non ref');
 EOS
 
-work_nok('non ref' => 'should be mapped to a reference', <<"EOS");
+work_nok('non ref' => 'should be mapped to a CODE-ref or to an ARRAY-ref', <<"EOS");
 svn ci -mx $file
 EOS
 
@@ -53,7 +53,7 @@ set_conf(<<'EOS');
 GENERIC('start-commit' => {});
 EOS
 
-work_nok('non array' => 'should be mapped to a CODE-ref or to an ARRAY of CODE-refs', <<"EOS");
+work_nok('non array' => 'should be mapped to a CODE-ref or to an ARRAY-ref', <<"EOS");
 svn ci -mx $file
 EOS
 
