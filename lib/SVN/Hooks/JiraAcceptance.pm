@@ -158,8 +158,7 @@ sub pre_commit {
 	if (defined $Match) {
 	    if ($jira_refs =~ $Match) {
 		$jira_refs = $1;
-	    }
-	    else {
+	    } else {
 		chomp $jira_refs;
 		croak <<"EOS";
 JIRA_ACCEPTANCE: Could not extract JIRA references from the log message.

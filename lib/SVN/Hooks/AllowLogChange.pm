@@ -62,8 +62,7 @@ sub ALLOW_LOG_CHANGE {
     foreach my $who (@args) {
 	if (is_string($who) || is_rx($who)) {
 	    push @Valid_Users, $who;
-	}
-	else {
+	} else {
 	    croak "$HOOK: invalid argument '$who'\n";
 	}
     }

@@ -100,23 +100,18 @@ sub pre_commit {
 		} elsif (is_value($what)) {
 		    if (is_integer($what)) {
 			if ($what) {
-			    $is_set or push @errors, "property $prop must be set for: $added";
-			}
-			else {
+			    $is_set or  push @errors, "property $prop must be set for: $added";
+			} else {
 			    $is_set and push @errors, "property $prop must not be set for: $added";
 			}
-		    }
-		    elsif (! $is_set) {
+		    } elsif (! $is_set) {
 			push @errors, "property $prop must be set to \"$what\" for: $added";
-		    }
-		    elsif ($props->{$prop} ne $what) {
+		    } elsif ($props->{$prop} ne $what) {
 			push @errors, "property $prop must be set to \"$what\" and not to \"$props->{$prop}\" for: $added";
 		    }
-		}
-		elsif (! $is_set) {
+		} elsif (! $is_set) {
 		    push @errors, "property $prop must be set and match \"$what\" for: $added";
-		}
-		elsif ($props->{$prop} !~ $what) {
+		} elsif ($props->{$prop} !~ $what) {
 		    push @errors, "property $prop must match \"$what\" but is \"$props->{$prop}\" for: $added";
 		}
 	    }

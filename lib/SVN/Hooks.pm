@@ -45,8 +45,7 @@ sub run_hook {
     if ($hook_name eq 'pre-commit') {
 	# The next arg is a transaction number
 	$repo_path = SVN::Look->new($repo_path, '-t' => $args[0]);
-    }
-    elsif ($hook_name =~ /^(?:post-commit|(?:pre|post)-revprop-change)$/) {
+    } elsif ($hook_name =~ /^(?:post-commit|(?:pre|post)-revprop-change)$/) {
 	# The next arg is a revision number
 	$repo_path = SVN::Look->new($repo_path, '-r' => $args[0]);
     }

@@ -148,15 +148,13 @@ sub _check_structure {
 	if ($structure eq 'DIR') {
 	    return (1) if @$path > 1;
 	    return (0, "the component ($path->[0]) should be a DIR in");
-	}
-	elsif ($structure eq 'FILE') {
+	} elsif ($structure eq 'FILE') {
 	    return (0, "the component ($path->[0]) should be a FILE in") if @$path > 1;
 	    return (1);
 	} elsif (is_integer($structure)) {
 	    return (1) if $structure;
 	    return (0, "invalid path");
-	}
-	else {
+	} else {
 	    return (0, "syntax error: unknown string spec ($structure), while checking");
 	}
     } elsif (is_array_ref($structure)) {
@@ -173,14 +171,12 @@ sub _check_structure {
 	    if (is_string($lhs)) {
 		if ($lhs eq $path->[0]) {
 		    return _check_structure($rhs, $path);
-		}
-		elsif ($lhs =~ /^\d+$/) {
+		} elsif ($lhs =~ /^\d+$/) {
 		    if ($lhs) {
 			return _check_structure($rhs, $path);
 		    } elsif (is_string($rhs)) {
 			return (0, "$rhs, while checking");
-		    }
-		    else {
+		    } else {
 			return (0, "syntax error: the right hand side of a number must be string, while checking");
 		    }
 		}
@@ -188,15 +184,13 @@ sub _check_structure {
 		if ($path->[0] =~ $lhs) {
 		    return _check_structure($rhs, $path);
 		}
-	    }
-	    else {
+	    } else {
 		my $what = ref $lhs;
 		return (0, "syntax error: the left hand side of arrays in the structure spec must be scalars or qr/Regexes/, not $what, while checking");
 	    }
 	}
 	return (0, "the component ($path->[0]) is not allowed in");
-    }
-    else {
+    } else {
 	my $what = ref $structure;
 	return (0, "syntax error: invalid reference to a $what in the structure spec, while checking");
     }

@@ -78,8 +78,7 @@ sub ALLOW_PROP_CHANGE {
     foreach my $arg (@args) {
 	if (is_string($arg) || is_rx($arg)) {
 	    push @whos, $arg;
-	}
-	else {
+	} else {
 	    croak "$HOOK: invalid argument '$arg'\n";
 	}
     }
@@ -108,15 +107,13 @@ sub pre_revprop_change {
 	my ($prop, $whos) = @$spec;
 	if (is_string($prop)) {
 	    next if $propname ne $prop;
-	}
-	else {
+	} else {
 	    next if $propname !~ $prop;
 	}
 	for my $who (@$whos) {
 	    if (is_string($who)) {
 		return if $author eq $who;
-	    }
-	    else {
+	    } else {
 		return if $author =~ $who;
 	    }
 	}

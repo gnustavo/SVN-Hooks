@@ -172,8 +172,7 @@ sub UPDATE_CONF_FILE {
 		@$what > 0    or croak "$HOOK: $function argument must have at least one element.\n";
 		-x $what->[0] or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
 		$confs{$function} = _functor($what);
-	    }
-	    else {
+	    } else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
 	    }
 
@@ -182,10 +181,8 @@ sub UPDATE_CONF_FILE {
     }
 
     if (my $rotate = delete $args{rotate}) {
-	$rotate =~ /^\d+$/
-	    or croak "$HOOK: rotate argument must be numeric, not '$rotate'";
-	$rotate < 10
-	    or croak "$HOOK: rotate argument must be less than 10, not '$rotate'";
+	$rotate =~ /^\d+$/ or croak "$HOOK: rotate argument must be numeric, not '$rotate'";
+	$rotate < 10       or croak "$HOOK: rotate argument must be less than 10, not '$rotate'";
 	$confs{rotate} = $rotate;
     }
 
@@ -209,8 +206,7 @@ sub pre_commit {
 	    for my $file ($svnlook->added(), $svnlook->updated()) {
 		if (is_string($from)) {
 		    next if $file ne $from;
-		}
-		else {
+		} else {
 		    next if $file !~ $from;
 		}
 
@@ -245,8 +241,7 @@ sub post_commit {
 	    my $to = $conf->{to};
 	    if (is_string($from)) {
 		next if $file ne $from;
-	    }
-	    else {
+	    } else {
 		next if $file !~ $from;
 		# interpolate backreferences 
 		$to = eval qq{"$to"}; ## no critic
@@ -351,8 +346,7 @@ sub _functor {
 	local $ENV{SVNREPOPATH} = $svnlook->repo();
 	if (system("$cmd $temp/file $path $ENV{SVNREPOPATH} 1>$temp/output 2>$temp/error") == 0) {
 	    return `cat $temp/output`;
-	}
-	else {
+	} else {
 	    croak `cat $temp/error`;
 	}
     };

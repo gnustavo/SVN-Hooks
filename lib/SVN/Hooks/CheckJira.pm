@@ -296,8 +296,7 @@ sub CHECK_JIRA {
 
     if (ref $regex) {
 	push @Checks, [$regex => $opts];
-    }
-    else {
+    } else {
 	while (my ($opt, $val) = each %$opts) {
 	    $Defaults{$opt} = $val;
 	}
