@@ -13,8 +13,6 @@ use Exporter qw/import/;
 my $HOOK = 'CHECK_JIRA';
 our @EXPORT = qw/CHECK_JIRA_CONFIG CHECK_JIRA/;
 
-our $VERSION = $SVN::Hooks::VERSION;
-
 =for Pod::Coverage post_commit pre_commit
 
 =head1 DESCRIPTION
