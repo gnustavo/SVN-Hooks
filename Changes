@@ -2,6 +2,8 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.18      2012-05-21 13:06:06 America/Sao_Paulo
+
 	Implement 'exclude' option for CHECK_JIRA directive.
 
 1.17      2012-05-01 18:07:52 America/Sao_Paulo
