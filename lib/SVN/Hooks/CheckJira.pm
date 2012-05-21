@@ -189,6 +189,14 @@ information about the commit proper.  The following arguments are the
 JIRA keys mentioned in the commit log message. The value returned by
 the routine, if any, is ignored.
 
+=item exclude => REGEXP
+
+Normally you specify a CHECK_JIRA with a regex matching a root
+directory in the repository hierarchy. Sometimes you need to specify
+some subparts of that root directory that shouldn't be treated by this
+CHECK_JIRA directive. You can use this option to specify these
+exclusions by means of another regex.
+
 =back
 
 You can set defaults for these options using a CHECK_JIRA directive
@@ -247,6 +255,14 @@ add a comment to each refered issue like this:
         post_action => add_comment("Subversion Commit r{rev} by {author} on {date}\n{log_msg}")
     });
 
+You can use a generic CHECK_JIRA excluding specific directories from
+it using the "exclude" option like this:
+
+    CHECK_JIRA(qr:^(trunk|branches/[^/]): => {
+        exclude => qr:/documentation/:,
+        # other options...
+    });
+
 =cut
 
 sub _validate_projects {
@@ -269,6 +285,12 @@ sub _validate_code {
     return $val;
 }
 
+sub _validate_regex {
+    my ($opt, $val) = @_;
+    is_rx($val) or croak "$HOOK: $opt\'s value must be a qr/REGEX/.\n";
+    return $val;
+}
+
 my %opt_checks = (
     projects          => \&_validate_projects,
     require           => \&_validate_bool,
@@ -279,6 +301,7 @@ my %opt_checks = (
     check_all         => \&_validate_code,
     check_all_svnlook => \&_validate_code,
     post_action       => \&_validate_code,
+    exclude           => \&_validate_regex,
 );
 
 sub CHECK_JIRA {
@@ -367,6 +390,8 @@ sub _check_if_needed {
 
 	for my $file (@files) {
 	    if ($file =~ $regex) {
+		# skip exclusions
+		next if exists $opts->{exclude} && $file =~ $opts->{exclude};
 
 		# Grok the JIRA issue keys from the commit log
 		my ($match) = ($svnlook->log_msg() =~ $MatchLog);
