@@ -9,7 +9,7 @@
 # of allowed regexes.
 
 my @allowed_merge_roots = (
-    qr@^(?:trunk|branches/[^/]+)/$@, # only on trunk and on branches roots
+    qr@^(?:trunk|branches/[^/]+)/$@, # only on trunk and on branch roots
 );
 
 # This hook loops over every path which had the svn:mergeinfo property
