@@ -2,6 +2,10 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.19      2012-06-24 15:12:56 America/Sao_Paulo
+
+	Fix example/check-mergeinfo.pl.
+
 1.18      2012-05-21 13:06:06 America/Sao_Paulo
 
 	Implement 'exclude' option for CHECK_JIRA directive.
