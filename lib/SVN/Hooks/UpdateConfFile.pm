@@ -234,7 +234,6 @@ sub post_commit {
 
     my $absbase = abs_path(catdir($SVN::Hooks::Repo, 'conf'));
 
-  CONF:
     foreach my $conf (@Config) {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
@@ -321,8 +320,6 @@ Any error message produced by the actuator appears below:
 $@
 EOS
 	    }
-
-	    next CONF;
 	}
     }
     return;
