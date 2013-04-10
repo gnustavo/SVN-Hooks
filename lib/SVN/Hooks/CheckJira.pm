@@ -267,7 +267,7 @@ sub _validate_projects {
     my ($opt, $val) = @_;
     is_string($val) && $val =~ /^[A-Z,]+$/
 	or croak "$HOOK: $opt\'s value must be a string matching /^[A-Z,]+\$/.\n";
-    my %projects = map {$_ => undef} grep {/./} split /,/, $val;
+    my %projects = map {$_ => undef} grep {/./} split /\s*,\s*/, $val;
     return \%projects;
 }
 
