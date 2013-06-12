@@ -2,9 +2,18 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.20      2013-06-12 15:08:11 America/Sao_Paulo
+
+        In CheckJira, the PROJKEYS in a 'projects' option may now have
+        spaces around the comma separating project keys.
+
+        Fix UpdateConfFile. It was considering only the fist
+        added/updated file in a commit for updating.
+
         Fix CheckStructure numeric else-clause detection. Also, fix
         its documentation to say that negative values are also treated
-        as true. Only zeroes are considered false.
+        as true. Only zeroes are considered false. (Thanks to Uwe
+        Satthoff for bringing this to my attention!)
 
 1.19      2012-06-24 15:12:56 America/Sao_Paulo
 
