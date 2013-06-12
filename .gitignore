@@ -1,6 +1,7 @@
 /t/author.enabled
 /SVN-Hooks-*
 /.build
+/.tidyall.d/
 *.bak
 *.tar.gz
 *~
