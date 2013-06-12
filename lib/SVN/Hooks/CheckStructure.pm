@@ -56,13 +56,13 @@ A regexp specifies the class of names that match it.
 
 =item NUMBER
 
-A number may be used as an else-clause. A positive number means that
+A number may be used as an else-clause. A non-zero number means that
 any name not yet matched by the previous pair must conform to the
 associated STRUCT_DEF.
 
-A negative number means that no name will do and signals an error. In
-this case, if the STRUCT_DEF is a string it is used as a help message
-shown to the user.
+A zero means that no name will do and signals an error. In this case,
+if the STRUCT_DEF is a string it is used as a help message shown to
+the user.
 
 =back
 
@@ -76,11 +76,11 @@ component must be.
 
 =item NUMBER
 
-A positive number simply tells that whatever the current component is
+A non-zero number simply tells that whatever the current component is
 is ok and finishes the check successfully.
 
-A negative number tells that whatever the current component is is a
-structure violation and aborts the commit.
+A zero tells that whatever the current component is is a structure
+violation and aborts the commit.
 
 =back
 
@@ -171,7 +171,7 @@ sub _check_structure {
 	    if (is_string($lhs)) {
 		if ($lhs eq $path->[0]) {
 		    return _check_structure($rhs, $path);
-		} elsif ($lhs =~ /^\d+$/) {
+		} elsif (is_integer($lhs)) {
 		    if ($lhs) {
 			return _check_structure($rhs, $path);
 		    } elsif (is_string($rhs)) {

@@ -2,6 +2,10 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+        Fix CheckStructure numeric else-clause detection. Also, fix
+        its documentation to say that negative values are also treated
+        as true. Only zeroes are considered false.
+
 1.19      2012-06-24 15:12:56 America/Sao_Paulo
 
 	Fix example/check-mergeinfo.pl.
