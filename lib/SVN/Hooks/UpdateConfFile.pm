@@ -36,8 +36,9 @@ It's configured by the following directive.
 
 =head2 UPDATE_CONF_FILE(FROM, TO, @ARGS)
 
-This directive tells that after a successful commit the file FROM, kept
-under version control, must be copied to TO.
+This directive makes that after a successful commit in which the file
+FROM, under version control, have been added or modified, its newest
+version is copied to TO.
 
 FROM can be a string or a qr/Regexp/ specifying the file path relative
 to the repository's root (e.g. "trunk/src/version.c" or
@@ -122,6 +123,12 @@ of TO are kept on disk with numeric suffixes ranging from C<.0> to
 C<.NUMBER-1>. This can be useful, for instance, in case you manage to
 commit a wrong authz file that denies any subsequent commit.
 
+=item remove => BOOL
+
+By default, if FROM is B<deleted> in the commit, nothing happens to
+TO. If you want to have the file TO removed from the repository when
+FROM is deleted, set this option to a true value such as '1'.
+
 =back
 
 	UPDATE_CONF_FILE(
@@ -145,6 +152,7 @@ commit a wrong authz file that denies any subsequent commit.
 	UPDATE_CONF_FILE(
 	    qr:/file(\n+)$:' => 'subdir/$1/file',
 	    rotate       => 2,
+            remove       => 1,
 	);
 
 =cut
@@ -186,8 +194,12 @@ sub UPDATE_CONF_FILE {
 	$confs{rotate} = $rotate;
     }
 
+    if (my $remove = delete $args{remove}) {
+        $confs{remove} = $remove;
+    }
+
     keys %args == 0
-	or croak "$HOOK: invalid function names: ", join(', ', sort keys %args), ".\n";
+	or croak "$HOOK: invalid option names: ", join(', ', sort keys %args), ".\n";
 
     push @Config, \%confs;
 
@@ -237,32 +249,7 @@ sub post_commit {
     foreach my $conf (@Config) {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
-	    my $to = $conf->{to};
-	    if (is_string($from)) {
-		next if $file ne $from;
-	    } else {
-		next if $file !~ $from;
-		# interpolate backreferences 
-		$to = eval qq{"$to"}; ## no critic
-	    }
-
-	    $to = abs_path(catfile($SVN::Hooks::Repo, 'conf', $to));
-	    if (-d $to) {
-		$to = catfile($to, (File::Spec->splitpath($file))[2]);
-	    }
-
-	    $absbase eq substr($to, 0, length($absbase))
-		or croak <<"EOS";
-$HOOK: post-commit aborted for: $file
-
-This means that $file was committed but the associated
-configuration file wasn't generated because its specified
-location ($to)
-isn't below the repository's configuration directory
-($absbase).
-
-Please, correct the ${HOOK}'s second argument.
-EOS
+            my $to = _post_where_to($absbase, $file, $from, $conf->{to});
 
 	    my $text = $svnlook->cat($file);
 
@@ -289,14 +276,7 @@ EOS
 	    print $fd $text;
 	    close $fd;
 
-	    if (my $rotate = $conf->{rotate}) {
-		for (my $i=$rotate-1; $i >= 0; --$i) {
-		    rename "$to.$i", sprintf("$to.%d", $i+1)
-			if -e "$to.$i";
-		}
-		rename $to, "$to.0"
-		    if -e $to;
-	    }
+            _rotate($to, $conf->{rotate}) if $conf->{rotate};
 
 	    rename "$to.new", $to;
 
@@ -321,6 +301,17 @@ $@
 EOS
 	    }
 	}
+        if ($conf->{remove}) {
+            for my $file ($svnlook->deleted()) {
+                my $to = _post_where_to($absbase, $file, $from, $conf->{to});
+                next unless -f $to;
+                if (my $rotate = $conf->{rotate}) {
+                    _rotate($to, $rotate);
+                } else {
+                    unlink $to or carp "$HOOK: can't unlink '$to'.\n";
+                }
+            }
+        }
     }
     return;
 }
@@ -347,6 +338,55 @@ sub _functor {
 	    croak `cat $temp/error`;
 	}
     };
+}
+
+# Return the server-side absolute path mapping for the configuration
+# file. $absbase is the absolute path to the repo's conf
+# directory. $file is the path of a file added, modified, or deleted
+# in the commit. $from and $to are the configured mapping.
+
+sub _post_where_to {
+    my ($absbase, $file, $from, $to) = @_;
+
+    if (is_string($from)) {
+        next if $file ne $from;
+    } else {
+        next if $file !~ $from;
+        # interpolate backreferences
+        $to = eval qq{"$to"};   ## no critic
+    }
+
+    $to = abs_path(catfile($SVN::Hooks::Repo, 'conf', $to));
+    if (-d $to) {
+        $to = catfile($to, (File::Spec->splitpath($file))[2]);
+    }
+
+    $absbase eq substr($to, 0, length($absbase))
+        or croak <<"EOS";
+$HOOK: post-commit aborted for: $file
+
+This means that $file was committed but the associated
+configuration file wasn't generated because its specified
+location ($to)
+isn't below the repository's configuration directory
+($absbase).
+
+Please, correct the ${HOOK}'s second argument.
+EOS
+
+    return $to;
+}
+
+# Rotates file $to $rotate times.
+
+sub _rotate {
+    my ($to, $rotate) = @_;
+    for (my $i=$rotate-1; $i >= 0; --$i) {
+        rename "$to.$i", sprintf("$to.%d", $i+1)
+            if -e "$to.$i";
+    }
+    rename $to, "$to.0"
+        if -e $to;
 }
 
 1; # End of SVN::Hooks::UpdateConfFile

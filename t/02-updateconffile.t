@@ -8,7 +8,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (can_svn()) {
-    plan tests => 13;
+    plan tests => 17;
 }
 else {
     plan skip_all => 'Cannot find or use svn commands.';
@@ -68,7 +68,7 @@ set_conf(<<'EOS');
 UPDATE_CONF_FILE('first', 'second', foo => 'string');
 EOS
 
-work_nok('invalid function', 'UPDATE_CONF_FILE: invalid function names:', <<"EOS");
+work_nok('invalid option', 'UPDATE_CONF_FILE: invalid option names:', <<"EOS");
 svn ci -mx $file
 EOS
 
@@ -212,3 +212,39 @@ svn add -q --no-auto-props $actuate
 svn ci -mx $actuate
 $perl $cmp $actuate $cactuate
 EOS
+
+set_conf(<<'EOS');
+UPDATE_CONF_FILE(
+    unremoveable => 'unremoveable',
+);
+
+UPDATE_CONF_FILE(
+    removeable => 'removeable',
+    remove     => 1,
+);
+EOS
+
+my $unremoveable  = catfile($wc, 'unremoveable');
+my $cunremoveable = catfile($conf, 'unremoveable');
+
+my $removeable  = catfile($wc, 'removeable');
+my $cremoveable = catfile($conf, 'removeable');
+
+work_ok('setup delete test', <<"EOS");
+echo asdf >$unremoveable
+echo asdf >$removeable
+svn add -q --no-auto-props $unremoveable $removeable
+svn ci -mx $unremoveable $removeable
+EOS
+
+work_ok('delete files in commit', <<"EOS");
+svn delete -q $unremoveable $removeable
+svn ci -mx $wc
+EOS
+
+#diag("wc: $wc; conf: $conf; $cunremoveable; $cremoveable");
+#system('bash');
+
+ok(! -f $cremoveable, 'remove conf');
+
+ok(-f $cunremoveable, 'do not remove conf by default');
