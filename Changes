@@ -2,6 +2,12 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.21      2013-06-18 09:36:02 America/Sao_Paulo
+
+        UpdateConfFile implements a new option 'remove' which, when
+        set, makes the configuration file in the server be removed if
+        the its versioned counterpart is removed from the repository.
+
 1.20      2013-06-12 15:08:11 America/Sao_Paulo
 
         In CheckJira, the PROJKEYS in a 'projects' option may now have
