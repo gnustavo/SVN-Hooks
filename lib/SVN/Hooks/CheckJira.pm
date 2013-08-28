@@ -265,8 +265,8 @@ it using the "exclude" option like this:
 
 sub _validate_projects {
     my ($opt, $val) = @_;
-    is_string($val) && $val =~ /^[A-Z,]+$/
-	or croak "$HOOK: $opt\'s value must be a string matching /^[A-Z,]+\$/.\n";
+    is_string($val) && $val =~ /^[A-Z,\s]+$/
+	or croak "$HOOK: $opt\'s value must be a string matching /^[A-Z,\\s]+\$/.\n";
     my %projects = map {$_ => undef} grep {/./} split /\s*,\s*/, $val;
     return \%projects;
 }
