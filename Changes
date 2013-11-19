@@ -2,6 +2,18 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.22      2013-11-19 11:19:06 America/Sao_Paulo
+
+        [Changes]
+
+        CheckJira: accept and disregard spaces in the "projects"
+        specification.
+
+        [Fixes]
+
+        The META.yml information which is automatically generated from
+        Github had a wrong URL for the module repository.
+
 1.21      2013-06-18 09:36:02 America/Sao_Paulo
 
         UpdateConfFile implements a new option 'remove' which, when
