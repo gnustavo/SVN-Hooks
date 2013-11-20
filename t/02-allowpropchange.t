@@ -42,7 +42,7 @@ ALLOW_PROP_CHANGE(qr/./);
 EOS
 
 work_nok('unknowk property' => 'ALLOW_PROP_CHANGE: the revision property svn:xpto cannot be changed.', <<"EOS");
-svn ps svn:xpto --revprop -r 1 value $repo
+svn ps svn:xpto --force --revprop -r 1 value $repo
 EOS
 
 work_nok('cannot delete' => 'ALLOW_PROP_CHANGE: revision properties can only be modified, not added or deleted.', <<"EOS");

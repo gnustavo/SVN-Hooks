@@ -43,7 +43,7 @@ ALLOW_LOG_CHANGE();
 EOS
 
 work_nok('nothing but svn:log' => 'ALLOW_LOG_CHANGE: the revision property svn:xpto cannot be changed.', <<"EOS");
-svn ps svn:xpto --revprop -r 1 value $repo
+svn ps svn:xpto --force --revprop -r 1 value $repo
 EOS
 
 work_nok('cannot delete' => 'ALLOW_LOG_CHANGE: a revision log can only be modified, not added or deleted.', <<"EOS");
