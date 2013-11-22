@@ -2,6 +2,13 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.23      2013-11-22 08:13:25 America/Sao_Paulo
+
+        [Fixes]
+
+        - Some tests were failing when run with Subversion 1.8 because
+          of changes in the 'svn propset' command.
+
 1.22      2013-11-19 11:19:06 America/Sao_Paulo
 
         [Changes]
