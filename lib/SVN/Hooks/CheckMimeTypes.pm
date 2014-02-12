@@ -65,6 +65,9 @@ sub pre_commit {
     foreach my $added ($svnlook->added()) {
 	next if $added =~ m:/$:; # disregard directories
 	my $props = $svnlook->proplist($added);
+
+        next if exists $props->{'svn:special'}; # disregard symbolic links too
+
 	unless (my $mimetype = $props->{'svn:mime-type'}) {
 	    push @errors, "property svn:mime-type is not set for: $added";
 	} elsif ($mimetype =~ m:^text/:) {
