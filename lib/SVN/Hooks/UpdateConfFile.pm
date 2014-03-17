@@ -273,7 +273,7 @@ EOS
 	    }
 
 	    open my $fd, '>', "$to.new"
-		or croak "$HOOK: Can't open file \"$to\" for writing: $!\n";
+		or croak "$HOOK: Can't open file \"$to.new\" for writing: $!\n";
 	    print $fd $text;
 	    close $fd;
 
