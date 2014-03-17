@@ -250,6 +250,7 @@ sub post_commit {
 	my $from = $conf->{from};
 	for my $file ($svnlook->added(), $svnlook->updated()) {
             my $to = _post_where_to($absbase, $file, $from, $conf->{to});
+            next unless defined $to;
 
 	    my $text = $svnlook->cat($file);
 
@@ -304,7 +305,7 @@ EOS
         if ($conf->{remove}) {
             for my $file ($svnlook->deleted()) {
                 my $to = _post_where_to($absbase, $file, $from, $conf->{to});
-                next unless -f $to;
+                next unless defined $to && -f $to;
                 if (my $rotate = $conf->{rotate}) {
                     _rotate($to, $rotate);
                 } else {
@@ -340,23 +341,23 @@ sub _functor {
     };
 }
 
-# Return the server-side absolute path mapping for the configuration
-# file. $absbase is the absolute path to the repo's conf
-# directory. $file is the path of a file added, modified, or deleted
-# in the commit. $from and $to are the configured mapping.
+# Return the server-side absolute path mapping for the configuration file, or
+# undef if $file doesn't match $from. $absbase is the absolute path to the
+# repo's conf directory. $file is the path of a file added, modified, or
+# deleted in the commit. $from and $to are the configured mapping.
 
 sub _post_where_to {
     my ($absbase, $file, $from, $to) = @_;
 
     if (is_string($from)) {
-        next if $file ne $from;
+        return if $file ne $from;
     } else {
-        next if $file !~ $from;
+        return if $file !~ $from;
         # interpolate backreferences
         $to = eval qq{"$to"};   ## no critic
     }
 
-    $to = abs_path(catfile($SVN::Hooks::Repo, 'conf', $to));
+    $to = abs_path(catfile($absbase, $to));
     if (-d $to) {
         $to = catfile($to, (File::Spec->splitpath($file))[2]);
     }
