@@ -44,9 +44,10 @@ FROM can be a string or a qr/Regexp/ specifying the file path relative
 to the repository's root (e.g. "trunk/src/version.c" or
 "qr:^conf/(\w+).conf$:").
 
-TO is a path relative to the C</repo/conf> directory in the server. It
-can be an explicit file name or a directory, in which case the
-basename of FROM is used as the name of the destination file.
+TO is a path relative to the C</repo/conf> directory in the server. It can be
+an explicit file name or a directory, in which case the basename of FROM is
+used as the name of the destination file. Non-existing diredtory components of
+TO are automatically created.
 
 If FROM is a qr/Regexp/, TO is evaluated as a string in order to allow
 for the interpolation of capture buffers from the regular
@@ -271,6 +272,14 @@ Any error message produced by the generator appears below:
 $@
 EOS
 	    }
+
+            # Create the directory where $to is to be created, if it doesn't
+            # already exist.
+            my $todir = (File::Spec->splitpath($to))[2];
+            unless (-d $todir) {
+                require File::Path;
+                File::Path::make_path($todir);
+            }
 
 	    open my $fd, '>', "$to.new"
 		or croak "$HOOK: Can't open file \"$to.new\" for writing: $!\n";

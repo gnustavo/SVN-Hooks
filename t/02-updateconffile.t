@@ -182,8 +182,6 @@ set_conf($config);
 
 my $subdir = catdir($conf, 'subdir');
 
-mkdir $subdir;
-
 my $subfile  = catfile($wc, 'subfile');
 my $csubfile = catfile($subdir, 'subfile');
 
