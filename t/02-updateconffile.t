@@ -240,9 +240,6 @@ svn delete -q $unremoveable $removeable
 svn ci -mx $wc
 EOS
 
-#diag("wc: $wc; conf: $conf; $cunremoveable; $cremoveable");
-#system('bash');
-
 ok(! -f $cremoveable, 'remove conf');
 
 ok(-f $cunremoveable, 'do not remove conf by default');
