@@ -112,7 +112,7 @@ my $cmp = catfile($t, 'cmp.pl');
     open my $fh, '>', $cmp or die "Can't open '$cmp' for writing: $!\n";
     print $fh <<'EOS';
 use File::Compare;
-compare(@ARGV);
+exit compare(@ARGV);
 EOS
 }
 
@@ -159,7 +159,7 @@ $perl $cmp $generated $cgenerate
 EOS
 
 my $config = <<'EOS';
-UPDATE_CONF_FILE(subfile => 'subdir');
+UPDATE_CONF_FILE(subfile => 'subdir/');
 
 UPDATE_CONF_FILE(qr/^file(\d)$/ => '$1-file');
 

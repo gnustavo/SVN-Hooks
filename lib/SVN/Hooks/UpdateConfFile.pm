@@ -49,6 +49,10 @@ an explicit file name or a directory, in which case the basename of FROM is
 used as the name of the destination file. Non-existing directory components of
 TO are automatically created.
 
+Note that if the path doesn't exist the hook assumes that it should be a
+file. To make sure it's understood as a directory you may end it with a
+forward slash (/).
+
 If FROM is a qr/Regexp/, TO is evaluated as a string in order to allow
 for the interpolation of capture buffers from the regular
 expression. This is useful to map the copy operation to a diferent
@@ -366,25 +370,27 @@ sub _post_where_to {
         $to = eval qq{"$to"};   ## no critic
     }
 
-    $to = abs_path(catfile($absbase, $to));
-    if (-d $to) {
-        $to = catfile($to, (File::Spec->splitpath($file))[2]);
+    my $is_directory = ($to =~ s:/$::);
+
+    my $abs_to = abs_path(catfile($absbase, $to));
+    if ($is_directory || -d $abs_to) {
+        $abs_to = catfile($abs_to, (File::Spec->splitpath($file))[2]);
     }
 
-    $absbase eq substr($to, 0, length($absbase))
+    $absbase eq substr($abs_to, 0, length($absbase))
         or croak <<"EOS";
 $HOOK: post-commit aborted for: $file
 
 This means that $file was committed but the associated
 configuration file wasn't generated because its specified
-location ($to)
+location ($abs_to)
 isn't below the repository's configuration directory
 ($absbase).
 
 Please, correct the ${HOOK}'s second argument.
 EOS
 
-    return $to;
+    return $abs_to;
 }
 
 # Rotates file $to $rotate times.
