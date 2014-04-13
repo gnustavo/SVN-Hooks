@@ -2,6 +2,13 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.25      2014-04-13 16:50:07 America/Sao_Paulo
+
+        [Fixes]
+
+        - UpdateConfFile: the specification of a subdirectory as the
+          destination file wasn't working.
+
 1.24      2014-03-16 23:31:06 America/Sao_Paulo
 
         [Fixes]
