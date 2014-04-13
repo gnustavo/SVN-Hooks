@@ -46,7 +46,7 @@ to the repository's root (e.g. "trunk/src/version.c" or
 
 TO is a path relative to the C</repo/conf> directory in the server. It can be
 an explicit file name or a directory, in which case the basename of FROM is
-used as the name of the destination file. Non-existing diredtory components of
+used as the name of the destination file. Non-existing directory components of
 TO are automatically created.
 
 If FROM is a qr/Regexp/, TO is evaluated as a string in order to allow
@@ -275,7 +275,7 @@ EOS
 
             # Create the directory where $to is to be created, if it doesn't
             # already exist.
-            my $todir = (File::Spec->splitpath($to))[2];
+            my $todir = (File::Spec->splitpath($to))[1];
             unless (-d $todir) {
                 require File::Path;
                 File::Path::make_path($todir);
