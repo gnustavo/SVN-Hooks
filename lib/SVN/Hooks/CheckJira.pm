@@ -11,7 +11,7 @@ use JIRA::Client;
 
 use Exporter qw/import/;
 my $HOOK = 'CHECK_JIRA';
-our @EXPORT = qw/CHECK_JIRA_CONFIG CHECK_JIRA/;
+our @EXPORT = qw/CHECK_JIRA_CONFIG CHECK_JIRA CHECK_JIRA_DISABLE/;
 
 =for Pod::Coverage post_commit pre_commit
 
@@ -328,6 +328,20 @@ sub CHECK_JIRA {
     return 1;
 }
 
+=head2 CHECK_JIRA_DISABLE
+
+This directive globally disables all CHECK_JIRA directives. It's useful, for
+instance, when your JIRA server must be taken down for maintenance and you
+don't want to reject Subversion commits in this period.
+
+=cut
+
+my $Disabled;
+
+sub CHECK_JIRA_DISABLE {
+    $Disabled = 1;
+}
+
 sub _pre_checks {
     my ($svnlook, $keys, $opts) = @_;
 
@@ -377,6 +391,8 @@ sub _post_action {
 
 sub _check_if_needed {
     my ($svnlook, $docheck) = @_;
+
+    return if $Disabled;
 
     defined $BaseURL
 	or croak "$HOOK: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive.\n";

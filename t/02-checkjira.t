@@ -14,7 +14,7 @@ elsif (not eval {require JIRA::Client}) {
     plan skip_all => 'Need JIRA::Client';
 }
 else {
-    plan tests => 15;
+    plan tests => 16;
 }
 
 my $t = reset_repo();
@@ -93,6 +93,13 @@ CHECK_JIRA(qr/./ => {});
 EOS
 
 work_nok('not configured', 'CHECK_JIRA: plugin not configured. Please, use the CHECK_JIRA_CONFIG directive', work(''));
+
+set_conf(<<'EOS');
+CHECK_JIRA_DISABLE;
+CHECK_JIRA(qr/./);
+EOS
+
+work_ok('disabled', work('no issue'));
 
 ################################################
 # From now on the checks need a JIRA connection.
