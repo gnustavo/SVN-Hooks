@@ -31,3 +31,4 @@
 * Implement a clone of
    http://svn.collab.net/viewvc/svn/trunk/contrib/hook-scripts/case-insensitive.py
 
+* I18N the SVN::Hooks messages.
