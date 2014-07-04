@@ -8,7 +8,7 @@ use Test::More;
 require "test-functions.pl";
 
 if (can_svn()) {
-    plan tests => 12;
+    plan tests => 13;
 }
 else {
     plan skip_all => 'Cannot find or use svn commands.';
@@ -134,3 +134,26 @@ work_nok('cry pre-unlock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
 svn lock $file
 svn unlock $file
 EOS
+
+set_conf(<<"EOS");
+GENERIC('pre-commit' => sub {
+    `echo -n 1 > $file`;
+});
+
+GENERIC('pre-commit' => sub {
+    `echo -n 2 >> $file`;
+});
+
+GENERIC('post-commit' => sub {
+    `echo -n 3 >> $file`;
+});
+GENERIC('post-commit' => sub {
+    `echo -n 4 >> $file`;
+});
+EOS
+
+do_script(newdir(), <<"EOS");
+svn ci -mx $file
+EOS
+
+ok(`cat $file` eq '1234', 'hook order');

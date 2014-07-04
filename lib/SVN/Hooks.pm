@@ -50,7 +50,7 @@ sub run_hook {
 	$repo_path = SVN::Look->new($repo_path, '-r' => $args[0]);
     }
 
-    foreach my $hook (values %{$Hooks{$hook_name}}) {
+    foreach my $hook (@{$Hooks{$hook_name}}) {
 	if (is_code_ref($hook)) {
 	    $hook->($repo_path, @args);
 	} elsif (is_array_ref($hook)) {
@@ -71,63 +71,63 @@ sub run_hook {
 
 sub POST_COMMIT (&) {
     my ($hook) = @_;
-    $Hooks{'post-commit'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'post-commit'}}, sub { $hook->(@_); };
 }
 
 # post-lock(repos-path, username)
 
 sub POST_LOCK (&) {
     my ($hook) = @_;
-    $Hooks{'post-lock'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'post-lock'}}, sub { $hook->(@_); };
 }
 
 # post-revprop-change(SVN::Look, username, property-name, action)
 
 sub POST_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    $Hooks{'post-revprop-change'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'post-revprop-change'}}, sub { $hook->(@_); };
 }
 
 # post-unlock(repos-path, username)
 
 sub POST_UNLOCK (&) {
     my ($hook) = @_;
-    $Hooks{'post-unlock'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'post-unlock'}}, sub { $hook->(@_); };
 }
 
 # pre-commit(SVN::Look)
 
 sub PRE_COMMIT (&) {
     my ($hook) = @_;
-    $Hooks{'pre-commit'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'pre-commit'}}, sub { $hook->(@_); };
 }
 
 # pre-lock(repos-path, path, username, comment, steal-lock-flag)
 
 sub PRE_LOCK (&) {
     my ($hook) = @_;
-    $Hooks{'pre-lock'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'pre-lock'}}, sub { $hook->(@_); };
 }
 
 # pre-revprop-change(SVN::Look, username, property-name, action)
 
 sub PRE_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    $Hooks{'pre-revprop-change'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'pre-revprop-change'}}, sub { $hook->(@_); };
 }
 
 # pre-unlock(repos-path, path, username, lock-token, break-unlock-flag)
 
 sub PRE_UNLOCK (&) {
     my ($hook) = @_;
-    $Hooks{'pre-unlock'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'pre-unlock'}}, sub { $hook->(@_); };
 }
 
 # start-commit(repos-path, username, capabilities)
 
 sub START_COMMIT (&) {
     my ($hook) = @_;
-    $Hooks{'start-commit'}{$hook} ||= sub { $hook->(@_); };
+    push @{$Hooks{'start-commit'}}, sub { $hook->(@_); };
 }
 
 ## use critic
@@ -364,7 +364,8 @@ returning anything. Otherwise, they must C<die> with a suitable error
 message.
 
 Also note that each hook directive can be called more than once if you
-need to implement more than one specific hook.
+need to implement more than one specific hook. The hooks will run
+in the order they were defined.
 
 =head2 Using Plugins
 
