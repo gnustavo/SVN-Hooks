@@ -2,6 +2,17 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.26      2014-07-04 10:48:58 America/Sao_Paulo
+
+  [Changes]
+
+  - Add directive CHECK_JIRA_DISABLE to SVN::Hooks::CheckJira to disable all
+    CHECK_JIRA directives.
+
+  - Make hooks execute in the order they are defined. Previously, the
+    execution order was unspecified. (Change kindly contributed by
+    DC. Thanks!)
+
 1.25      2014-04-13 16:50:07 America/Sao_Paulo
 
   [Fixes]
