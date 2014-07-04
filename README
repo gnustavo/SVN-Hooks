@@ -18,7 +18,7 @@ It also comes with post-commit hooks for
 
 But as a framework, it can be extended to implement all types of hooks.
 
-Copyright (c) 2012 by CPqD (http://www.cpqd.com.br/)
+Copyright (c) 2008-2014 by CPqD (http://www.cpqd.com.br/)
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

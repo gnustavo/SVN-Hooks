@@ -1,5 +1,3 @@
-# Copyright (C) 2008 by CPqD
-
 use strict;
 use warnings;
 use Cwd;
