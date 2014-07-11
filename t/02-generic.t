@@ -136,24 +136,32 @@ svn unlock $file
 EOS
 
 set_conf(<<"EOS");
-GENERIC('pre-commit' => sub {
-    `echo -n 1 > $file`;
-});
+sub truncate {
+    open FILE, '>', '$file' or die 'Cannot open $file: \$!';
+    close FILE;
+}
 
-GENERIC('pre-commit' => sub {
-    `echo -n 2 >> $file`;
-});
+sub mark {
+    my (\$mark) = \@_;
+    return sub {
+        open FILE, '>>', '$file' or die \"Cannot open $file: \$!\";
+        print FILE \$mark;
+        close FILE;
+    };
+}
 
-GENERIC('post-commit' => sub {
-    `echo -n 3 >> $file`;
-});
-GENERIC('post-commit' => sub {
-    `echo -n 4 >> $file`;
-});
+GENERIC('pre-commit' => \\&truncate);
+GENERIC('pre-commit' => mark(1));
+GENERIC('pre-commit' => mark(2));
+GENERIC('pre-commit' => mark(3));
+GENERIC('pre-commit' => mark(4));
 EOS
 
 do_script(newdir(), <<"EOS");
 svn ci -mx $file
 EOS
 
-ok(`cat $file` eq '1234', 'hook order');
+open FILE, '<', $file or die "Cannot open $file: $!";
+my $marks = <FILE>;
+close FILE;
+ok($marks eq '1234', 'hook order');
