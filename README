@@ -1,4 +1,4 @@
-SVN::Hooks - A framework for implementing Subversion hooks.
+SVN::Hooks - Framework for implementing Subversion hooks
 
 It comes with a bunch of plugins (actually, sub-modules of SVN::Hooks)
 that implement some of the most used standalone Subversion hooks

@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 package SVN::Hooks;
-# ABSTRACT: A framework for implementing Subversion hooks.
+# ABSTRACT: Framework for implementing Subversion hooks
 
 use File::Basename;
 use File::Spec::Functions;
