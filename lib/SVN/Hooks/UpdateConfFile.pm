@@ -44,10 +44,11 @@ FROM can be a string or a qr/Regexp/ specifying the file path relative
 to the repository's root (e.g. "trunk/src/version.c" or
 "qr:^conf/(\w+).conf$:").
 
-TO is a path relative to the C</repo/conf> directory in the server. It can be
-an explicit file name or a directory, in which case the basename of FROM is
-used as the name of the destination file. Non-existing directory components of
-TO are automatically created.
+TO must be a relative path indicating where the original file must be copied
+to below the C</repo/conf> directory in the server. It can be an explicit
+file name or a directory, in which case the basename of FROM is used as the
+name of the destination file. Non-existing directory components of TO are
+automatically created.
 
 Note that if the path doesn't exist the hook assumes that it should be a
 file. To make sure it's understood as a directory you may end it with a
@@ -370,25 +371,26 @@ sub _post_where_to {
         $to = eval qq{"$to"};   ## no critic
     }
 
-    my $is_directory = ($to =~ s:/$::);
-
-    my $abs_to = abs_path(catfile($absbase, $to));
-    if ($is_directory || -d $abs_to) {
-        $abs_to = catfile($abs_to, (File::Spec->splitpath($file))[2]);
-    }
-
-    $absbase eq substr($abs_to, 0, length($absbase))
+    $to !~ m@(?:^|/)\.\.(?:/|$)@
         or croak <<"EOS";
 $HOOK: post-commit aborted for: $file
 
 This means that $file was committed but the associated
 configuration file wasn't generated because its specified
-location ($abs_to)
-isn't below the repository's configuration directory
-($absbase).
+location ($to)
+contains a '..' path component which is not accepted by this hook.
 
 Please, correct the ${HOOK}'s second argument.
 EOS
+
+    my $is_directory = ($to =~ s:/$::);
+
+    $to =~ s:^/+::;
+
+    my $abs_to = catfile($absbase, $to);
+    if ($is_directory || -d $abs_to) {
+        $abs_to = catfile($abs_to, (File::Spec->splitpath($file))[2]);
+    }
 
     return $abs_to;
 }
