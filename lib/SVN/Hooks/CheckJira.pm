@@ -81,7 +81,7 @@ sub CHECK_JIRA_CONFIG {
     if (defined $MatchLog) {
 	is_rx($MatchLog) or croak "CHECK_JIRA_CONFIG: fourth argument must be a Regexp.\n";
     } else {
-	$MatchLog = qr/[A-Z]{2,}/;
+	$MatchLog = qr/(.*)/;
     }
 
     @_ >= 3 && @_ <= 5
