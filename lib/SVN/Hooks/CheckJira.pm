@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use Data::Util qw(:check);
 use SVN::Hooks;
-use JIRA::Client;
+use JIRA::REST;
 
 use Exporter qw/import/;
 my $HOOK = 'CHECK_JIRA';
@@ -144,9 +144,19 @@ each referenced issue with three arguments:
 
 =over
 
-=item the JIRA::Client object used to talk to the JIRA server.
+=item the JIRA::REST object used to talk to the JIRA server.
 
-=item the RemoteIssue object representing the issue.
+Note that up to version 1.26 of SVN::Hooks::CheckJira this used to be a
+JIRA::Client object, which uses JIRA's SOAP API which was deprecated on JIRA
+6.0 and won't be available anymore on JIRA 7.0.
+
+If you have code relying on the JIRA::Client module you're advised to
+rewrite it using the JIRA::REST module. As a stopgap measure you can
+disregard the JIRA::REST object and create your own JIRA::Client object. For
+this you only need the three arguments you've passed to the
+CHECK_JIRA_CONFIG directive.
+
+=item the hash representing the issue.
 
 =item the SVN::Look object used to grok information about the commit.
 
@@ -155,20 +165,19 @@ each referenced issue with three arguments:
 The subroutine must simply return with no value to indicate success
 and must die to indicate failure.
 
-Plese, read the JIRA::Client and SVN::Look modules documentation to
+Plese, read the JIRA::REST and SVN::Look modules documentation to
 understand how to use these objects.
 
 =item check_all => CODE-REF
 
-Sometimes checking each issue separatelly isn't enough. You may want
-to check some relation among all the referenced issues. In this case,
-pass a code reference to this option. It will be called once for the
-commit. Its first argument is the JIRA::Client object used to talk to
-the JIRA server. The following arguments are references to RemoteIssue
-objects for every referenced issue. The last argument is the SVN::Look
-object used to grok information about the commit. The subroutine must
-simply return with no value to indicate success and must die to
-indicate failure.
+Sometimes checking each issue separatelly isn't enough. You may want to
+check some relation among all the referenced issues. In this case, pass a
+code reference to this option. It will be called once for the commit. Its
+first argument is the JIRA::REST object used to talk to the JIRA server. The
+following arguments are references to hashes representing every referenced
+issue. The last argument is the SVN::Look object used to grok information
+about the commit. The subroutine must simply return with no value to
+indicate success and must die to indicate failure.
 
 =item check_all_svnlook => CODE-REF
 
@@ -181,7 +190,7 @@ information about the commit. The rest of the arguments are the same.
 This is not a check, but an opportunity to perform some action after a
 successful commit. The code reference passed will be called once
 during the post-commit hook phase. Its first argument is the
-JIRA::Client object used to talk to the JIRA server. The second
+JIRA::REST object used to talk to the JIRA server. The second
 argument is the SVN::Look object that can be used to inspect all the
 information about the commit proper.  The following arguments are the
 JIRA keys mentioned in the commit log message. The value returned by
@@ -244,7 +253,7 @@ add a comment to each referred issue like this:
             # into the $svnlook reference
 	    $format =~ s/\{(\w+)\}/"\$svnlook->$1()"/eeg;
             for my $key (@keys) {
-                $jira->addComment($key, $format);
+                $jira->POST("/issue/$key/comment", undef, { body => $format });
             }
         }
     }
@@ -348,19 +357,20 @@ sub _pre_checks {
     # Grok and check each JIRA issue
     my @issues;
     foreach my $key (@$keys) {
-	my $issue = eval {$JIRA->getIssue($key)};
+	my $issue = eval {$JIRA->GET("/issue/$key")};
 	if ($opts->{valid}) {
 	    croak "$HOOK: issue $key is not valid: $@\n" if $@;
 	}
 	$issue or next;
 	if ($opts->{unresolved}) {
 	    croak "$HOOK: issue $key is already resolved.\n"
-		if defined $issue->{resolution};
+		if defined $issue->{fields}{resolution};
 	}
 	if ($opts->{by_assignee}) {
 	    my $author = $svnlook->author();
-	    croak "$HOOK: committer ($author) is different from issue ${key}'s assignee ($issue->{assignee}).\n"
-		if $author ne $issue->{assignee};
+            my $assignee = $issue->{fields}{assignee}{name};
+	    croak "$HOOK: committer ($author) is different from issue ${key}'s assignee ($assignee).\n"
+		if $author ne $assignee;
 	}
 	if (my $check = $opts->{check_one}) {
 	    $check->($JIRA, $issue, $svnlook);
@@ -431,7 +441,7 @@ sub _check_if_needed {
 
 		# Connect to JIRA if not yet connected.
 		unless (defined $JIRA) {
-		    $JIRA = eval {JIRA::Client->new($BaseURL, $Login, $Passwd)};
+		    $JIRA = eval {JIRA::REST->new($BaseURL, $Login, $Passwd)};
 		    croak "CHECK_JIRA_CONFIG: cannot connect to the JIRA server: $@\n" if $@;
 		}
 
@@ -457,3 +467,15 @@ sub post_commit {
 }
 
 1; # End of SVN::Hooks::CheckJira
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<JIRA::REST>
+
+=item * L<JIRA::Client>
+
+=item * L<JIRA SOAP API deprecation notice|https://developer.atlassian.com/display/JIRADEV/SOAP+and+XML-RPC+API+Deprecated+in+JIRA+6.0>
+
+=back

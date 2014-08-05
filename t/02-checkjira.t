@@ -10,8 +10,8 @@ require "test-functions.pl";
 if (not can_svn()) {
     plan skip_all => 'Cannot find or use svn commands.';
 }
-elsif (not eval {require JIRA::Client}) {
-    plan skip_all => 'Need JIRA::Client';
+elsif (not eval {require JIRA::REST}) {
+    plan skip_all => 'Need JIRA::REST';
 }
 else {
     plan tests => 16;
@@ -112,10 +112,10 @@ CHECK_JIRA_CONFIG('http://no.way.to.get.there', 'user', 'pass');
 CHECK_JIRA(qr/./);
 EOS
 
-    work_nok('no server', 'CHECK_JIRA_CONFIG: cannot connect to the JIRA server:', work('[TST-1] no server'));
+    work_nok('no server', 'Bad hostname', work('[TST-1] no server'));
 
     my $config = <<'EOS';
-CHECK_JIRA_CONFIG('http://jira.atlassian.com/', 'jiraclient', '4jCSVpK7', qr/^\[([^\]]+)\]/);
+CHECK_JIRA_CONFIG('https://jira.atlassian.com/', 'gustavo+jiraclient@gnustavo.com', 'W3PvT&9q0d^HLG0n', qr/^\[([^\]]+)\]/);
 EOS
 
     set_conf($config . <<'EOS');
@@ -130,19 +130,19 @@ sub fix_for {
     return sub {
 	my ($jira, $issue, $svnlook) = @_;
 	die "CHECK_JIRA: missing SVN::Look object" unless ref $svnlook eq 'SVN::Look';
-	foreach my $fv ($issue->{fixVersion}) {
-	    return if $version eq $fv;
+	foreach my $fv (@{$issue->{fields}{fixVersion}}) {
+	    return if $version eq $fv->{name};
 	}
 	die "CHECK_JIRA: issue $issue->{key} not scheduled for version $version.\n";
     }
 }
 
-CHECK_JIRA(qr/./, {check_one => fix_for('future-version')});
+CHECK_JIRA(qr/./, {check_one => fix_for('A version')});
 EOS
 
     work_nok('no keys', 'CHECK_JIRA: you must cite at least one JIRA issue key in the commit message', work('no keys'));
 
     work_nok('not valid', 'CHECK_JIRA: issue ZYX-1 is not valid:', work('[ZYX-1]'));
 
-    work_nok('check_one', 'CHECK_JIRA: issue TST-18099 not scheduled for version future-version.', work('[TST-18099]'));
+    work_nok('check_one', 'CHECK_JIRA: issue TST-55263 not scheduled for version future-version.', work('[TST-55263]'));
 }
