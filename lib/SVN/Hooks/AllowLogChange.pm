@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::AllowLogChange;
 # ABSTRACT: Allow changes in revision log messages.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

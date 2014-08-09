@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::CheckMimeTypes;
 # ABSTRACT: Require the svn:mime-type property.
+
+use strict;
+use warnings;
 
 use Carp;
 use SVN::Hooks;

@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::JiraAcceptance;
 # ABSTRACT: Integrate Subversion with the JIRA ticketing system.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

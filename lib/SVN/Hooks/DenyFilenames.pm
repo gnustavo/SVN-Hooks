@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::DenyFilenames;
 # ABSTRACT: Deny some file names.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

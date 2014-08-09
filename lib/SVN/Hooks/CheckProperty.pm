@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::CheckProperty;
 # ABSTRACT: Check properties in added files.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

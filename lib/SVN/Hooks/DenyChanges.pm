@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::DenyChanges;
 # ABSTRACT: Deny some changes in a repository.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::CheckStructure;
 # ABSTRACT: Check the structure of a repository.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

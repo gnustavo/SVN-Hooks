@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::CheckCapability;
 # ABSTRACT: Check the svn client capabilities.
+
+use strict;
+use warnings;
 
 use Carp;
 use SVN::Hooks;

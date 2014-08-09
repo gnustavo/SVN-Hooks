@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::Notify;
 # ABSTRACT: Subversion activity notification.
+
+use strict;
+use warnings;
 
 use SVN::Hooks;
 

@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::CheckLog;
 # ABSTRACT: Check log messages in commits.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

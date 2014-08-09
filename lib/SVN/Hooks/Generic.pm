@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::Generic;
 # ABSTRACT: Implement generic checks for all Subversion hooks.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

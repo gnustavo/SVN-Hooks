@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::Mailer;
 # ABSTRACT: Send emails after successful commits.
+
+use strict;
+use warnings;
 
 use Carp;
 use SVN::Hooks;

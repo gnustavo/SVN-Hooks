@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::UpdateConfFile;
 # ABSTRACT: Maintain the repository configuration versioned.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);
@@ -368,7 +368,7 @@ sub _post_where_to {
     } else {
         return if $file !~ $from;
         # interpolate backreferences
-        $to = eval qq{"$to"};   ## no critic
+        $to = eval qq{"$to"};   ## no critic (BuiltinFunctions::ProhibitStringyEval)
     }
 
     $to !~ m@(?:^|/)\.\.(?:/|$)@

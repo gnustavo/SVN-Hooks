@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package SVN::Hooks::AllowPropChange;
 # ABSTRACT: Allow changes in revision properties.
+
+use strict;
+use warnings;
 
 use Carp;
 use Data::Util qw(:check);

@@ -1,1 +1,2 @@
 exclude = ProhibitSubroutinePrototypes
+exclude = ProhibitAutomaticExportation
