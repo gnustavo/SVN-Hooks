@@ -565,3 +565,7 @@ But as these are exactly the arguments Subversion passes when it calls
 the hooks, you usually call C<run_hook> like this:
 
 	run_hook($0, @ARGV);
+
+=head1 REPOSITORY
+
+L<https://github.com/gnustavo/SVN-Hooks>
