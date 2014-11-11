@@ -55,7 +55,7 @@ The function signatures are the following:
 
 =item pre-unlock(repos-path, path, username, lock-token, break-unlock-flag)
 
-=item start-commit(repos-path, username, capabilities)
+=item start-commit(repos-path, username, capabilities, txt-name)
 
 =back
 
@@ -67,7 +67,7 @@ performing the Subversion action which triggered the hook.
 The sketch below shows how this directive could be used.
 
 	sub my_start_commit {
-	    my ($repo_path, $username, $capabilities) = @_;
+	    my ($repo_path, $username, $capabilities, $txt_name) = @_;
 	    # ...
 	}
 

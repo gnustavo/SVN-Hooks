@@ -133,7 +133,7 @@ sub PRE_UNLOCK (&) {
     return;
 }
 
-# start-commit(repos-path, username, capabilities)
+# start-commit(repos-path, username, capabilities, txt-name)
 
 sub START_COMMIT (&) {
     my ($hook) = @_;
@@ -157,7 +157,7 @@ A single script can implement several hooks:
 	use SVN::Hooks;
 
 	START_COMMIT {
-	    my ($repo_path, $username, $capabilities) = @_;
+	    my ($repo_path, $username, $capabilities, $txt_name) = @_;
 	    # ...
 	};
 
@@ -332,7 +332,7 @@ L<SVN::Look> documentation to know how to use it.)
 
 =item * PRE_UNLOCK(repos-path, path, username, lock-token, break-unlock-flag)
 
-=item * START_COMMIT(repos-path, username, capabilities)
+=item * START_COMMIT(repos-path, username, capabilities, txt-name)
 
 =back
 
@@ -345,7 +345,7 @@ This is an example of a script implementing two hooks:
 	# ...
 
 	START_COMMIT {
-	    my ($repos_path, $username, $capabilities) = @_;
+	    my ($repos_path, $username, $capabilities, $txt_name) = @_;
 
 	    exists $committers{$username}
 		or die "User '$username' is not allowed to commit.\n";
@@ -541,7 +541,7 @@ called, like this:
 
 =over
 
-=item * start-commit repo-path user capabilities
+=item * start-commit repo-path user capabilities txt-name
 
 =item * pre-commit repo-path txn
 

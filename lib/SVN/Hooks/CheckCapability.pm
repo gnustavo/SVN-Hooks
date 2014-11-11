@@ -48,7 +48,7 @@ sub CHECK_CAPABILITY {
 }
 
 sub start_commit {
-    my ($repo_path, $user, $capabilities) = @_;
+    my ($repo_path, $user, $capabilities, $txt_name) = @_;
 
     $capabilities ||= ''; # pre 1.5 svn clients don't pass the capabilities
 
