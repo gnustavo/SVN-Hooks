@@ -35,6 +35,7 @@ sub run_hook {
 
         # The configuration file must be evaluated in the main:: namespace
 	package main;
+
 	unless (my $return = do $conffile) {
 	    die "couldn't parse '$conffile': $@\n" if $@;
 	    die "couldn't do '$conffile': $!\n"    unless defined $return;
