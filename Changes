@@ -2,6 +2,18 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.28      2015-02-18 09:33:41-02:00 America/Sao_Paulo
+
+  [Internal changes]
+
+  - Clean up module prerequisite list in dist.ini.
+    
+  - Use Dist::Zilla::Plugin::MetaProvide to insert provides into META.yml.
+    
+  - Replace README with brian d foy's README.pod template.
+    
+  - Update documentation.
+
 1.27      2014-08-09 17:04:45 America/Sao_Paulo
 
   [Fixes]
