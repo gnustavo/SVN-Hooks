@@ -25,6 +25,19 @@ sub can_svn {
     return 1;
 }
 
+sub svn_version {
+    open my $pipe, '-|', "svn --version" or die;
+    my $version = <$pipe>;
+    local $/ = undef;           # slurp mode to read everything else up
+    <$pipe>;
+    close $pipe or die;
+    if ($version =~ /version ([\d\.]+)/) {
+        return $1;
+    } else {
+        die "Couldn't grok version from 'svn --version' command";
+    }
+}
+
 our $T;
 
 sub newdir {

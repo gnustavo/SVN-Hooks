@@ -114,26 +114,30 @@ work_nok('cry pre-revprop-change' => 'SVN::Look=HASH', <<"EOS");
 svn ps svn:log --revprop -r 1 'changed' $t/wc
 EOS
 
-set_conf(<<'EOS');
+SKIP: {
+    skip 'SVN 1.9.x has a bug on the pre-lock/pre-unlock hooks', 2 if svn_version() =~ /^1\.9\./;
+
+    set_conf(<<'EOS');
 GENERIC(
     'pre-lock' => sub { die join(',',@_), "\n"; },
 );
 EOS
 
-work_nok('cry pre-lock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
+    work_nok('cry pre-lock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
 svn lock -mx $file
 EOS
 
-set_conf(<<'EOS');
+    set_conf(<<'EOS');
 GENERIC(
     'pre-unlock' => sub { die join(',',@_), "\n"; },
 );
 EOS
 
-work_nok('cry pre-unlock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
+    work_nok('cry pre-unlock' => qr:\Q$repo\E,/?file.txt,:, <<"EOS");
 svn lock $file
 svn unlock $file
 EOS
+}
 
 set_conf(<<"EOS");
 sub truncate {
