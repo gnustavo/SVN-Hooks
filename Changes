@@ -2,6 +2,16 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.29      2015-08-24 08:20:10-03:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Andrey Starodubtsev contributed fixes to make tests pass on Windows.
+
+  - Subversion 1.9.0 seems to have a bug on the pre-lock/pre-unlock hooks
+    that makes the commands lock/unlock succeed even if the hooks fail. This
+    release skips tests using those hooks when using svn 1.9.
+
 1.28      2015-02-18 09:33:41-02:00 America/Sao_Paulo
 
   [Internal changes]
