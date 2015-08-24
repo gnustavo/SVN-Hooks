@@ -87,7 +87,7 @@ ok(my $author = get_author($t), 'grok author');
 
 set_conf(<<"EOS");
 DENY_ADDITION(qr/add/);
-DENY_EXCEPT_USERS($author);
+DENY_EXCEPT_USERS('$author');
 EOS
 
 work_ok('except user', <<"EOS");

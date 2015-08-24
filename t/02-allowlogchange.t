@@ -62,7 +62,7 @@ svn ps svn:log --revprop -r 1 value $repo
 EOS
 
 set_conf(<<"EOS");
-ALLOW_LOG_CHANGE($author);
+ALLOW_LOG_CHANGE('$author');
 EOS
 
 work_ok('can modify', <<"EOS");
