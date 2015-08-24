@@ -113,7 +113,9 @@ EOS
     # ":/bin:/usr/bin". During the tests we try to set up the hooks so
     # that they will use the PATH as it is in the test environment.
     if (defined $ENV{PATH} and length $ENV{PATH}) {
-	print $fd "BEGIN { \$ENV{PATH} = '$ENV{PATH}' }\n";
+	my $path = $ENV{PATH};
+	$path =~ s/\\$//;
+	print $fd "BEGIN { \$ENV{PATH} = '$path' }\n";
     }
 
     if (defined $ENV{PERL5LIB} and length $ENV{PERL5LIB}) {

@@ -27,7 +27,7 @@ UPDATE_CONF_FILE();
 EOS
 
 work_nok('require first arg', 'UPDATE_CONF_FILE: invalid first argument.', <<"EOS");
-echo asdf >$file
+echo asdf>$file
 svn add -q --no-auto-props $file
 svn ci -mx $file
 EOS
@@ -127,7 +127,7 @@ my $validate  = catfile($wc, 'validate');
 my $cvalidate = catfile($conf, 'validate');
 
 work_ok('update valid', <<"EOS");
-echo asdf >$validate
+echo asdf>$validate
 svn add -q --no-auto-props $validate
 svn ci -mx $validate
 $perl $cmp $validate $cvalidate
@@ -152,7 +152,7 @@ EOS
 }
 
 work_ok('generate', <<"EOS");
-echo asdf >$generate
+echo asdf>$generate
 svn add -q --no-auto-props $generate
 svn ci -mx $generate
 $perl $cmp $generated $cgenerate
@@ -169,7 +169,7 @@ sub actuate {
     my ($text, $file, $svnlook) = @_;
     die "undefined second argument" unless defined $file;
     die "undefined third argument" unless defined $svnlook;
-    open F, '>', "TTT/repo/conf/really-actuated" or die $!;
+    open F, '>', 'TTT/repo/conf/really-actuated' or die $!;
     print F $text;
     close F;
 }
@@ -188,7 +188,7 @@ my $subfile  = catfile($wc, 'subfile');
 my $csubfile = catfile($subdir, 'subfile');
 
 work_ok('to subdir', <<"EOS");
-echo asdf >$subfile
+echo asdf>$subfile
 svn add -q --no-auto-props $subfile
 svn ci -mx $subfile
 $perl $cmp $subfile $csubfile
@@ -198,7 +198,7 @@ my $outfile = catfile($wc, 'outfile');
 my $coutfile = catfile($t, 'repo', 'outdir', 'outfile');
 
 work_nok('to outdir', '', <<"EOS");
-echo asdf >$outfile
+echo asdf>$outfile
 svn add -q --no-auto-props $outfile
 svn ci -mx $outfile
 $perl $cmp $outfile $coutfile
@@ -207,7 +207,7 @@ EOS
 my $cfile1 = catfile($conf, '1-file');
 
 work_ok('regexp', <<"EOS");
-echo asdf >${file}1
+echo asdf>${file}1
 svn add -q --no-auto-props ${file}1
 svn ci -mx ${file}1
 $perl $cmp ${file}1 $cfile1
@@ -217,7 +217,7 @@ my $actuate  = catfile($wc, 'actuate');
 my $cactuate = catfile($conf, 'really-actuated');
 
 work_ok('actuate', <<"EOS");
-echo asdf >$actuate
+echo asdf>$actuate
 svn add -q --no-auto-props $actuate
 svn ci -mx $actuate
 $perl $cmp $actuate $cactuate
@@ -241,8 +241,8 @@ my $removeable  = catfile($wc, 'removeable');
 my $cremoveable = catfile($conf, 'removeable');
 
 work_ok('setup delete test', <<"EOS");
-echo asdf >$unremoveable
-echo asdf >$removeable
+echo asdf>$unremoveable
+echo asdf>$removeable
 svn add -q --no-auto-props $unremoveable $removeable
 svn ci -mx $unremoveable $removeable
 EOS
