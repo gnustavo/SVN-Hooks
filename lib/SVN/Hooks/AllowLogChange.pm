@@ -28,7 +28,7 @@ It's configured by the following directive.
 =head2 ALLOW_LOG_CHANGE(WHO, ...)
 
 This directive enables the change of revision log messages, which are
-mantained in the C<svn:log> revision property.
+maintained in the C<svn:log> revision property.
 
 The optional WHO argument specifies the users that are allowed to make
 those changes. If absent, any user can change a log

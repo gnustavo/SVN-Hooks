@@ -56,7 +56,7 @@ forward slash (/).
 
 If FROM is a qr/Regexp/, TO is evaluated as a string in order to allow
 for the interpolation of capture buffers from the regular
-expression. This is useful to map the copy operation to a diferent
+expression. This is useful to map the copy operation to a different
 directory structure. For example, this configuration
 "qr:^conf/(\w+).conf$: => '$1.conf'" updates any .conf file in the
 repository conf directory.
