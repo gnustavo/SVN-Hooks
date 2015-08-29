@@ -9,7 +9,9 @@ use URI::file;
 use Config;
 
 # Make sure the svn messages come in English.
-$ENV{LC_MESSAGES} = 'C';
+# https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+$ENV{LC_ALL} = 'C';
+delete $ENV{LANGUAGE};
 
 sub can_svn {
   CMD:
@@ -34,7 +36,7 @@ sub svn_version {
     if ($version =~ /version ([\d\.]+)/) {
         return $1;
     } else {
-        die "Couldn't grok version from 'svn --version' command";
+        die "Couldn't grok version from 'svn --version' command output: '$version'";
     }
 }
 
