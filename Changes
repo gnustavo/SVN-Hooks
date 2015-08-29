@@ -2,6 +2,12 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.30      2015-08-29 13:19:57-03:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Make sure tests are performed using the C locale.
+
 1.29      2015-08-24 08:20:10-03:00 America/Sao_Paulo
 
   [Fixes]
