@@ -2,6 +2,18 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.31      2015-11-26 23:13:57-02:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Fix bug introduced in version 1.26 that made hooks be invoked as many
+    times as their plugin directives was used. For example, if the
+    CHECK_JIRA directive was used 10 times to configure the CheckJira
+    plugin, the pre-commit function hook was invoked 10 times too! Hooks
+    that just checked conditions were made slower by this bug, but hooks
+    that performed actions (such as sending notifications) would execute
+    them multiple times, with probably bad effects.
+
 1.30      2015-08-29 13:19:57-03:00 America/Sao_Paulo
 
   [Fixes]
