@@ -53,7 +53,7 @@ sub run_hook {
 	$repo_path = SVN::Look->new($repo_path, '-r' => $args[0]);
     }
 
-    foreach my $hook (@{$Hooks{$hook_name}}) {
+    foreach my $hook (@{$Hooks{$hook_name}{list}}) {
 	if (is_code_ref($hook)) {
 	    $hook->($repo_path, @args);
 	} elsif (is_array_ref($hook)) {
@@ -74,7 +74,10 @@ sub run_hook {
 
 sub POST_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Hooks{'post-commit'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'post-commit'}{set}{$hook}) {
+        push @{$Hooks{'post-commit'}{list}},
+            ($Hooks{'post-commit'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -82,7 +85,10 @@ sub POST_COMMIT (&) {
 
 sub POST_LOCK (&) {
     my ($hook) = @_;
-    push @{$Hooks{'post-lock'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'post-lock'}{set}{$hook}) {
+        push @{$Hooks{'post-lock'}{list}},
+            ($Hooks{'post-lock'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -90,7 +96,10 @@ sub POST_LOCK (&) {
 
 sub POST_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    push @{$Hooks{'post-revprop-change'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'post-revprop-change'}{set}{$hook}) {
+        push @{$Hooks{'post-revprop-change'}{list}},
+            ($Hooks{'post-revprop-change'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -98,7 +107,10 @@ sub POST_REVPROP_CHANGE (&) {
 
 sub POST_UNLOCK (&) {
     my ($hook) = @_;
-    push @{$Hooks{'post-unlock'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'post-unlock'}{set}{$hook}) {
+        push @{$Hooks{'post-unlock'}{list}},
+            ($Hooks{'post-unlock'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -106,7 +118,10 @@ sub POST_UNLOCK (&) {
 
 sub PRE_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Hooks{'pre-commit'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'pre-commit'}{set}{$hook}) {
+        push @{$Hooks{'pre-commit'}{list}},
+            ($Hooks{'pre-commit'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -114,7 +129,10 @@ sub PRE_COMMIT (&) {
 
 sub PRE_LOCK (&) {
     my ($hook) = @_;
-    push @{$Hooks{'pre-lock'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'pre-lock'}{set}{$hook}) {
+        push @{$Hooks{'pre-lock'}{list}},
+            ($Hooks{'pre-lock'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -122,7 +140,10 @@ sub PRE_LOCK (&) {
 
 sub PRE_REVPROP_CHANGE (&) {
     my ($hook) = @_;
-    push @{$Hooks{'pre-revprop-change'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'pre-revprop-change'}{set}{$hook}) {
+        push @{$Hooks{'pre-revprop-change'}{list}},
+            ($Hooks{'pre-revprop-change'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -130,7 +151,10 @@ sub PRE_REVPROP_CHANGE (&) {
 
 sub PRE_UNLOCK (&) {
     my ($hook) = @_;
-    push @{$Hooks{'pre-unlock'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'pre-unlock'}{set}{$hook}) {
+        push @{$Hooks{'pre-unlock'}{list}},
+            ($Hooks{'pre-unlock'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 
@@ -138,7 +162,10 @@ sub PRE_UNLOCK (&) {
 
 sub START_COMMIT (&) {
     my ($hook) = @_;
-    push @{$Hooks{'start-commit'}}, sub { $hook->(@_); };
+    unless (exists $Hooks{'start-commit'}{set}{$hook}) {
+        push @{$Hooks{'start-commit'}{list}},
+            ($Hooks{'start-commit'}{set}{$hook} = sub { $hook->(@_); });
+    }
     return;
 }
 

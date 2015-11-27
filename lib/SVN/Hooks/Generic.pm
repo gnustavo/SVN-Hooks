@@ -101,7 +101,10 @@ sub GENERIC {
 	}
 	foreach my $foo (@$functions) {
 	    is_code_ref($foo) or die "$HOOK: hook '$hook' should be mapped to CODE-refs.\n";
-	    push @{$SVN::Hooks::Hooks{$hook}}, sub { $foo->(@_); };
+            unless (exists $SVN::Hooks::Hooks{$hook}{set}{$foo}) {
+                push @{$SVN::Hooks::Hooks{$hook}{list}},
+                    ($SVN::Hooks::Hooks{$hook}{set}{$foo} = sub { $foo->(@_); });
+            }
 	}
     }
 
