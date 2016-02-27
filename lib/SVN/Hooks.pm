@@ -70,7 +70,7 @@ sub run_hook {
 
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
 
-# post-commit(SVN::Look)
+# post-commit(SVN::Look, revision, txn-name)
 
 sub POST_COMMIT (&) {
     my ($hook) = @_;
@@ -92,7 +92,7 @@ sub POST_LOCK (&) {
     return;
 }
 
-# post-revprop-change(SVN::Look, username, property-name, action)
+# post-revprop-change(SVN::Look, revision, username, property-name, action)
 
 sub POST_REVPROP_CHANGE (&) {
     my ($hook) = @_;
@@ -114,7 +114,7 @@ sub POST_UNLOCK (&) {
     return;
 }
 
-# pre-commit(SVN::Look)
+# pre-commit(SVN::Look, txn-name)
 
 sub PRE_COMMIT (&) {
     my ($hook) = @_;
@@ -136,7 +136,7 @@ sub PRE_LOCK (&) {
     return;
 }
 
-# pre-revprop-change(SVN::Look, username, property-name, action)
+# pre-revprop-change(SVN::Look, revision, username, property-name, action)
 
 sub PRE_REVPROP_CHANGE (&) {
     my ($hook) = @_;
@@ -158,7 +158,15 @@ sub PRE_UNLOCK (&) {
     return;
 }
 
-# start-commit(repos-path, username, capabilities, txt-name)
+# <  1.8: start-commit(repos-path, username, capabilities)
+# >= 1.8: start-commit(repos-path, username, capabilities, txn-name)
+
+# Subversion 1.8 added a txn-name argument to the start-commit. However it's
+# only good to get at the commit properties but not to know about the files
+# being changed by the commit, which would allow us to use the start-commit
+# to perform many of the checks that we perform currently in the pre-commit
+# hook. So, for now I'm not going to use the new argument to construct a
+# SVN::Look object, since it is mostly useless anyway.
 
 sub START_COMMIT (&) {
     my ($hook) = @_;
@@ -185,7 +193,7 @@ A single script can implement several hooks:
 	use SVN::Hooks;
 
 	START_COMMIT {
-	    my ($repo_path, $username, $capabilities, $txt_name) = @_;
+	    my ($repo_path, $username, $capabilities, $txn_name) = @_;
 	    # ...
 	};
 
@@ -360,7 +368,7 @@ L<SVN::Look> documentation to know how to use it.)
 
 =item * PRE_UNLOCK(repos-path, path, username, lock-token, break-unlock-flag)
 
-=item * START_COMMIT(repos-path, username, capabilities, txt-name)
+=item * START_COMMIT(repos-path, username, capabilities, txn-name)
 
 =back
 
@@ -373,7 +381,7 @@ This is an example of a script implementing two hooks:
 	# ...
 
 	START_COMMIT {
-	    my ($repos_path, $username, $capabilities, $txt_name) = @_;
+	    my ($repos_path, $username, $capabilities, $txn_name) = @_;
 
 	    exists $committers{$username}
 		or die "User '$username' is not allowed to commit.\n";
@@ -569,7 +577,7 @@ called, like this:
 
 =over
 
-=item * start-commit repo-path user capabilities txt-name
+=item * start-commit repo-path user capabilities txn-name
 
 =item * pre-commit repo-path txn
 
