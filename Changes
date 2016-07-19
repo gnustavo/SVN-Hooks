@@ -2,6 +2,14 @@ Revision history for SVN-Hooks. -*- text -*-
 
 {{$NEXT}}
 
+1.32      2016-07-19 14:05:37-03:00 America/Sao_Paulo
+
+  [Changes]
+
+  - Now hooks can assume they run with their current directory set to the
+    repository's roor directory on the server. Previously they could not
+    assume anything, since Subversion does not specify where the hooks run.
+
 1.31      2015-11-26 23:13:57-02:00 America/Sao_Paulo
 
   [Fixes]
