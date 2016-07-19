@@ -28,6 +28,9 @@ sub run_hook {
 
     $Repo = $repo_path;
 
+    # Allow all hooks assume they execute on the repository's root directory
+    chdir $repo_path or die "cannot chdir to $repo_path: $!\n";
+
     # Reload all configuration files
     foreach my $conf (@Conf_Files) {
 	my $conffile = file_name_is_absolute($conf) ? $conf : catfile($Repo, $conf);
@@ -262,6 +265,11 @@ under Windows). Because of this, many administrators are baffled when
 their hook program runs fine by hand, but doesn't work when run by
 Subversion. Be sure to explicitly set any necessary environment
 variables in your hook program and/or use absolute paths to programs."
+
+Not even the current directory where the hooks run is specified by
+Subversion. However, the hooks executed by the SVN::Hooks framework run with
+their currect directory set to the repository's root directory in the
+server. This can be useful sometimes.
 
 There are several useful hook scripts available elsewhere
 L<http://svn.apache.org/repos/asf/subversion/trunk/contrib/hook-scripts/>,
