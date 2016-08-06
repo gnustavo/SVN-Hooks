@@ -213,7 +213,7 @@ against the STRUCT_DEF.
 The function returns true if the check succeeds and dies with a proper
 message otherwise.
 
-The funcion is intended to check paths as they're shown by the 'svn
+The function is intended to check paths as they're shown by the 'svn
 ls' command, i.e., with no leading slashes and with a trailing slash
 to indicate directories. The leading slash is assumed if it's missing,
 but the trailing slash is needed to indicate directories.

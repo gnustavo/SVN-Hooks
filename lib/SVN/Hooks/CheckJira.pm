@@ -41,7 +41,7 @@ to match against the commit logs in order to extract the list of JIRA
 issue keys. By default, the JIRA keys are looked for in the whole
 commit log, which is equivalent to qr/(.*)/. Sometimes this can be
 suboptimal because the user can introduce in the message some text
-that inadvertently looks like a JIRA issue key whithout being so. With
+that inadvertently looks like a JIRA issue key without being so. With
 this argument, the log message is matched against the REGEXP and only
 the first matched group (i.e., the part of the message captured by the
 first parenthesis (C<$1>)) is used to look for JIRA issue keys.
@@ -109,7 +109,7 @@ The available options are the following:
 
 =item projects => 'PROJKEYS'
 
-By default, the commiter can reference any JIRA issue in the commit
+By default, the committer can reference any JIRA issue in the commit
 log. You can restrict the allowed keys to a set of JIRA projects by
 specifying a comma-separated list of project keys to this option.
 
@@ -132,8 +132,8 @@ false value to this option.
 
 =item by_assignee => [01]
 
-By default, the commiter can reference any valid JIRA issue. Passing a
-true value to this option you require that the commiter can only
+By default, the committer can reference any valid JIRA issue. Passing a
+true value to this option you require that the committer can only
 reference issues to which she is the current assignee.
 
 =item check_one => CODE-REF
@@ -228,11 +228,11 @@ commit, do this:
 
 The C<'post_action'> pseudo-check can be used to interact with the
 JIRA server after a successful commit. For instance, you may want to
-add a comment to each refered issue like this:
+add a comment to each referred issue like this:
 
     # This routine returns a closure that can be passed to
     # post_action.  The closure receives a string to be added as a
-    # comment to each issue refered to by the commit message. The
+    # comment to each issue referred to by the commit message. The
     # commit info can be interpolated inside the comment using the
     # SVN::Look method names inside angle brackets.
 

@@ -60,7 +60,7 @@ sub JIRA_CONFIG {
 By default the JIRA references are looked for in the commit log
 message as a whole. Sometimes this can be suboptimal because the user
 can introduce in the message some text that inadvertently looks like a
-JIRA reference whithout being so.
+JIRA reference without being so.
 
 With this directive, the log message is matched against the REGEXP and
 only the first group matched (i.e., the part of the message captured
