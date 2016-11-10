@@ -27,7 +27,6 @@ use SVN::Hooks::CheckStructure;
 use SVN::Hooks::DenyChanges;
 use SVN::Hooks::DenyFilenames;
 use SVN::Hooks::Generic;
-use SVN::Hooks::JiraAcceptance;
 use SVN::Hooks::Mailer;
 use SVN::Hooks::Notify;
 use SVN::Hooks::UpdateConfFile;
