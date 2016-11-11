@@ -123,7 +123,7 @@ command above.
 
 =item rotate => NUMBER
 
-By default, after each successful commit the TO file is overwriten by
+By default, after each successful commit the TO file is overwritten by
 the new contents of FROM. With this option, the last NUMBER versions
 of TO are kept on disk with numeric suffixes ranging from C<.0> to
 C<.NUMBER-1>. This can be useful, for instance, in case you manage to
