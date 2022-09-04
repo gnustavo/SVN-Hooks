@@ -184,7 +184,6 @@ sub UPDATE_CONF_FILE {
 	    } elsif (is_array_ref($what)) {
 		# This should point to list of command arguments
 		@$what > 0    or croak "$HOOK: $function argument must have at least one element.\n";
-		-x $what->[0] or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
 		$confs{$function} = _functor($what);
 	    } else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
